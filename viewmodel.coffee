@@ -1,4 +1,4 @@
-class @ViewModel
+class ViewModel
   bindingToken = RegExp("\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*'|/(?:[^/\\\\]|\\\\.)*/w*|[^\\s:,/][^,\"'{}()/:[\\]]*[^\\s,\"'{}()/:[\\]]|[^\\s]","g")
   divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/
   keywordRegexLookBehind =
