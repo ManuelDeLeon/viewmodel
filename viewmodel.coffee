@@ -357,12 +357,12 @@ class ViewModel
     addHelper = (name, template, that) ->
       Template[template][name] = -> that[name]()
 
+    reservedWords = ['bind', 'extend', 'addHelpers', 'toJS', 'fromJS', '_addDelayedProperty', '_delayed', '_id', 'dispose']
+
     @addHelpers = (template) =>
-      for p in properties
+      for p of @ when p not in reservedWords
         addHelper p, template, @
       @
-
-    reservedWords = ['bind', 'extend', 'addHelpers', 'toJS', 'fromJS', '_addDelayedProperty', '_delayed', '_id', 'dispose']
 
     @toJS = (includeFunctions) =>
       ret = {}
