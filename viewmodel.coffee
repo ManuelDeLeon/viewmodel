@@ -83,19 +83,23 @@ class ViewModel
       p.element.bind p.bindName, -> p.vm[p.property]()
 
   @addBind 'value', (p) ->
+    delayTime = p.elementBind['delay'] or 1
+    delayName = p.vm._id + '_' + p.bindName + "_" + p.property
     p.autorun (c) ->
       newValue = p.vm[p.property]()
-      p.element.val newValue if p.element.val() isnt newValue
+      if p.element.val() isnt newValue
+        p.element.val newValue
+
       return if c.firstRun
-      delay 750, p.vm._id + '_' + p.property, ->
+      delay 750, delayName, ->
         p.vm._delayed[p.property] newValue if p.vm._delayed[p.property]() isnt newValue
 
     p.vm._addDelayedProperty p.property, p.vm[p.property](), p.vm
     p.element.bind "cut paste keypress input", (ev) ->
-      delay 1, p.vm._id + '_' + p.property, ->
+      delay delayTime, delayName, ->
         newValue = p.element.val()
         p.vm[p.property] newValue if p.vm[p.property]() isnt newValue
-
+      delay 1, ->
         if p.elementBind.returnKey and 13 in [ev.which, ev.keyCode]
           p.vm[p.elementBind.returnKey]()
 
@@ -355,7 +359,9 @@ class ViewModel
       @
 
     addHelper = (name, template, that) ->
-      Template[template][name] = -> that[name]()
+      obj = {}
+      obj[name] = -> that[name]()
+      Template[template].helpers obj
 
     reservedWords = ['bind', 'extend', 'addHelpers', 'toJS', 'fromJS', '_addDelayedProperty', '_delayed', '_id', 'dispose']
 
