@@ -3,6 +3,7 @@
 /.build
 /packages
 /c
+/p
 /*.iml
 /.idea
 /smart.lock
