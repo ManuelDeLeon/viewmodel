@@ -102,8 +102,7 @@ class ViewModel
       delay 1, ->
         if p.elementBind.returnKey and 13 in [ev.which, ev.keyCode]
           p.vm[p.elementBind.returnKey]()
-
-
+      false
 
   @addBind 'checked', (p) ->
     p.autorun ->
