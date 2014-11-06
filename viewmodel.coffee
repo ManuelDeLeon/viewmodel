@@ -260,6 +260,7 @@ class ViewModel
     obj = p2 || p1
     dependencies = {}
     values = {}
+    initialValues = {}
     dependenciesDelayed = {}
     valuesDelayed = {}
     @_delayed = {}
@@ -282,6 +283,7 @@ class ViewModel
     addProperty = (p, value, vm) ->
       if not values[p]
         properties.push p
+        initialValues[p] = value
         addRawProperty p, value, vm, values, dependencies
 
     @_addDelayedProperty = (p, value, vm) ->
@@ -363,7 +365,7 @@ class ViewModel
       obj[name] = -> that[name]()
       Template[template].helpers obj
 
-    reservedWords = ['bind', 'extend', 'addHelpers', 'toJS', 'fromJS', '_addDelayedProperty', '_delayed', '_id', 'dispose']
+    reservedWords = ['bind', 'extend', 'addHelpers', 'toJS', 'fromJS', '_addDelayedProperty', '_delayed', '_id', 'dispose', 'reset']
 
     @addHelpers = (template) =>
       for p of @ when p not in reservedWords
@@ -390,3 +392,10 @@ class ViewModel
       for p of values
         dependencies[p].changed()
         dependenciesDelayed[p].changed() if dependenciesDelayed[p]
+      @
+
+    @reset = ->
+      for p in properties
+        values[p] = initialValues[p]
+        valuesDelayed[p] = initialValues[p]
+      @
