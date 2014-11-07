@@ -398,4 +398,8 @@ class ViewModel
       for p in properties
         values[p] = initialValues[p]
         valuesDelayed[p] = initialValues[p]
+
+      for p of values
+        dependencies[p].changed()
+        dependenciesDelayed[p].changed() if dependenciesDelayed[p]
       @
