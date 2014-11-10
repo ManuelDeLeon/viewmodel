@@ -239,10 +239,14 @@ class ViewModel
       setAttr attr, p
 
   constructor: (p1, p2) ->
-    disposed = false
-    @dispose = -> disposed = true
     templateBound = false
     @_id = '_vm_' + (if p2 then p1 else Math.random())
+
+    disposed = false
+    @dispose = ->
+      Session.set @_id, undefined
+      disposed = true
+
     if p2
       self = this
       delay 1, ->
