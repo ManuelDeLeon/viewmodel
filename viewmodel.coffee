@@ -57,7 +57,8 @@ class ViewModel
     result
 
   isObject = (obj) -> Object.prototype.toString.call(obj) is '[object Object]'
-  isString = (obj) -> Object.prototype.toString.call(obj) is '[object String]'
+  isString = (obj) -> obj instanceof String
+  isArray = (obj) -> obj instanceof Array
   isElement = (o) -> (if typeof HTMLElement is "object" then o instanceof HTMLElement else o and typeof o is "object" and o isnt null and o.nodeType is 1 and typeof o.nodeName is "string")
 
 
@@ -107,9 +108,12 @@ class ViewModel
 
   @addBind 'checked', (p) ->
     p.autorun ->
-      p.element.prop 'checked', p.vm[p.property]() if p.element.is(':checked') isnt p.vm[p.property]()
+      if p.element.attr('type') is 'checkbox'
+        p.element.prop 'checked', p.vm[p.property]() if p.element.is(':checked') isnt p.vm[p.property]()
+      else
+        p.element.prop 'checked', p.vm[p.property]() is p.element.val() if p.element.is(':checked') isnt  (p.vm[p.property]() is p.element.val())
     p.element.bind 'change', ->
-      newValue = p.element.is(':checked')
+      newValue = if p.element.attr('type') is 'checkbox' then p.element.is(':checked') else p.element.val()
       p.vm[p.property] newValue if p.vm[p.property]() isnt newValue
 
   @addBind 'focused', (p) ->
@@ -239,6 +243,7 @@ class ViewModel
       setAttr attr, p
 
   constructor: (p1, p2) ->
+
     templateBound = false
     @_id = '_vm_' + (if p2 then p1 else Math.random())
 
@@ -275,14 +280,20 @@ class ViewModel
     addRawProperty = (p, value, vm, values, dependencies) ->
       dep = dependencies[p] || dependencies[p] = new Tracker.Dependency()
       vm[p] = (e) ->
-        if arguments.length
+        if isArray(e)
+          values[p] = new ReactiveArray(e, dep)
+          dep.changed()
+        else if arguments.length
           if values[p] isnt e
-            dep.changed()
             values[p] = e
+            dep.changed()
         else
           dep.depend()
         values[p]
-      values[p] = value
+      if isArray(value)
+        values[p] = new ReactiveArray(value, dep)
+      else
+        values[p] = value
 
     addProperty = (p, value, vm) ->
       if not values[p]
