@@ -5,6 +5,10 @@
       "1.0.3"
     ],
     [
+      "manuel:reactivearray",
+      "1.0.0"
+    ],
+    [
       "meteor",
       "1.1.0"
     ],
