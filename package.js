@@ -1,6 +1,6 @@
 Package.describe({
   summary: "MVVM framework for Meteor",
-  version: "1.1.3",
+  version: "1.1.4",
   git: "https://github.com/ManuelDeLeon/viewmodel"
 });
 
@@ -10,4 +10,5 @@ Package.onUse(function(api) {
     api.use('manuel:reactivearray@1.0.0', 'client')
     api.addFiles(['viewmodel.coffee'], 'client');
     api.export('ViewModel');
+    api.export('ReactiveArray');
 });
