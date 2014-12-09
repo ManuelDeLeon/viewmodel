@@ -81,13 +81,13 @@ class ViewModel
       name = arr[0]
       p.element.bind p.bindName, -> p.vm[name].apply p.vm, (eval(par) for par in arr.slice(1, arr.length - 1))
     else
-      p.element.bind p.bindName, -> p.vm[p.property]()
+      p.element.bind p.bindName, -> getProperty p.vm, p.property
 
   @addBind 'value', (p) ->
     delayTime = p.elementBind['delay'] or 1
     delayName = p.vm._id + '_' + p.bindName + "_" + p.property
     p.autorun (c) ->
-      newValue = p.vm[p.property]()
+      newValue = getProperty p.vm, p.property
       if p.element.val() isnt newValue
         p.element.val newValue
 
@@ -96,7 +96,7 @@ class ViewModel
         p.vm._delayed[p.property] newValue if p.vm._delayed[p.property]() isnt newValue
 
     p.vm._addDelayedProperty p.property, p.vm[p.property](), p.vm
-    p.element.bind "cut paste keypress input", (ev) ->
+    p.element.bind "cut paste keypress input change", (ev) ->
       delay delayTime, delayName, ->
         newValue = p.element.val()
         p.vm[p.property] newValue if p.vm[p.property]() isnt newValue
@@ -105,6 +105,15 @@ class ViewModel
           p.vm[p.elementBind.returnKey]()
       if p.elementBind.returnKey and 13 in [ev.which, ev.keyCode]
         ev.preventDefault()
+
+  @addBind 'options', (p) ->
+    p.autorun ->
+      arr = p.vm[p.property]().array()
+      p.element.find('option').remove()
+      value = getProperty p.vm, p.elementBind['value']
+      for o in arr
+        selected = if value is o then "selected='selected'" else ""
+        p.element.append("<option #{selected}>#{o}</option>")
 
   @addBind 'checked', (p) ->
     p.autorun ->
@@ -128,6 +137,7 @@ class ViewModel
     p.element.focusout -> p.vm[p.property] false if p.vm[p.property]()
 
   getProperty = (vm, prop) ->
+    return null if not prop
     if prop.charAt(0) is '!'
       negate = true
       prop = prop.substring 1
@@ -215,7 +225,7 @@ class ViewModel
     else
       prevValue = ''
       p.autorun ->
-        cssClass = p.vm[p.property]()
+        cssClass = getProperty p.vm, p.property
         p.element.removeClass prevValue
         p.element.addClass cssClass
         prevValue = cssClass
@@ -230,7 +240,7 @@ class ViewModel
         setStyle style, p
     else
       p.autorun ->
-        style = p.vm[p.property]()
+        style = getProperty p.vm, p.property
         style = parseBind(style) if not isObject style
         p.element.css style
 
@@ -278,7 +288,7 @@ class ViewModel
 
 
     addRawProperty = (p, value, vm, values, dependencies) ->
-      dep = dependencies[p] || dependencies[p] = new Tracker.Dependency()
+      dep = dependencies[p] || (dependencies[p] = new Tracker.Dependency())
       vm[p] = (e) ->
         if isArray(e)
           values[p] = new ReactiveArray(e, dep)
