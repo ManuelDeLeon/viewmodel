@@ -385,16 +385,34 @@ class ViewModel
       addProperties newObj, @
       @
 
-    addHelper = (name, template, that) ->
+    _addHelper = (name, template, that) ->
       obj = {}
       obj[name] = -> that[name]()
-      Template[template].helpers obj
+      if template instanceof Blaze.Template
+        template.helpers obj
+      else if template instanceof Blaze.TemplateInstance
+        template.view.template.helpers obj
+      else
+        Template[template].helpers obj
 
-    reservedWords = ['bind', 'extend', 'addHelpers', 'toJS', 'fromJS', '_addDelayedProperty', '_delayed', '_id', 'dispose', 'reset']
+    reservedWords = ['bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_addDelayedProperty', '_delayed', '_id', 'dispose', 'reset']
 
-    @addHelpers = (template) =>
-      for p of @ when p not in reservedWords
-        addHelper p, template, @
+    @addHelper = (helper, template) ->
+      _addHelper helper, template, @
+      @
+    @addHelpers = (p1, p2) =>
+      if p2
+        helpers = p1
+        template = p2
+        if helpers instanceof Array
+          for p in helpers when p not in reservedWords
+            _addHelper p, template, @
+        else
+          _addHelper helpers, template, @
+      else
+        template = p1
+        for p of @ when p not in reservedWords
+          _addHelper p, template, @
       @
 
     @toJS = (includeFunctions) =>
