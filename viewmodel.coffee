@@ -81,7 +81,7 @@ class ViewModel
       name = arr[0]
       p.element.bind p.bindName, -> p.vm[name].apply p.vm, (eval(par) for par in arr.slice(1, arr.length - 1))
     else
-      p.element.bind p.bindName, -> getProperty p.vm, p.property
+      p.element.bind p.bindName, (e) -> getProperty p.vm, p.property, e
 
   @addBind 'value', (p) ->
     delayTime = p.elementBind['delay'] or 1
@@ -136,7 +136,7 @@ class ViewModel
     p.element.focus -> p.vm[p.property] true if not p.vm[p.property]()
     p.element.focusout -> p.vm[p.property] false if p.vm[p.property]()
 
-  getProperty = (vm, prop) ->
+  getProperty = (vm, prop, e) ->
     return null if not prop
     if prop.charAt(0) is '!'
       negate = true
@@ -144,12 +144,18 @@ class ViewModel
 
     if prop.indexOf('.') >= 0
       funcs = prop.split('.')
-      propToUse = vm[funcs[0]]()
+      if e
+        propToUse = vm[funcs[0]](e)
+      else
+        propToUse = vm[funcs[0]]()
       if propToUse
         gotIt = true
         for i in [1..(funcs.length - 2)] by 1
           gotIt = false
           break if not propToUse[funcs[i]]
+          if e
+            propToUse = propToUse[funcs[i]](e)
+          else
           propToUse = propToUse[funcs[i]]()
           gotIt = true
         ret = propToUse[funcs[funcs.length - 1]] if gotIt
@@ -161,7 +167,10 @@ class ViewModel
         name = arr[0]
         ret = vm[name].apply vm, (eval(par) for par in arr.slice(1, arr.length - 1))
       else
-        ret = vm[prop]()
+        if e
+          ret = vm[prop](e)
+        else
+          ret = vm[prop]()
 
     if negate then not ret else ret
 

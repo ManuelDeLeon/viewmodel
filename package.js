@@ -1,6 +1,6 @@
 Package.describe({
   summary: "MVVM framework for Meteor",
-  version: "1.1.7",
+  version: "1.1.8",
   git: "https://github.com/ManuelDeLeon/viewmodel"
 });
 
