@@ -88,7 +88,9 @@ class ViewModel
     delayName = p.vm._vm_id + '_' + p.bindName + "_" + p.property
     p.autorun (c) ->
       newValue = getProperty p.vm, p.property
-      if p.element.val() isnt newValue
+      if p.element.is "select" and p.element.prop('multiple')
+        console.log "X"
+      else if p.element.val() isnt newValue
         p.element.val newValue
 
       return if c.firstRun
@@ -107,6 +109,17 @@ class ViewModel
         ev.preventDefault()
 
   @addBind 'options', (p) ->
+    if not p.element.is "select"
+      throw new Error "The options bind can only be used with SELECT elements."
+    if p.elementBind['value']
+      value = getProperty p.vm, p.elementBind['value']
+      if isArray value
+        if not p.element.prop('multiple')
+          throw new Error "Can't use an array value for single selection options."
+      else
+        if p.element.prop('multiple')
+          throw new Error "Must use an array value for multiple selection options."
+
     p.autorun ->
       arr = p.vm[p.property]().array()
       p.element.find('option').remove()
@@ -348,7 +361,14 @@ class ViewModel
         t = parentView.templateInstance() if parentView.templateInstance
         break if t
         parentView = parentView.parentView
-      vm.parent = -> t._vm_instance
+      vm.parent = ->
+        return t._vm_instance if t._vm_instance
+        for p of t
+          if t[p] instanceof ViewModel
+            t._vm_instance = t[p]
+            return t._vm_instance
+        return undefined
+
       template._vm_instance = vm
 
     @bind = (template) =>
