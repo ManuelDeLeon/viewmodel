@@ -61,7 +61,6 @@ class ViewModel
   isArray = (obj) -> obj instanceof Array
   isElement = (o) -> (if typeof HTMLElement is "object" then o instanceof HTMLElement else o and typeof o is "object" and o isnt null and o.nodeType is 1 and typeof o.nodeName is "string")
 
-
   delayed = { }
   delay = (time, nameOrFunc, fn) ->
     func = fn || nameOrFunc
@@ -86,18 +85,16 @@ class ViewModel
   @addBind 'value', (p) ->
     delayTime = p.elementBind['delay'] or 1
     delayName = p.vm._vm_id + '_' + p.bindName + "_" + p.property
+    isSelect = p.element.is "select"
+    isMultiple = p.element.prop('multiple')
     p.autorun (c) ->
       newValue = getProperty p.vm, p.property
-      if p.element.is "select" and p.element.prop('multiple')
-        console.log "X"
+      if isSelect and isMultiple
+        p.element.find("option").each ->
+          $(this).attr "selected", this.value in newValue
       else if p.element.val() isnt newValue
         p.element.val newValue
 
-      return if c.firstRun
-      delay 750, delayName, ->
-        p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
-
-    p.vm._vm_addDelayedProperty p.property, p.vm[p.property](), p.vm
     p.element.bind "cut paste keypress input change", (ev) ->
       delay delayTime, delayName, ->
         newValue = p.element.val()
@@ -126,7 +123,7 @@ class ViewModel
       value = getProperty p.vm, p.elementBind['value']
       for o in arr
         selected = if value is o then "selected='selected'" else ""
-        p.element.append("<option #{selected}>#{o}</option>")
+        p.element.append("<option #{selected} value=\"#{o.replace(/&quot;/g, "&amp;quot;").replace(/\"/g, "&quot;") }\">#{o}</option>")
 
   @addBind 'checked', (p) ->
     p.autorun ->
@@ -299,17 +296,11 @@ class ViewModel
           else
             Session.set self._vm_id, self.toJS()
 
-
     obj = p2 || p1
     dependencies = {}
     values = {}
     initialValues = {}
-    dependenciesDelayed = {}
-    valuesDelayed = {}
-    @_vm_delayed = {}
     properties = []
-    propertiesDelayed = []
-
 
     addRawProperty = (p, value, vm, values, dependencies) ->
       dep = dependencies[p] || (dependencies[p] = new Tracker.Dependency())
@@ -337,11 +328,6 @@ class ViewModel
         properties.push p
         initialValues[p] = value
         addRawProperty p, value, vm, values, dependencies
-
-    @_vm_addDelayedProperty = (p, value, vm) ->
-      if not valuesDelayed[p]
-        propertiesDelayed.push p
-        addRawProperty p, value, vm._vm_delayed, valuesDelayed, dependenciesDelayed
 
     addProperties = (propObj, that) ->
       for p of propObj
@@ -436,7 +422,7 @@ class ViewModel
       else
         Template[template].helpers obj
 
-    reservedWords = ['bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_addDelayedProperty', '_vm_delayed', '_vm_id', 'dispose', 'reset', 'parent']
+    reservedWords = ['bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent']
 
     @addHelper = (helper, template) ->
       _addHelper helper, template, @
@@ -459,31 +445,29 @@ class ViewModel
     @toJS = (includeFunctions) =>
       ret = {}
       if includeFunctions
-        for p of @ when p not in reservedWords and p not in propertiesDelayed
+        for p of @ when p not in reservedWords
           ret[p] = @[p]()
       else
-        for p in properties when p not in propertiesDelayed
-          ret[p] = @[p]()
-      for p in propertiesDelayed
-        ret[p] = this._vm_delayed[p]()
+        for p in properties
+          value = @[p]()
+          if value instanceof ReactiveArray
+            ret[p] = value.array()
+          else
+            ret[p] = @[p]()
       ret
 
     @fromJS = (obj) =>
       for p of values when obj[p]
         values[p] = obj[p]
-        valuesDelayed[p] = obj[p]
 
       for p of values
         dependencies[p].changed()
-        dependenciesDelayed[p].changed() if dependenciesDelayed[p]
       @
 
     @reset = ->
       for p in properties
         values[p] = initialValues[p]
-        valuesDelayed[p] = initialValues[p]
 
       for p of values
         dependencies[p].changed()
-        dependenciesDelayed[p].changed() if dependenciesDelayed[p]
       @
