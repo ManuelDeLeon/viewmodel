@@ -192,13 +192,13 @@ class ViewModel
     p.autorun -> p.element.html getProperty p.vm, p.property
 
   enable = (elem) ->
-    if elem.is('button')
+    if elem.is('button') or elem.is('input')
       elem.removeAttr('disabled')
     else
       elem.removeClass('disabled')
 
   disable = (elem) ->
-    if elem.is('button')
+    if elem.is('button') or elem.is('input')
       elem.attr('disabled', 'disabled')
     else
       elem.addClass('disabled')
