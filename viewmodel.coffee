@@ -6,6 +6,15 @@ class ViewModel
     return: 1
     typeof: 1
 
+  viewmodels = []
+  @byId = (id) ->
+    for vm in viewmodels
+      return vm.vm if vm.id is id
+    undefined
+
+  @byTemplate = (template) ->
+    (vm.vm for vm in viewmodels when vm.template is template)
+
   parseBind = (objectLiteralString) ->
     str = $.trim(objectLiteralString)
     str = str.slice(1, -1) if str.charCodeAt(0) is 123
@@ -373,6 +382,16 @@ class ViewModel
       else
         addParent vm, template
         [template, template.$(db)]
+
+      if template instanceof Blaze.TemplateInstance
+        viewmodels.push
+          vm: @
+          id: @_vm_id.substring("_vm_".length)
+          template: template.view.name.substring("Template.".length)
+      else
+        viewmodels.push
+          vm: @
+          id: @_vm_id.substring("_vm_".length)
 
       self = @
       if container?.autorun
