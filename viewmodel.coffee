@@ -6,6 +6,8 @@ class ViewModel
     return: 1
     typeof: 1
 
+  isDev = window.location.hostname is "localhost"
+
   viewmodels = []
   @byId = (id) ->
     for vm in viewmodels
@@ -383,15 +385,17 @@ class ViewModel
         addParent vm, template
         [template, template.$(db)]
 
-      if template instanceof Blaze.TemplateInstance
-        viewmodels.push
-          vm: @
-          id: @_vm_id.substring("_vm_".length)
-          template: template.view.name.substring("Template.".length)
-      else
-        viewmodels.push
-          vm: @
-          id: @_vm_id.substring("_vm_".length)
+      if isDev
+        if template instanceof Blaze.TemplateInstance
+          viewmodels.push
+            vm: @
+            id: @_vm_id.substring("_vm_".length)
+            template: template.view.name.substring("Template.".length)
+        else
+          viewmodels.push
+            vm: @
+            id: @_vm_id.substring("_vm_".length)
+
 
       self = @
       if container?.autorun
