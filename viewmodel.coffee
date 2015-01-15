@@ -6,8 +6,6 @@ class ViewModel
     return: 1
     typeof: 1
 
-  isDev = window.location.hostname is "localhost"
-
   viewmodels = []
   @byId = (id) ->
     for vm in viewmodels
@@ -286,15 +284,15 @@ class ViewModel
   constructor: (p1, p2) ->
 
     templateBound = false
-    @_vm_id = '_vm_' + (if p2 then p1 else Math.random())
+    @_vm_id = ''
 
     disposed = false
     @dispose = ->
       Session.set @_vm_id, undefined
       disposed = true
 
-
     if p2
+      @_vm_id = '_vm_' + p1
       self = this
       delay 1, ->
         if Session.get(self._vm_id)
@@ -306,6 +304,7 @@ class ViewModel
             c.stop()
           else
             Session.set self._vm_id, self.toJS()
+
 
     obj = p2 || p1
     dependencies = {}
@@ -385,7 +384,7 @@ class ViewModel
         addParent vm, template
         [template, template.$(db)]
 
-      if isDev
+      if @_vm_id
         if template instanceof Blaze.TemplateInstance
           viewmodels.push
             vm: @
@@ -396,15 +395,16 @@ class ViewModel
             vm: @
             id: @_vm_id.substring("_vm_".length)
 
-
       self = @
       if container?.autorun
         container.autorun (c) ->
+          templateBound = true
+          js = self.toJS()
           return if c.firstRun
           if disposed
             c.stop()
           else
-            Session.set self._vm_id, self.toJS()
+            Session.set self._vm_id, js
 
       dataBoundElements.each ->
         element = $(this)

@@ -1,6 +1,6 @@
 Package.describe({
-  summary: "MVVM framework for Meteor. (Knockout for Meteor)",
-  version: "1.2.4",
+  summary: "MVVM framework for Meteor. Similar to Knockout and Angular directives.",
+  version: "1.2.5",
   git: "https://github.com/ManuelDeLeon/viewmodel"
 });
 
