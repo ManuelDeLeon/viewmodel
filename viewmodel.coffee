@@ -312,12 +312,12 @@ class ViewModel
         if Session.get(self._vm_id)
           self.fromJS Session.get(self._vm_id), false
         else
-          Session.setDefault self._vm_id, self.toJS() if not Session.get(self._vm_id)?
+          Session.setDefault self._vm_id, self._vm_toJS() if not Session.get(self._vm_id)?
         Tracker.autorun (c) ->
           if disposed or templateBound
             c.stop()
           else
-            Session.set self._vm_id, self.toJS()
+            Session.set self._vm_id, self._vm_toJS()
 
 
     obj = p2 || p1
@@ -422,7 +422,7 @@ class ViewModel
       if container?.autorun
         container.autorun (c) ->
           templateBound = true
-          js = self.toJS()
+          js = self._vm_toJS()
           return if c.firstRun
           if disposed
             c.stop()
@@ -468,7 +468,7 @@ class ViewModel
       else
         Template[template].helpers obj
 
-    reservedWords = ['bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed']
+    reservedWords = ['bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS']
 
     @addHelper = (helper, template) ->
       _addHelper helper, template, @
@@ -488,7 +488,7 @@ class ViewModel
           _addHelper p, template, @
       @
 
-    @toJS = (includeFunctions) =>
+    @_vm_toJS = (includeFunctions) =>
       ret = {}
       if includeFunctions
         for p of @ when p not in reservedWords and p not in propertiesDelayed
@@ -499,10 +499,24 @@ class ViewModel
           if value instanceof ReactiveArray
             ret[p] = value.array()
           else
-            ret[p] = @[p]()
+            ret[p] = value
 
       for p in propertiesDelayed
         ret[p] = this._vm_delayed[p]()
+      ret
+
+    @toJS = (includeFunctions) =>
+      ret = {}
+      if includeFunctions
+        for p of @ when p not in reservedWords
+          ret[p] = @[p]()
+      else
+        for p in properties
+          value = @[p]()
+          if value instanceof ReactiveArray
+            ret[p] = value.array()
+          else
+            ret[p] = value
       ret
 
     @fromJS = (obj) =>
