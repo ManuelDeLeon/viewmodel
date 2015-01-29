@@ -8,7 +8,7 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('METEOR@1.0');
     api.use('coffeescript');
-    api.use('manuel:reactivearray');
+    api.use('manuel:reactivearray@1.0.2');
     api.addFiles('viewmodel.coffee', 'client');
     api.export('ViewModel', 'client');
 });
