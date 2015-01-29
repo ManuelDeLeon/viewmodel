@@ -6,14 +6,14 @@ class ViewModel
     return: 1
     typeof: 1
 
-  viewmodels = []
+  @all = new ReactiveArray()
   @byId = (id) ->
-    for vm in viewmodels
+    for vm in @all
       return vm.vm if vm.id is id
     undefined
 
   @byTemplate = (template) ->
-    (vm.vm for vm in viewmodels when vm.template is template)
+    (vm.vm for vm in @all when vm.template is template)
 
   parseBind = (objectLiteralString) ->
     str = $.trim(objectLiteralString)
@@ -335,8 +335,9 @@ class ViewModel
       vm[p] = (e) ->
         if isArray(e)
           values[p] = new ReactiveArray(e)
+          dep.changed()
         else if arguments.length
-          if values[p] isnt e
+          if isObject(values[p]) or values[p] isnt e
             values[p] = e
             dep.changed()
         else
@@ -409,12 +410,12 @@ class ViewModel
 
       if @_vm_id
         if template instanceof Blaze.TemplateInstance
-          viewmodels.push
+          ViewModel.all.push
             vm: @
             id: @_vm_id.substring("_vm_".length)
             template: template.view.name.substring("Template.".length)
         else
-          viewmodels.push
+          ViewModel.all.push
             vm: @
             id: @_vm_id.substring("_vm_".length)
 
