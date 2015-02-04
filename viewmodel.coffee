@@ -304,10 +304,10 @@ class ViewModel
     @dispose = ->
       Session.set @_vm_id, undefined
       disposed = true
-
+    self = this
     if p2
       @_vm_id = '_vm_' + p1
-      self = this
+
       delay 1, ->
         if Session.get(self._vm_id)
           self.fromJS Session.get(self._vm_id), false
@@ -324,7 +324,7 @@ class ViewModel
     dependencies = {}
     values = {}
     initialValues = {}
-    properties = []
+    @_vm_properties = []
     dependenciesDelayed = {}
     valuesDelayed = {}
     @_vm_delayed = {}
@@ -354,7 +354,7 @@ class ViewModel
 
     addProperty = (p, value, vm) ->
       if not values[p]
-        properties.push p
+        vm._vm_properties.push p
         initialValues[p] = value
         addRawProperty p, value, vm, values, dependencies
 
@@ -408,18 +408,16 @@ class ViewModel
         addParent vm, template
         [template, template.$(db)]
 
+      vmForAll =
+        vm: @
       if @_vm_id
-        if template instanceof Blaze.TemplateInstance
-          ViewModel.all.push
-            vm: @
-            id: @_vm_id.substring("_vm_".length)
-            template: template.view.name.substring("Template.".length)
-        else
-          ViewModel.all.push
-            vm: @
-            id: @_vm_id.substring("_vm_".length)
+        vmForAll.id = @_vm_id.substring("_vm_".length)
 
-      self = @
+      if template instanceof Blaze.TemplateInstance
+        vmForAll.template = template.view.name.substring("Template.".length)
+
+      ViewModel.all.push vmForAll
+
       if container?.autorun
         container.autorun (c) ->
           templateBound = true
@@ -469,7 +467,7 @@ class ViewModel
       else
         Template[template].helpers obj
 
-    reservedWords = ['bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS']
+    @_vm_reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS']
 
     @addHelper = (helper, template) ->
       _addHelper helper, template, @
@@ -479,23 +477,23 @@ class ViewModel
         helpers = p1
         template = p2
         if helpers instanceof Array
-          for p in helpers when p not in reservedWords
+          for p in helpers when p not in @_vm_reservedWords
             _addHelper p, template, @
         else
           _addHelper helpers, template, @
       else
         template = p1
-        for p of @ when p not in reservedWords
+        for p of @ when p not in @_vm_reservedWords
           _addHelper p, template, @
       @
 
     @_vm_toJS = (includeFunctions) =>
       ret = {}
       if includeFunctions
-        for p of @ when p not in reservedWords and p not in propertiesDelayed
+        for p of @ when p not in @_vm_reservedWords and p not in propertiesDelayed
           ret[p] = @[p]()
       else
-        for p in properties when p not in propertiesDelayed
+        for p in self._vm_properties when p not in propertiesDelayed
           value = @[p]()
           if value instanceof ReactiveArray
             ret[p] = value.array()
@@ -509,10 +507,10 @@ class ViewModel
     @toJS = (includeFunctions) =>
       ret = {}
       if includeFunctions
-        for p of @ when p not in reservedWords
+        for p of @ when p not in @_vm_reservedWords
           ret[p] = @[p]()
       else
-        for p in properties
+        for p in self._vm_properties
           value = @[p]()
           if value instanceof ReactiveArray
             ret[p] = value.array()
@@ -535,7 +533,7 @@ class ViewModel
       @
 
     @reset = ->
-      for p in properties
+      for p in self._vm_properties
         values[p] = initialValues[p]
         valuesDelayed[p] = initialValues[p]
 
