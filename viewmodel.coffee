@@ -150,10 +150,13 @@ class ViewModel
 
   @addBind 'checked', (p) ->
     p.autorun ->
-      if p.element.attr('type') is 'checkbox'
-        p.element.prop 'checked', p.vm[p.property]() if p.element.is(':checked') isnt p.vm[p.property]()
+      if isArray(p.vm[p.property]())
+        p.element.prop 'checked', p.element.val() in p.vm[p.property]()
       else
-        p.element.prop 'checked', p.vm[p.property]() is p.element.val() if p.element.is(':checked') isnt  (p.vm[p.property]() is p.element.val())
+        if p.element.attr('type') is 'checkbox'
+          p.element.prop 'checked', p.vm[p.property]() if p.element.is(':checked') isnt p.vm[p.property]()
+        else
+          p.element.prop 'checked', p.vm[p.property]() is p.element.val() if p.element.is(':checked') isnt  (p.vm[p.property]() is p.element.val())
     p.element.bind 'change', ->
       newValue = if p.element.attr('type') is 'checkbox' then p.element.is(':checked') else p.element.val()
       p.vm[p.property] newValue if p.vm[p.property]() isnt newValue
