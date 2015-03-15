@@ -150,7 +150,7 @@ class ViewModel
 
   @addBind 'checked', (p) ->
     p.autorun ->
-      if isArray(p.vm[p.property]())
+      if isArray p.vm[p.property]()
         p.element.prop 'checked', p.element.val() in p.vm[p.property]()
       else
         if p.element.attr('type') is 'checkbox'
@@ -158,8 +158,14 @@ class ViewModel
         else
           p.element.prop 'checked', p.vm[p.property]() is p.element.val() if p.element.is(':checked') isnt  (p.vm[p.property]() is p.element.val())
     p.element.bind 'change', ->
-      newValue = if p.element.attr('type') is 'checkbox' then p.element.is(':checked') else p.element.val()
-      p.vm[p.property] newValue if p.vm[p.property]() isnt newValue
+      if isArray p.vm[p.property]()
+        if p.element.is(':checked')
+          p.vm[p.property]().push p.element.val() if newValue not in p.vm[p.property]()
+        else
+          p.vm[p.property]().remove p.element.val()
+      else
+        newValue = if p.element.attr('type') is 'checkbox' then p.element.is(':checked') else p.element.val()
+        p.vm[p.property] newValue if p.vm[p.property]() isnt newValue
 
   @addBind 'focused', (p) ->
     p.autorun (c) ->
