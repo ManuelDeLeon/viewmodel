@@ -66,7 +66,7 @@ class ViewModel
     result
 
   isObject = (obj) -> Object.prototype.toString.call(obj) is '[object Object]'
-  isString = (obj) -> obj instanceof String
+  isString = (obj) -> Object.prototype.toString.call(obj) is '[object String]'
   isArray = (obj) -> obj instanceof Array
   isElement = (o) -> (if typeof HTMLElement is "object" then o instanceof HTMLElement else o and typeof o is "object" and o isnt null and o.nodeType is 1 and typeof o.nodeName is "string")
 
@@ -305,16 +305,19 @@ class ViewModel
       setAttr attr, p
 
   constructor: (p1, p2) ->
-
+    trackers = []
     templateBound = false
     @_vm_id = ''
 
     disposed = false
     @dispose = ->
-      Session.set @_vm_id, undefined
+      if @_vm_id
+        Session.set @_vm_id, undefined
+      trackers.pop().stop() while trackers.length
+      ViewModel.all.remove @
       disposed = true
     self = this
-    if p2
+    if p1 and p2
       @_vm_id = '_vm_' + p1
 
       delay 1, ->
@@ -322,7 +325,7 @@ class ViewModel
           self.fromJS Session.get(self._vm_id), false
         else
           Session.setDefault self._vm_id, self._vm_toJS() if not Session.get(self._vm_id)?
-        Tracker.autorun (c) ->
+        trackers.push Tracker.autorun (c) ->
           if disposed or templateBound
             c.stop()
           else
