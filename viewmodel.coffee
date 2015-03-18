@@ -305,17 +305,14 @@ class ViewModel
       setAttr attr, p
 
   constructor: (p1, p2) ->
-    trackers = []
-    templateBound = false
+    _defaultComputation = null
     @_vm_id = ''
 
-    disposed = false
     @dispose = ->
       Session.set @_vm_id, undefined
-      trackers.pop().stop() while trackers.length
+      _defaultComputation.stop() if _defaultComputation
       thisId = @_vm_id
       ViewModel.all.remove((vm) -> vm.vm._vm_id is thisId)
-      disposed = true
 
     self = this
     if p1 and p2
@@ -327,11 +324,8 @@ class ViewModel
           self.fromJS Session.get(self._vm_id), false
         else
           Session.setDefault self._vm_id, self._vm_toJS() if not Session.get(self._vm_id)?
-        trackers.push Tracker.autorun (c) ->
-          if disposed or templateBound
-            c.stop()
-          else
-            Session.set self._vm_id, self._vm_toJS()
+        _defaultComputation = Tracker.autorun ->
+          Session.set self._vm_id, self._vm_toJS()
     else
       @_vm_id = '_vm_' + Math.random()
 
@@ -433,14 +427,11 @@ class ViewModel
       ViewModel.all.push vmForAll
 
       if @_vm_hasId and container?.autorun
+        _defaultComputation.stop() if _defaultComputation
         container.autorun (c) ->
-          templateBound = true
           js = self._vm_toJS()
           return if c.firstRun
-          if disposed
-            c.stop()
-          else
-            Session.set self._vm_id, js
+          Session.set self._vm_id, js
 
       dataBoundElements.each ->
         element = $(this)
@@ -456,11 +447,7 @@ class ViewModel
             property: elementBind[bindName]
             container: container
             autorun: (f) ->
-              fun = (c) ->
-                if disposed
-                  c.stop()
-                else
-                  f(c)
+              fun = (c) -> f(c)
               if container.autorun
                 container.autorun fun
               else
