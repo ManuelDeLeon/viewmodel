@@ -311,13 +311,15 @@ class ViewModel
 
     disposed = false
     @dispose = ->
-      if @_vm_id
-        Session.set @_vm_id, undefined
+      Session.set @_vm_id, undefined
       trackers.pop().stop() while trackers.length
-      ViewModel.all.remove @
+      thisId = @_vm_id
+      ViewModel.all.remove((vm) -> vm.vm._vm_id is thisId)
       disposed = true
+
     self = this
     if p1 and p2
+      @_vm_hasId = true
       @_vm_id = '_vm_' + p1
 
       delay 1, ->
@@ -330,7 +332,8 @@ class ViewModel
             c.stop()
           else
             Session.set self._vm_id, self._vm_toJS()
-
+    else
+      @_vm_id = '_vm_' + Math.random()
 
     obj = p2 || p1
     dependencies = {}
@@ -422,15 +425,14 @@ class ViewModel
 
       vmForAll =
         vm: @
-      if @_vm_id
-        vmForAll.id = @_vm_id.substring("_vm_".length)
+        id: @_vm_id.substring("_vm_".length)
 
       if template instanceof Blaze.TemplateInstance
         vmForAll.template = template.view.name.substring("Template.".length)
 
       ViewModel.all.push vmForAll
 
-      if container?.autorun
+      if @_vm_hasId and container?.autorun
         container.autorun (c) ->
           templateBound = true
           js = self._vm_toJS()
