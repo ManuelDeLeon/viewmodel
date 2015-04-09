@@ -1,7 +1,7 @@
 Package.describe({
   name: 'manuel:viewmodel',
   summary: "Native MVVM framework for Meteor. Similar to Knockout and Angular.",
-  version: "1.4.0",
+  version: "1.4.1",
   git: "https://github.com/ManuelDeLeon/viewmodel"
 });
 
