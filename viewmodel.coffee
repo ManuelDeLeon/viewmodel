@@ -167,6 +167,13 @@ class ViewModel
         newValue = if p.element.attr('type') is 'checkbox' then p.element.is(':checked') else p.element.val()
         p.vm[p.property] newValue if p.vm[p.property]() isnt newValue
 
+  @addBind 'change', (p) ->
+    propWithValue = p.elementBind.value or p.elementBind.checked or p.elementBind.text or p.elementBind.focused
+    if propWithValue
+      p.autorun ->
+        p.vm[propWithValue]()
+        p.vm[p.elementBind.change]()
+
   @addBind 'focused', (p) ->
     p.autorun (c) ->
       v = p.vm[p.property]()
