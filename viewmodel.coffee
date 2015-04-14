@@ -368,10 +368,13 @@ class ViewModel
       else
         values[p] = value
 
+    @_vm_reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS', 'blaze_events', 'blaze_helpers', 'onRendered', 'onCreated', 'onDestroyed']
+
     addProperty = (p, value, vm) ->
       if not values[p]
-        vm._vm_properties.push p
-        initialValues[p] = value
+        if p not in self._vm_reservedWords
+          vm._vm_properties.push p
+          initialValues[p] = value
         addRawProperty p, value, vm, values, dependencies
 
     @_vm_addDelayedProperty = (p, value, vm) ->
@@ -475,7 +478,7 @@ class ViewModel
       else
         Template[template].helpers obj
 
-    @_vm_reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS']
+
 
     @addHelper = (helper, template) ->
       _addHelper helper, template, @

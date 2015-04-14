@@ -24,7 +24,7 @@ Blaze.Template.prototype.viewmodel = ->
         Template.instance().viewmodel[helperName]()
       template.helpers helper
 
-  this.onCreated ->
+  template.onCreated ->
     templateInstance = this
     argCount = 0
     vmName = null
@@ -47,8 +47,21 @@ Blaze.Template.prototype.viewmodel = ->
     for obj in vmObjects
       templateInstance.viewmodel.extend obj
 
-  this.onRendered ->
+    if this.viewmodel.onCreated
+      this.viewmodel.onCreated this
+
+    if this.viewmodel.blaze_helpers
+      template.helpers this.viewmodel.blaze_helpers()
+
+    if this.viewmodel.blaze_events
+      template.events this.viewmodel.blaze_events()
+
+  template.onRendered ->
+    if this.viewmodel.onRendered
+      this.viewmodel.onRendered this
     this.viewmodel.bind this
 
-  this.onDestroyed ->
+  template.onDestroyed ->
+    if this.viewmodel.onDestroyed
+      this.viewmodel.onDestroyed this
     this.viewmodel.dispose()
