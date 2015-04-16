@@ -170,9 +170,9 @@ class ViewModel
   @addBind 'change', (p) ->
     propWithValue = p.elementBind.value or p.elementBind.checked or p.elementBind.text or p.elementBind.focused
     if propWithValue
-      p.autorun ->
+      p.autorun (c) ->
         p.vm[propWithValue]()
-        p.vm[p.elementBind.change]()
+        p.vm[p.elementBind.change]() if not c.firstRun
 
   @addBind 'focused', (p) ->
     p.autorun (c) ->
