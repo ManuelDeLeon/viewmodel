@@ -1,7 +1,7 @@
 Package.describe({
   name: 'manuel:viewmodel',
   summary: "MVVM, two-way data binding, and components for Meteor. Similar to Knockout.",
-  version: "1.5.1",
+  version: "1.5.2",
   git: "https://github.com/ManuelDeLeon/viewmodel"
 });
 

@@ -270,6 +270,15 @@ class ViewModel
   @addBind 'if', ifFunc
   @addBind 'visible', ifFunc
 
+  unlessFunc = (p) ->
+    p.autorun ->
+      if getProperty p.vm, p.elementBind[p.bindName]
+        p.element.hide()
+      else
+        p.element.show()
+  @addBind 'unless', unlessFunc
+  @addBind 'hidden', unlessFunc
+
   setClass = (cssClass, p) ->
     p.autorun ->
       if getProperty p.vm, p.property[cssClass]
