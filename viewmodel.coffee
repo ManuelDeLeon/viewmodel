@@ -79,9 +79,8 @@ class ViewModel
         addRawProperty p, value, vm, values, dependencies
 
     @_vm_addDelayedProperty = (p, value, vm) ->
-      if not valuesDelayed[p]
-        propertiesDelayed.push p
-        addRawProperty p, value, vm._vm_delayed, valuesDelayed, dependenciesDelayed
+      propertiesDelayed.push p
+      addRawProperty p, value, vm._vm_delayed, valuesDelayed, dependenciesDelayed
 
     addProperties = (propObj, that) ->
       for p of propObj
