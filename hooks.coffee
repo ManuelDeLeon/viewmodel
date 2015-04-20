@@ -1,5 +1,3 @@
-isString = (obj) -> Object.prototype.toString.call(obj) is '[object String]'
-
 getArgumentResult = (arg, data) ->
   if arg instanceof Function
     return arg(data)
@@ -11,7 +9,7 @@ Blaze.Template.prototype.viewmodel = ->
   argTotal = args.length
   vmHelpers = []
   lastArg = args[argTotal - 1]
-  if isString lastArg
+  if Helper.isString lastArg
     vmHelpers.push lastArg
   else if lastArg instanceof Array
     for helper in lastArg
@@ -34,12 +32,12 @@ Blaze.Template.prototype.viewmodel = ->
       argCount++
       argResult = getArgumentResult(arg, templateInstance.data)
       if argCount is 1
-        if isString argResult
+        if Helper.isString argResult
           vmName = argResult
         else
           vmObjects.push argResult
       else if argCount is argTotal
-        if not (isString(argResult) or argResult instanceof Array)
+        if not (Helper.isString(argResult) or argResult instanceof Array)
           vmObjects.push argResult
       else
         vmObjects.push argResult
