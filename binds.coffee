@@ -102,41 +102,53 @@ ViewModel.addBind 'focused', (p) ->
 
 getProperty = (vm, prop, e) ->
   return null if not prop
-  if prop.charAt(0) is '!'
-    negate = true
-    prop = prop.substring 1
 
-  if prop.indexOf('.') >= 0
-    funcs = prop.split('.')
-    if e
-      propToUse = vm[funcs[0]](e)
-    else
-      propToUse = vm[funcs[0]]()
-    if propToUse
-      gotIt = true
-      for i in [1..(funcs.length - 2)] by 1
-        gotIt = false
-        break if not propToUse[funcs[i]]
-        if e
-          propToUse = propToUse[funcs[i]](e)
-        else
-        propToUse = propToUse[funcs[i]]()
-        gotIt = true
-      ret = propToUse[funcs[funcs.length - 1]] if gotIt
-    else
-      ret = undefined
+  if ~prop.indexOf(" && ")
+    props = prop.split(' && ')
+    for nProp in props
+      return false if !getProperty(vm, nProp, e)
+    return true
+  else if ~prop.indexOf(" || ")
+    props = prop.split(' || ')
+    for nProp in props
+      return true if getProperty(vm, nProp, e)
+    return false
   else
-    if prop.indexOf('(') > 0
-      arr = prop.split(/[(,)]/)
-      name = arr[0]
-      ret = vm[name].apply vm, (eval(par) for par in arr.slice(1, arr.length - 1))
-    else
-      if e
-        ret = vm[prop](e)
-      else
-        ret = vm[prop]()
+    if prop.charAt(0) is '!'
+      negate = true
+      prop = prop.substring 1
 
-  if negate then not ret else ret
+    if ~prop.indexOf('.')
+      funcs = prop.split('.')
+      if e
+        propToUse = vm[funcs[0]](e)
+      else
+        propToUse = vm[funcs[0]]()
+      if propToUse
+        gotIt = true
+        for i in [1..(funcs.length - 2)] by 1
+          gotIt = false
+          break if not propToUse[funcs[i]]
+          if e
+            propToUse = propToUse[funcs[i]](e)
+          else
+          propToUse = propToUse[funcs[i]]()
+          gotIt = true
+        ret = propToUse[funcs[funcs.length - 1]] if gotIt
+      else
+        ret = undefined
+    else
+      if prop.indexOf('(') > 0
+        arr = prop.split(/[(,)]/)
+        name = arr[0]
+        ret = vm[name].apply vm, (eval(par) for par in arr.slice(1, arr.length - 1))
+      else
+        if e
+          ret = vm[prop](e)
+        else
+          ret = vm[prop]()
+
+    if negate then not ret else ret
 
 ViewModel.addBind 'text', (p) ->
   p.autorun ->
