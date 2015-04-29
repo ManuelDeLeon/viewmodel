@@ -2,10 +2,34 @@ getArgumentResult = (arg, data) ->
   if arg instanceof Function
     return arg(data)
   return arg
-    
+
+Blaze.Template.prototype.createViewModel = (data) ->
+  template = this
+  argCount = 0
+  vmName = null
+  vmObjects = []
+  for arg in template.viewmodelArgs
+    argCount++
+    argResult = getArgumentResult(arg, data)
+    if argCount is 1
+      if Helper.isString argResult
+        vmName = argResult
+      else
+        vmObjects.push argResult
+    else if argCount is template.viewmodelArgs.length
+      if not (Helper.isString(argResult) or argResult instanceof Array)
+        vmObjects.push argResult
+    else
+      vmObjects.push argResult
+  viewmodel = new ViewModel vmName, {}
+  for obj in vmObjects
+    viewmodel.extend obj
+  viewmodel
+
 Blaze.Template.prototype.viewmodel = ->
   template = this
   args = arguments
+  template.viewmodelArgs = args
   argTotal = args.length
   vmHelpers = []
   lastArg = args[argTotal - 1]
@@ -23,27 +47,7 @@ Blaze.Template.prototype.viewmodel = ->
       template.helpers helper
 
   template.onCreated ->
-    templateInstance = this
-    argCount = 0
-    vmName = null
-    vmObjects = []
-
-    for arg in args
-      argCount++
-      argResult = getArgumentResult(arg, templateInstance.data)
-      if argCount is 1
-        if Helper.isString argResult
-          vmName = argResult
-        else
-          vmObjects.push argResult
-      else if argCount is argTotal
-        if not (Helper.isString(argResult) or argResult instanceof Array)
-          vmObjects.push argResult
-      else
-        vmObjects.push argResult
-    templateInstance.viewmodel = new ViewModel vmName, {}
-    for obj in vmObjects
-      templateInstance.viewmodel.extend obj
+    this.viewmodel = template.createViewModel(this.data)
 
     if this.viewmodel.onCreated
       this.viewmodel.onCreated this
