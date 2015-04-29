@@ -158,6 +158,8 @@ class ViewModel
 
     @extend = (newObj) =>
       addProperties newObj, @
+      if @_vm_hasId and Session.get(self._vm_id)
+        self.fromJS Session.get(self._vm_id)
       @
 
     _addHelper = (name, template, that) ->
@@ -247,8 +249,12 @@ class ViewModel
 
     if @_vm_hasId
       if Session.get(self._vm_id)
-        self.fromJS Session.get(self._vm_id), false
+        self.fromJS Session.get(self._vm_id)
       else
         Session.setDefault self._vm_id, self._vm_toJS() if not Session.get(self._vm_id)?
-      _defaultComputation = Tracker.autorun ->
-        Session.set self._vm_id, self._vm_toJS()
+
+      _defaultComputation = Tracker.autorun (c) ->
+        obj = self._vm_toJS()
+        if not c.firstRun
+          console.log obj
+          Session.set self._vm_id, obj
