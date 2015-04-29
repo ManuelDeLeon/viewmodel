@@ -26,14 +26,6 @@ class ViewModel
     if p1 and p2
       @_vm_hasId = true
       @_vm_id = '_vm_' + p1
-
-      Helper.delay 1, ->
-        if Session.get(self._vm_id)
-          self.fromJS Session.get(self._vm_id), false
-        else
-          Session.setDefault self._vm_id, self._vm_toJS() if not Session.get(self._vm_id)?
-        _defaultComputation = Tracker.autorun ->
-          Session.set self._vm_id, self._vm_toJS()
     else
       @_vm_id = '_vm_' + Math.random()
 
@@ -252,3 +244,11 @@ class ViewModel
         dependencies[p].changed()
         dependenciesDelayed[p].changed() if dependenciesDelayed[p]
       @
+
+    if @_vm_hasId
+      if Session.get(self._vm_id)
+        self.fromJS Session.get(self._vm_id), false
+      else
+        Session.setDefault self._vm_id, self._vm_toJS() if not Session.get(self._vm_id)?
+      _defaultComputation = Tracker.autorun ->
+        Session.set self._vm_id, self._vm_toJS()
