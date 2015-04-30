@@ -106,7 +106,7 @@ ViewModel.addBind 'options', (p) ->
         throw new Error "Must use an array value for multiple selection options."
 
   p.autorun ->
-    arr = getProperty(p.vm, p.property).array()
+    arr = getProperty(p.vm, p.property)
     p.element.find('option').remove()
     value = getProperty p.vm, p.elementBind['value']
     for o in arr
@@ -140,6 +140,18 @@ ViewModel.addBind 'change', (p) ->
     p.autorun (c) ->
       p.vm[propWithValue]()
       p.vm[p.elementBind.change]() if not c.firstRun
+  else
+    ViewModel.binds.default(p)
+
+ViewModel.addBind 'file', (p) ->
+  p.element.bind 'change', (e) ->
+    file = if e.target.files?.length then e.target.files[0] else null
+    p.vm[p.property] file
+
+ViewModel.addBind 'files', (p) ->
+  p.element.bind 'change', (e) ->
+    p.vm[p.property]().clear()
+    p.vm[p.property]().push(f) for f in e.target.files
 
 ViewModel.addBind 'focused', (p) ->
   p.autorun (c) ->

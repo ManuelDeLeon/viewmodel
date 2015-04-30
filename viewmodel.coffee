@@ -8,9 +8,9 @@ class ViewModel
   @byTemplate = (template) ->
     (vm.vm for vm in @all when vm.template is template)
 
-  binds = {}
-  @hasBind = (bindName) -> binds[bindName]?
-  @addBind = (bindName, func) -> binds[bindName] = func
+  @binds = {}
+  @hasBind = (bindName) -> ViewModel.binds[bindName]?
+  @addBind = (bindName, func) -> ViewModel.binds[bindName] = func
 
   constructor: (p1, p2) ->
     _defaultComputation = null
@@ -140,7 +140,7 @@ class ViewModel
         elementBind = Helper.parseBind element.data('bind')
         element.attr "data-bound", true
         for bindName of elementBind
-          bindFunc = binds[bindName] || binds.default
+          bindFunc = ViewModel.binds[bindName] || ViewModel.binds.default
           bindFunc
             vm: vm
             element: element
@@ -256,5 +256,4 @@ class ViewModel
       _defaultComputation = Tracker.autorun (c) ->
         obj = self._vm_toJS()
         if not c.firstRun
-          console.log obj
           Session.set self._vm_id, obj
