@@ -12,12 +12,14 @@ getProperty = (vm, prop, e) ->
       return true if getProperty(vm, nProp, e)
     return false
   else
+    negate = false
     if prop.charAt(0) is '!'
       negate = true
       prop = prop.substring 1
-
+    ret = undefined
     if ~prop.indexOf('.')
       funcs = prop.split('.')
+      propToUse = null
       if e
         propToUse = vm[funcs[0]](e)
       else
@@ -41,10 +43,14 @@ getProperty = (vm, prop, e) ->
         name = arr[0]
         ret = vm[name].apply vm, (eval(par) for par in arr.slice(1, arr.length - 1))
       else
-        if e
-          ret = vm[prop](e)
+        if not vm[prop]
+          console.log "Property '#{prop}' not found on view model:"
+          console.log vm
         else
-          ret = vm[prop]()
+          if e
+            ret = vm[prop](e)
+          else
+            ret = vm[prop]()
 
     if negate then not ret else ret
 
@@ -113,12 +119,14 @@ ViewModel.addBind 'options', (p) ->
     optionsText = p.elementBind['optionsText']
     optionsValue = p.elementBind['optionsValue']
     optionsCaption = p.elementBind['optionsCaption']
-    if optionsCaption[0] is "'" or optionsCaption[0] is '"'
-      optionsCaption = optionsCaption.substring(1, optionsCaption.length - 1)
-    else
-      optionsCaption = getProperty(p.vm, optionsCaption)
     if optionsCaption
-      p.element.append("<option selected='selected'>#{_.escape(optionsCaption)}</option>")
+      caption = ''
+      if optionsCaption[0] is "'" or optionsCaption[0] is '"'
+        caption = optionsCaption.substring(1, optionsCaption.length - 1)
+      else
+        caption = getProperty(p.vm, optionsCaption)
+      p.element.append("<option value='' selected='selected'>#{_.escape(caption)}</option>")
+
     for o in arr
       selected = if value is o then "selected='selected'" else ""
       text = _.escape(if optionsText then o[optionsText] else o)
