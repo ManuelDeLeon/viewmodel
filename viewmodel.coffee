@@ -1,12 +1,12 @@
 class ViewModel
   @all = new ReactiveArray()
   @byId = (id) ->
-    for vm in @all
+    for vm in @all.list()
       return vm.vm if vm.id is id
     undefined
 
   @byTemplate = (template) ->
-    (vm.vm for vm in @all when vm.template is template)
+    (vm.vm for vm in @all.list() when vm.template is template)
 
   @binds = {}
   @hasBind = (bindName) -> ViewModel.binds[bindName]?
