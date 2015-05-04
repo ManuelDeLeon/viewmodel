@@ -107,11 +107,23 @@ ViewModel.addBind 'options', (p) ->
 
   p.autorun ->
     arr = getProperty(p.vm, p.property)
+    arr = arr.fetch() if arr instanceof Mongo.Cursor
     p.element.find('option').remove()
     value = getProperty p.vm, p.elementBind['value']
+    optionsText = p.elementBind['optionsText']
+    optionsValue = p.elementBind['optionsValue']
+    optionsCaption = p.elementBind['optionsCaption']
+    if optionsCaption[0] is "'" or optionsCaption[0] is '"'
+      optionsCaption = optionsCaption.substring(1, optionsCaption.length - 1)
+    else
+      optionsCaption = getProperty(p.vm, optionsCaption)
+    if optionsCaption
+      p.element.append("<option selected='selected'>#{_.escape(optionsCaption)}</option>")
     for o in arr
       selected = if value is o then "selected='selected'" else ""
-      p.element.append("<option #{selected} value=\"#{o.replace(/&quot;/g, "&amp;quot;").replace(/\"/g, "&quot;") }\">#{o}</option>")
+      text = _.escape(if optionsText then o[optionsText] else o)
+      oValue = _.escape(if optionsValue then o[optionsValue] else o)
+      p.element.append("<option #{selected} value=\"#{oValue}\">#{text}</option>")
 
 ViewModel.addBind 'checked', (p) ->
   p.autorun ->
