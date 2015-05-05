@@ -128,9 +128,9 @@ ViewModel.addBind 'options', (p) ->
       p.element.append("<option value='' selected='selected'>#{_.escape(caption)}</option>")
 
     for o in arr
-      selected = if value is o then "selected='selected'" else ""
       text = _.escape(if optionsText then o[optionsText] else o)
       oValue = _.escape(if optionsValue then o[optionsValue] else o)
+      selected = if value is oValue then "selected='selected'" else ""
       p.element.append("<option #{selected} value=\"#{oValue}\">#{text}</option>")
 
 ViewModel.addBind 'checked', (p) ->
