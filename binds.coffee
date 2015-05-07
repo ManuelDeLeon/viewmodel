@@ -155,11 +155,22 @@ ViewModel.addBind 'checked', (p) ->
       p.vm[p.property] newValue if val isnt newValue
 
 ViewModel.addBind 'change', (p) ->
-  propWithValue = p.elementBind.value or p.elementBind.checked or p.elementBind.text or p.elementBind.focused
-  if propWithValue
-    p.autorun (c) ->
-      p.vm[propWithValue]()
-      p.vm[p.elementBind.change]() if not c.firstRun
+  propToFunc = {}
+  if _.isObject(p.elementBind.change)
+    propToFunc = p.elementBind.change
+  else
+    b = p.elementBind
+    propWithValue = b.value or b.checked or b.text or b.focused or b.hover
+    if propWithValue
+      propToFunc[propWithValue] = p.elementBind.change
+
+  if _.size(propToFunc)
+    for prop of propToFunc
+      func = propToFunc[prop]
+      do (prop, func) ->
+        p.autorun (c) ->
+          newValue = p.vm[prop]()
+          p.vm[func](newValue) if not c.firstRun
   else
     ViewModel.binds.default(p)
 
@@ -275,7 +286,11 @@ ViewModel.addBind 'style', (p) ->
 
 setAttr = (attr, p) ->
   p.autorun ->
-    p.element.attr attr, p.vm[p.property[attr]]()
+    if not p.vm[p.property[attr]]
+      console.log "Property '#{p.property[attr]}' not found on view model:"
+      console.log p.vm
+    else
+      p.element.attr attr, p.vm[p.property[attr]]()
 
 ViewModel.addBind 'attr', (p) ->
   for attr of p.property

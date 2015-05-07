@@ -48,7 +48,7 @@ Blaze.Template.prototype.viewmodel = ->
 
   template.onCreated ->
     this.viewmodel = template.createViewModel(this.data)
-
+    this.viewmodel.templateInstance = this;
     if this.viewmodel.onCreated
       this.viewmodel.onCreated this
 
