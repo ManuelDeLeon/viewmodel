@@ -61,7 +61,7 @@ class ViewModel
       else
         values[p] = value
 
-    @_vm_reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS', 'blaze_events', 'blaze_helpers', 'onRendered', 'onCreated', 'onDestroyed', '_vm_hasId', 'templateInstance']
+    @_vm_reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS', 'blaze_events', 'blaze_helpers', 'onRendered', 'onCreated', 'onDestroyed', '_vm_hasId', 'templateInstance', 'autorun']
 
     addProperty = (p, value, vm) ->
       if not values[p]
