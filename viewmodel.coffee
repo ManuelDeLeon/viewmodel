@@ -12,6 +12,8 @@ class ViewModel
   @hasBind = (bindName) -> ViewModel.binds[bindName]?
   @addBind = (bindName, func) -> ViewModel.binds[bindName] = func
 
+  @parseBind = Helper.parseBind
+
   constructor: (p1, p2) ->
     _defaultComputation = null
     @_vm_id = ''
