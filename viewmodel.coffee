@@ -63,7 +63,7 @@ class ViewModel
       else
         values[p] = value
 
-    @_vm_reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS', 'blaze_events', 'blaze_helpers', 'onRendered', 'onCreated', 'onDestroyed', '_vm_hasId', 'templateInstance', 'autorun']
+    @_vm_reservedWords = Helper.reservedWords
 
     addProperty = (p, value, vm) ->
       if not values[p]
@@ -79,7 +79,7 @@ class ViewModel
     addProperties = (propObj, that) ->
       for p of propObj
         value = propObj[p]
-        if value instanceof Function
+        if value instanceof Function or p in self._vm_reservedWords
           that[p] = value
         else
           addProperty p, value, that
