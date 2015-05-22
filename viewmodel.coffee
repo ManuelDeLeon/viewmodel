@@ -15,6 +15,7 @@ class ViewModel
   @parseBind = Helper.parseBind
 
   constructor: (p1, p2) ->
+    self = this
     _defaultComputation = null
     @_vm_id = ''
 
@@ -22,9 +23,10 @@ class ViewModel
       Session.set @_vm_id, undefined
       _defaultComputation.stop() if _defaultComputation
       thisId = @_vm_id
+      self.parent()._vm_children.remove(self) if self.parent and self.parent()
       ViewModel.all.remove((vm) -> vm.vm._vm_id is thisId)
+      self
 
-    self = this
     if p1 and p2
       @_vm_hasId = true
       @_vm_id = '_vm_' + p1
@@ -40,6 +42,8 @@ class ViewModel
     valuesDelayed = {}
     @_vm_delayed = {}
     propertiesDelayed = []
+    @_vm_children = new ReactiveArray()
+    @children = -> self._vm_children
 
     addRawProperty = (p, value, vm, values, dependencies) ->
       dep = dependencies[p] || (dependencies[p] = new Tracker.Dependency())
@@ -94,15 +98,10 @@ class ViewModel
         t = parentView.templateInstance() if parentView.templateInstance
         break if t
         parentView = parentView.parentView
-      vm.parent = ->
-        return t._vm_instance if t._vm_instance
-        for p of t
-          if t[p] instanceof ViewModel
-            t._vm_instance = t[p]
-            return t._vm_instance
-        return undefined
-
-      template._vm_instance = vm
+      vm.parent = -> t.viewmodel
+      if t?.viewmodel
+        t.viewmodel._vm_children.push vm
+      template.viewmodel = vm if not template.viewmodel
 
     @bind = (template) =>
       vm = @
