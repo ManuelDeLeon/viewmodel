@@ -1,3 +1,7 @@
+## 1.6.9
+
+* Check the view model object before extending from it.
+
 ## 1.6.8
 
 * Fix dispose when template doesn't have a parent.
