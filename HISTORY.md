@@ -19,7 +19,7 @@
 * Monkey patch Blaze so Blaze.View.prototype.onViewReady uses setTimeout instead of Tracker.autoFlush. This is to avoid a situation where a parent will execute the onRendered callback before a child can do so, even though the child already rendered.
 
 > Don't like monkey patching Meteor? 
-> Tell someone at MDG to reopen the ticket to fix the way onRendered events are called. See
+> Tell someone at MDG to fix the way onRendered events are called.
 > https://github.com/meteor/meteor/issues/4410
 
 * Use ViewModel reserved words "as is" when extending a view model.
