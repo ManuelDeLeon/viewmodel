@@ -1,5 +1,5 @@
 // Don't like monkey patching Meteor?
-// Tell someone at MDG to fix the way onRendered events are called
+// Tell someone at MDG to fix the way onRendered events are called.
 // https://github.com/meteor/meteor/issues/4410
 
 Blaze.View.prototype.onViewReady = function (cb) {
