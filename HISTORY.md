@@ -1,3 +1,7 @@
+## 1.7.1
+
+* Don't throw an error when calling .parent() of a vm that doesn't have one.
+
 ## 1.6.9
 
 * Check the view model object before extending from it.
@@ -17,9 +21,5 @@
 * Add a history file! (it was about time)
 
 * Monkey patch Blaze so Blaze.View.prototype.onViewReady uses setTimeout instead of Tracker.autoFlush. This is to avoid a situation where a parent will execute the onRendered callback before a child can do so, even though the child already rendered.
-
-> Don't like monkey patching Meteor? 
-> Tell someone at MDG to fix the way onRendered events are called.
-> https://github.com/meteor/meteor/issues/4410
 
 * Use ViewModel reserved words "as is" when extending a view model.

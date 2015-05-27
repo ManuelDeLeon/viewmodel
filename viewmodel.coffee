@@ -98,7 +98,7 @@ class ViewModel
         t = parentView.templateInstance() if parentView.templateInstance
         break if t
         parentView = parentView.parentView
-      vm.parent = -> t.viewmodel
+      vm.parent = -> t?.viewmodel
       if t?.viewmodel
         t.viewmodel._vm_children.push vm
       template.viewmodel = vm if not template.viewmodel
