@@ -284,14 +284,18 @@ ViewModel.addBind 'style', (p) ->
       style = Helper.parseBind(style) if not Helper.isObject style
       p.element.css style
 
-setAttr = (attr, p) ->
+setAttr = (attr, prop, vm, p) ->
   p.autorun ->
-    if not p.vm[p.property[attr]]
-      console.log "Property '#{p.property[attr]}' not found on view model:"
-      console.log p.vm
+    if not vm[prop]
+      console.log "Property '#{prop}' not found on view model:"
+      console.log vm
     else
-      p.element.attr attr, p.vm[p.property[attr]]()
+      p.element.attr attr, vm[prop]()
 
 ViewModel.addBind 'attr', (p) ->
   for attr of p.property
-    setAttr attr, p
+    setAttr attr, p.property[attr], p.vm, p
+
+for attr in ['src', 'href', 'readonly']
+  do (attr) ->
+    ViewModel.addBind attr, (p) -> setAttr( attr, p.property, p.vm, p )
