@@ -1,4 +1,8 @@
-﻿## 1.7.2
+﻿## 1.7.3
+
+* Prevent event and helper hooks from being added twice.
+
+## 1.7.2
 
 * blaze_events and blaze_helpers now accept either an object or a function
 

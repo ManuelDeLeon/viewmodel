@@ -49,19 +49,22 @@ Blaze.Template.prototype.viewmodel = ->
         Template.instance().viewmodel[helperName]()
       template.helpers helper
 
+  created = false
   template.onCreated ->
     this.viewmodel = template.createViewModel(this.data)
     this.viewmodel.templateInstance = this;
     if this.viewmodel.onCreated
       this.viewmodel.onCreated this
 
-    if this.viewmodel.blaze_helpers
-      helpers = this.viewmodel.blaze_helpers
-      template.helpers( if _.isFunction(helpers) then helpers() else helpers )
+    if not created
+      if this.viewmodel.blaze_helpers
+        helpers = this.viewmodel.blaze_helpers
+        template.helpers( if _.isFunction(helpers) then helpers() else helpers )
 
-    if this.viewmodel.blaze_events
-      events = this.viewmodel.blaze_events
-      template.events( if _.isFunction(events) then events() else events )
+      if this.viewmodel.blaze_events
+        events = this.viewmodel.blaze_events
+        template.events( if _.isFunction(events) then events() else events )
+    created = true
 
   template.onRendered ->
     if this.viewmodel.onRendered
