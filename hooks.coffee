@@ -56,10 +56,12 @@ Blaze.Template.prototype.viewmodel = ->
       this.viewmodel.onCreated this
 
     if this.viewmodel.blaze_helpers
-      template.helpers this.viewmodel.blaze_helpers()
+      helpers = this.viewmodel.blaze_helpers
+      template.helpers( if _.isFunction(helpers) then helpers() else helpers )
 
     if this.viewmodel.blaze_events
-      template.events this.viewmodel.blaze_events()
+      events = this.viewmodel.blaze_events
+      template.events( if _.isFunction(events) then events() else events )
 
   template.onRendered ->
     if this.viewmodel.onRendered

@@ -1,4 +1,8 @@
-﻿## 1.7.1
+﻿## 1.7.2
+
+* blaze_events and blaze_helpers now accept either an object or a function
+
+## 1.7.1
 
 * Don't throw an error when calling .parent() of a vm that doesn't have one.
 
