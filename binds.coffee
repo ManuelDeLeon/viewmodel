@@ -203,13 +203,13 @@ ViewModel.addBind 'html', (p) ->
   p.autorun -> p.element.html getProperty p.vm, p.property
 
 enable = (elem) ->
-  if elem.is('button') or elem.is('input')
+  if elem.is('button') or elem.is('input') or elem.is('textarea')
     elem.removeAttr('disabled')
   else
     elem.removeClass('disabled')
 
 disable = (elem) ->
-  if elem.is('button') or elem.is('input')
+  if elem.is('button') or elem.is('input') or elem.is('textarea')
     elem.attr('disabled', 'disabled')
   else
     elem.addClass('disabled')
