@@ -53,6 +53,7 @@ Blaze.Template.prototype.viewmodel = ->
   template.onCreated ->
     this.viewmodel = template.createViewModel(this.data)
     this.viewmodel.templateInstance = this;
+    this.viewmodel._vm_addParent this.viewmodel, this
     if this.viewmodel.onCreated
       this.viewmodel.onCreated this
 

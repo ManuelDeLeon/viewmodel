@@ -23,7 +23,7 @@ class ViewModel
       Session.set @_vm_id, undefined
       _defaultComputation.stop() if _defaultComputation
       thisId = @_vm_id
-      self.parent()._vm_children.remove(self) if self.parent and self.parent()
+      self.parent()._vm_children.remove(self) if self.parent?()
       ViewModel.all.remove((vm) -> vm.vm._vm_id is thisId)
       self
 
@@ -91,24 +91,25 @@ class ViewModel
     if Helper.isObject(obj)
       addProperties obj, @
 
-    addParent = (vm, template) ->
-      parentView = template.view.parentView
-      t = null
-      while parentView
-        t = parentView.templateInstance() if parentView.templateInstance
-        break if t
-        parentView = parentView.parentView
-      vm.parent = -> t?.viewmodel
-      if t?.viewmodel
-        t.viewmodel._vm_children.push vm
-      template.viewmodel = vm if not template.viewmodel
+    @_vm_addParent = (vm, template) ->
+      if not vm.parent
+        parentView = template.view.parentView
+        t = null
+        while parentView
+          t = parentView.templateInstance() if parentView.templateInstance
+          break if t
+          parentView = parentView.parentView
+        vm.parent = -> t?.viewmodel
+        if t?.viewmodel
+          t.viewmodel._vm_children.push vm
+        template.viewmodel = vm if not template.viewmodel
 
     @bind = (template) =>
       vm = @
       db = '[data-bind]:not([data-bound])'
       [container, dataBoundElements] = if Helper.isString(template)
         if Template[template]
-          addParent vm, Template[template]
+          @_vm_addParent vm, Template[template]
           [Template[template], Template[template].$(db)]
         else
           [$(template), $(template).find(db)]
@@ -117,7 +118,7 @@ class ViewModel
       else if template instanceof jQuery
         [template, template.find(db)]
       else
-        addParent vm, template
+        @_vm_addParent vm, template
         [template, template.$(db)]
 
       vmForAll =
