@@ -1,4 +1,8 @@
-﻿## 1.7.4
+﻿## 1.7.6
+
+* parent is set onCreated (when possible)
+
+## 1.7.5
 
 * Fix enabled/disabled binding for textarea
 
