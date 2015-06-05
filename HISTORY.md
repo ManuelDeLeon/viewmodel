@@ -1,5 +1,9 @@
 ﻿## 1.7.4
 
+* Fix enabled/disabled binding for textarea
+
+## 1.7.4
+
 * Add the following attributes as binds: 'src', 'href', 'readonly'
 
 ## 1.7.3
