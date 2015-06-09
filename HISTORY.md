@@ -1,4 +1,8 @@
-﻿## 1.7.6
+﻿## 1.7.7
+
+* Add toggle binding for toggling a boolean on click.
+
+## 1.7.6
 
 * parent is set onCreated (when possible)
 

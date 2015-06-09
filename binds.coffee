@@ -299,3 +299,6 @@ ViewModel.addBind 'attr', (p) ->
 for attr in ['src', 'href', 'readonly']
   do (attr) ->
     ViewModel.addBind attr, (p) -> setAttr( attr, p.property, p.vm, p )
+
+ViewModel.addBind 'toggle', (p) ->
+  p.element.bind 'click', -> p.vm[p.property](! p.vm[p.property]())
