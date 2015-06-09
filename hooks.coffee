@@ -76,3 +76,15 @@ Blaze.Template.prototype.viewmodel = ->
     if this.viewmodel.onDestroyed
       this.viewmodel.onDestroyed this
     this.viewmodel.dispose()
+
+binds = { }
+Blaze.Template.prototype.elementBind = (selector, data) ->
+  if not data and binds[this.name]
+    return binds[this.name]
+
+  html = $("<div></div>").append($(Blaze.toHTMLWithData(this, data)))
+  bind = ViewModel.parseBind(html.find(selector).data("bind"))
+  if not data
+    binds[this.name] = bind
+
+  return bind

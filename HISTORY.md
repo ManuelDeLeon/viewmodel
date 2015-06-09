@@ -1,4 +1,8 @@
-﻿## 1.7.7
+﻿## 1.7.8
+
+* Add template.elementBind method to retrieve the bind on an element. Very useful for testing.
+
+## 1.7.7
 
 * Add toggle binding for toggling a boolean on click.
 
