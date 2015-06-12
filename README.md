@@ -21,4 +21,7 @@ The solution is to use an MVVM like pattern: You keep the state of the UI in a j
 
 Go to [viewmodel.meteor.com][1] for examples and full documentation.
 
+Go to the [ViewModel Board][2] if you have any questions, comments, feedback, or just want to talk about anything related to ViewModel and Meteor.
+
 [1]:http://viewmodel.meteor.com/
+[2]:http://viewmodelboard.meteor.com
