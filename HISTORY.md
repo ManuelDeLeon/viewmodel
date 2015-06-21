@@ -1,4 +1,7 @@
-﻿## 1.7.8
+﻿## 1.7.9
+* Put onRendered functions on the animation frame so you don't see a flicker if you define your elements with one style and then change it via the view model's default value.
+
+## 1.7.8
 
 * Add template.elementBind method to retrieve the bind on an element. Very useful for testing.
 
