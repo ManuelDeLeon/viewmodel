@@ -14,3 +14,6 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions, comments
 ```
 - Use ES5 properties. So instead of converting properties to functions that you can get by calling them without parameters (e.g. `vm.name()`) and setting them by passing a parameter (e.g. `vm.name('Paco')`), it would just make the property reactive and you would call and set them as regular properties (`var name = vm.name` and `vm.name = 'Paco'`)
 - The `if` binding would remove the element from the DOM and `visible` would leave it on the page. Right now they're synonyms and both leave the element on the page but with the style `display: none`. The same would apply to `hidden`/`unless`.
+- Add a `v-group-value` binding for checkboxes and radios. That way `v-checked` will bind a boolean telling whether the checkbox/radio is ticked or not, and `v-group-value` binds to the value of the group.
+- View models will only be able to bind to Meteor templates and must be created on the template's onCreated event.
+- Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto`, `named` (like right now where you have to give the view model a name for it to save the state), `none`
