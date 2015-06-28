@@ -1,4 +1,8 @@
-﻿## 1.7.9
+﻿## 1.8.0
+
+* If ViewModel.byId doesn't find a view model with the given id, it will return a view model with that template (as long as there's only one).
+
+## 1.7.9
 * Put onRendered functions on the animation frame so you don't see a flicker if you define your elements with one style and then change it via the view model's default value.
 
 ## 1.7.8

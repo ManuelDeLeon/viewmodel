@@ -3,6 +3,8 @@ class ViewModel
   @byId = (id) ->
     for vm in @all.list()
       return vm.vm if vm.id is id
+    byTemplate = @byTemplate(id)
+    return byTemplate[0] if byTemplate.length is 1
     undefined
 
   @byTemplate = (template) ->
