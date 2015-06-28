@@ -1,7 +1,7 @@
 # ViewModel vNext
 This is a place for me to put ideas I think are worth considering if I ever get to do a version 2.0 of the ViewModel library. **These are just ideas, there is no time frame for when, or even if, I'll work on it**
 
-Drop me a line at http://viewmodelboard.meteor.com with your questions, comments, flames?
+Drop me a line at http://viewmodelboard.meteor.com with your questions or comments.
 
 - Use `v-` tags instead of `data-bind`. I got this from the Vue.js. I can't think of a downside for doing `<button v-click="doSomething"></button>` instead of `<button data-bind="click: doSomething"></button>`. For multiple properties it can look like this:
 ```
@@ -18,5 +18,5 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions, comments
 - Add a `v-group-value` binding for checkboxes and radios. That way `v-checked` will bind a boolean telling whether the checkbox/radio is ticked or not, and `v-group-value` binds to the value of the group.
 - View models will only be able to bind to Meteor templates and you must give a template instance when creating them.
 - Show a console warning when you use a reserved word in your view models.
-- Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto` (it will save the state if it's the only view model for the template or if it has a name), `named` (like right now where you have to give the view model a name for it to save the state), and `none`. You would be able to set it globally via `ViewModel.persist = 'named'` and for individual templates via `viewmodel.vmPersist = 'none'`
+- Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto` (it will save the state if it's the only view model for the template or if it has a name), `named` (like right now where you have to give the view model a name for it to save the state), and `none`. You would be able to set it globally via `ViewModel.persist = 'named'` or `ViewModel.saveState = 'named'` and for individual templates via `viewmodel.vmPersist = 'none'`.
 - Figure out a way to make binding definitions/extensions more human readable. I'm the author of this thing and I have to re-read the extension part of the documentation 5 times before adding a new binding.
