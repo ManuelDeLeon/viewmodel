@@ -1,16 +1,38 @@
+requestAnimFrame = do ->
+  window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or (callback) ->
+    window.setTimeout callback, 0
+    return
+
 class @Helper
   @isObject = (obj) -> Object.prototype.toString.call(obj) is '[object Object]'
   @isString = (obj) -> Object.prototype.toString.call(obj) is '[object String]'
   @isArray = (obj) -> obj instanceof Array
   @isElement = (o) -> (if typeof HTMLElement is "object" then o instanceof HTMLElement else o and typeof o is "object" and o isnt null and o.nodeType is 1 and typeof o.nodeName is "string")
 
+  @requestTimeout = (fn, delay) ->
+    ex = ->
+      current = (new Date).getTime()
+      delta = current - start
+      if delta >= delay then fn.call() else (handle.value = requestAnimFrame(ex))
+      return
+
+    if !window.requestAnimationFrame and !window.webkitRequestAnimationFrame and !(window.mozRequestAnimationFrame and window.mozCancelRequestAnimationFrame) and !window.oRequestAnimationFrame and !window.msRequestAnimationFrame
+      return window.setTimeout(fn, delay)
+    start = (new Date).getTime()
+    handle = new Object
+    handle.value = requestAnimFrame(ex)
+    handle
+
+  @clearRequestTimeout = (handle) ->
+    if window.cancelAnimationFrame then window.cancelAnimationFrame(handle.value) else if window.webkitCancelAnimationFrame then window.webkitCancelAnimationFrame(handle.value) else if window.webkitCancelRequestAnimationFrame then window.webkitCancelRequestAnimationFrame(handle.value) else if window.mozCancelRequestAnimationFrame then window.mozCancelRequestAnimationFrame(handle.value) else if window.oCancelRequestAnimationFrame then window.oCancelRequestAnimationFrame(handle.value) else if window.msCancelRequestAnimationFrame then window.msCancelRequestAnimationFrame(handle.value) else clearTimeout(handle)
+    return
   @delayed = { }
   @delay = (time, nameOrFunc, fn) ->
     func = fn || nameOrFunc
     name = nameOrFunc if fn
     d = @delayed[name] if name
-    Meteor.clearTimeout d if d?
-    id = Meteor.setTimeout func, time
+    @clearRequestTimeout d if d?
+    id = @requestTimeout func, time
     @delayed[name] = id if name
 
   bindingToken = RegExp("\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*'|/(?:[^/\\\\]|\\\\.)*/w*|[^\\s:,/][^,\"'{}()/:[\\]]*[^\\s,\"'{}()/:[\\]]|[^\\s]","g")
