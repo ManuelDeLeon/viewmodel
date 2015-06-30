@@ -68,9 +68,16 @@ Blaze.Template.prototype.viewmodel = ->
     created = true
 
   template.onRendered ->
+    if this.viewmodel.beforeBind
+      this.viewmodel.beforeBind this
+
     if this.viewmodel.onRendered
       this.viewmodel.onRendered this
+
     this.viewmodel.bind this
+
+    if this.viewmodel.afterBind
+      this.viewmodel.afterBind this
 
   template.onDestroyed ->
     if this.viewmodel.onDestroyed
