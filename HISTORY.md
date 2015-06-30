@@ -1,8 +1,15 @@
-﻿## 1.8.0
+﻿## 1.8.1
+
+* Prevent value bind from updating on the next JS cycle when the value doesn't have to be delayed.
+* Add `beforeBind` and `afterBind` to be used instead of `onRendered` (onRendered still works but before/after bind is clearer)
+
+
+## 1.8.0
 
 * If ViewModel.byId doesn't find a view model with the given id, it will return a view model with that template (as long as there's only one).
 
 ## 1.7.9
+
 * Put onRendered functions on the animation frame so you don't see a flicker if you define your elements with one style and then change it via the view model's default value.
 
 ## 1.7.8

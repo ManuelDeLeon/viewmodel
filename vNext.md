@@ -22,3 +22,4 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Figure out a way to make binding definitions/extensions more human readable. I'm the author of this thing and I have to re-read the extension part of the documentation 5 times before adding a new binding.
 - Add a `viewmodel.children()` method.
 - Think of a way to add filters, converters, and validators.
+- Remove `onRendered` and `onCreated` in favor of `beforeRendered`/`afterRendered` and `beforeCreated`/`afterCreated`
