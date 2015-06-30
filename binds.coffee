@@ -63,7 +63,7 @@ ViewModel.addBind 'default', (p) ->
     p.element.bind p.bindName, (e) -> getProperty p.vm, p.property, e
 
 ViewModel.addBind 'value', (p) ->
-  delayTime = p.elementBind['delay'] or 1
+  delayTime = p.elementBind['delay'] or 0
   delayName = p.vm._vm_id + '_' + p.bindName + "_" + p.property
   isSelect = p.element.is "select"
   isMultiple = p.element.prop('multiple')
@@ -84,12 +84,17 @@ ViewModel.addBind 'value', (p) ->
     p.vm._vm_addDelayedProperty p.property, getProperty(p.vm, p.property), p.vm
 
   p.element.bind "cut paste keypress input change", (ev) ->
-    Helper.delay delayTime, delayName, ->
+    f = ->
       newValue = p.element.val()
       p.vm[p.property] newValue if getProperty(p.vm, p.property, ev) isnt newValue
       if isInput
         Helper.delay 500, delayName + "X", ->
           p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
+    if delayTime
+      Helper.delay delayTime, delayName, f
+    else
+      f()
+
     Helper.delay 1, ->
       if p.elementBind.returnKey and 13 in [ev.which, ev.keyCode]
         if isInput
