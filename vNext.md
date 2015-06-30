@@ -23,3 +23,4 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Add a `viewmodel.children()` method.
 - Think of a way to add filters, converters, and validators.
 - Remove `onRendered` and `onCreated` in favor of `beforeRendered`/`afterRendered` and `beforeCreated`/`afterCreated`
+- Remove `text` bind and just use `value` for everything. One thing less to remember.
