@@ -19,7 +19,7 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - View models will only be able to bind to Meteor templates and you must give a template instance when creating them.
 - Show a console warning when you use a reserved word in your view models.
 - Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto` (it will save the state if it's the only view model for the template or if it has a name), `named` (like right now where you have to give the view model a name for it to save the state), and `none`. You would be able to set it globally via `ViewModel.persist = 'named'` or `ViewModel.saveState = 'named'` and for individual templates via `viewmodel.vmPersist = 'none'`.
-- Figure out a way to make binding definitions/extensions more human readable. I'm the author of this thing and I have to re-read the extension part of the documentation 5 times before adding a new binding.
+- Figure out a way to make binding definitions/extensions more human readable. The parameters aren't exactly crystal clear.
 - Add a `viewmodel.children()` method.
 - Think of a way to add filters, converters, and validators.
 - Remove `onRendered` and `onCreated` in favor of `beforeRendered`/`afterRendered` and `beforeCreated`/`afterCreated`
