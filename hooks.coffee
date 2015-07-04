@@ -84,17 +84,20 @@ Blaze.Template.prototype.viewmodel = ->
         this.autorun (c) ->
           url = window.location.href
           for prop in props
-            url = VmHelper.updateQueryString( tName + "." + prop, that.viewmodel[prop]().toString(), url)
+            value = that.viewmodel[prop]() or ""
+            url = VmHelper.updateQueryString( tName + "." + prop, value.toString(), url)
           window.history.pushState(null, null, url) if not c.firstRun and document.URL isnt url
 
         # Update view model from URL
         updateFromUrl = (state, title, url = document.URL) ->
+          processed = []
           for key, value of VmHelper.url(url).queryKey when ~key.indexOf(".")
             [template, property] = key.split(".")
             if property in props
+              processed.push property
               template = template.split("%2E").join(".") if ~template.indexOf("%2E")
               decodedValue = decodeURI(value)
-              if template is tName and that.viewmodel[property]() isnt decodedValue
+              if template is tName
                 that.viewmodel[property] decodedValue
         window.onpopstate = window.history.onstatechange = updateFromUrl
         updateFromUrl()
