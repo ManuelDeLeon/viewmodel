@@ -2,8 +2,46 @@ requestAnimFrame = do ->
   window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or (callback) ->
     window.setTimeout callback, 0
     return
+parseUri = (str) ->
+  o = parseUri.options
+  m = o.parser[(if o.strictMode then "strict" else "loose")].exec(str)
+  uri = {}
+  i = 14
+  uri[o.key[i]] = m[i] or ""  while i--
+  uri[o.q.name] = {}
+  uri[o.key[12]].replace o.q.parser, ($0, $1, $2) ->
+    uri[o.q.name][$1] = $2  if $1
+    return
 
-class @Helper
+  uri
+
+parseUri.options =
+  strictMode: false
+  key: [
+    "source"
+    "protocol"
+    "authority"
+    "userInfo"
+    "user"
+    "password"
+    "host"
+    "port"
+    "relative"
+    "path"
+    "directory"
+    "file"
+    "query"
+    "anchor"
+  ]
+  q:
+    name: "queryKey"
+    parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+
+  parser:
+    strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/
+    loose: /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+
+class @VmHelper
   @isObject = (obj) -> Object.prototype.toString.call(obj) is '[object Object]'
   @isString = (obj) -> Object.prototype.toString.call(obj) is '[object String]'
   @isArray = (obj) -> obj instanceof Array
@@ -92,5 +130,30 @@ class @Helper
           values = [tok]
     result
 
-  @reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS', 'blaze_events', 'blaze_helpers', 'onRendered', 'onCreated', 'onDestroyed', '_vm_hasId', 'templateInstance', 'autorun', '_vm_children', 'children', '_vm_addParent', 'beforeBind', 'afterBind']
+  @reservedWords = ['_vm_properties', '_vm_reservedWords','bind', 'extend', 'addHelper', 'addHelpers', 'toJS', 'fromJS', '_vm_id', 'dispose', 'reset', 'parent', '_vm_addDelayedProperty', '_vm_delayed', '_vm_toJS', 'blaze_events', 'blaze_helpers', 'onRendered', 'onCreated', 'onDestroyed', '_vm_hasId', 'templateInstance', 'autorun', '_vm_children', 'children', '_vm_addParent', 'beforeBind', 'afterBind', 'onUrl']
 
+  @url: (target = document.URL) -> parseUri(target)
+  @updateQueryString: (key, value, url) ->
+    if !url
+      url = window.location.href
+    re = new RegExp('([?&])' + key + '=.*?(&|#|$)(.*)', 'gi')
+    hash = undefined
+    if re.test(url)
+      if typeof value != 'undefined' and value != null
+        url.replace re, '$1' + key + '=' + value + '$2$3'
+      else
+        hash = url.split('#')
+        url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '')
+        if typeof hash[1] != 'undefined' and hash[1] != null
+          url += '#' + hash[1]
+        url
+    else
+      if typeof value != 'undefined' and value != null
+        separator = if url.indexOf('?') != -1 then '&' else '?'
+        hash = url.split('#')
+        url = hash[0] + separator + key + '=' + value
+        if typeof hash[1] != 'undefined' and hash[1] != null
+          url += '#' + hash[1]
+        url
+      else
+        url

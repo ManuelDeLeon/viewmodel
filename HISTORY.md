@@ -1,4 +1,8 @@
-﻿## 1.8.1
+﻿## 1.8.2
+
+* ViewModel is now able to save the state on the URL. To do so add a `onUrl` property to your viewmodels with either a string or array of strings with the names of the properties you want on the URL. You must give the view model a unique name though.
+
+## 1.8.1
 
 * Prevent value bind from updating on the next JS cycle when the value doesn't have to be delayed.
 * Add `beforeBind` and `afterBind` to be used instead of `onRendered` (onRendered still works but before/after bind is clearer)

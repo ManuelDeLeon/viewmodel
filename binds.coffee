@@ -77,7 +77,7 @@ ViewModel.addBind 'value', (p) ->
       p.element.val newValue
 
     return if c.firstRun
-    if isInput and not Helper.delayed[delayName + "X"]
+    if isInput and not VmHelper.delayed[delayName + "X"]
       p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
 
   if isInput
@@ -88,14 +88,14 @@ ViewModel.addBind 'value', (p) ->
       newValue = p.element.val()
       p.vm[p.property] newValue if getProperty(p.vm, p.property, ev) isnt newValue
       if isInput
-        Helper.delay 500, delayName + "X", ->
+        VmHelper.delay 500, delayName + "X", ->
           p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
     if delayTime
-      Helper.delay delayTime, delayName, f
+      VmHelper.delay delayTime, delayName, f
     else
       f()
 
-    Helper.delay 1, ->
+    VmHelper.delay 1, ->
       if p.elementBind.returnKey and 13 in [ev.which, ev.keyCode]
         if isInput
           newValue = p.element.val()
@@ -109,7 +109,7 @@ ViewModel.addBind 'options', (p) ->
     throw new Error "The options bind can only be used with SELECT elements."
   if p.elementBind['value']
     value = getProperty p.vm, p.elementBind['value']
-    if Helper.isArray value
+    if VmHelper.isArray value
       if not p.element.prop('multiple')
         throw new Error "Can't use an array value for single selection options."
     else
@@ -141,7 +141,7 @@ ViewModel.addBind 'options', (p) ->
 ViewModel.addBind 'checked', (p) ->
   p.autorun ->
     val = getProperty(p.vm, p.property)
-    if Helper.isArray val
+    if VmHelper.isArray val
       p.element.prop 'checked', p.element.val() in val
     else
       if p.element.attr('type') is 'checkbox'
@@ -150,7 +150,7 @@ ViewModel.addBind 'checked', (p) ->
         p.element.prop 'checked', val is p.element.val() if p.element.is(':checked') isnt  (val is p.element.val())
   p.element.bind 'change', ->
     val = getProperty(p.vm, p.property)
-    if Helper.isArray val
+    if VmHelper.isArray val
       if p.element.is(':checked')
         val.push p.element.val() if newValue not in val
       else
@@ -264,7 +264,7 @@ setClass = (cssClass, p) ->
       p.element.removeClass cssClass
 
 ViewModel.addBind 'class', (p) ->
-  if Helper.isObject p.property
+  if VmHelper.isObject p.property
     for cssClass of p.property
       setClass cssClass, p
   else
@@ -280,13 +280,13 @@ setStyle = (style, p) ->
     p.element.css style, p.vm[p.property[style]]()
 
 ViewModel.addBind 'style', (p) ->
-  if Helper.isObject p.property
+  if VmHelper.isObject p.property
     for style of p.property
       setStyle style, p
   else
     p.autorun ->
       style = getProperty p.vm, p.property
-      style = Helper.parseBind(style) if not Helper.isObject style
+      style = VmHelper.parseBind(style) if not VmHelper.isObject style
       p.element.css style
 
 setAttr = (attr, prop, vm, p) ->

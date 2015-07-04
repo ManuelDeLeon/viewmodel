@@ -3,6 +3,21 @@ getArgumentResult = (arg, data) ->
     return arg(data)
   return arg
 
+((history) ->
+  pushState = history.pushState
+  replaceState = history.replaceState
+
+  history.pushState = (state, title, url) ->
+    if typeof history.onstatechange is 'function'
+      history.onstatechange state, title, url
+    pushState.apply history, arguments
+  history.replaceState = (state) ->
+    if typeof history.onstatechange is 'function'
+      history.onstatechange state, title, url
+    replaceState.apply history, arguments
+  return
+) window.history
+
 Blaze.Template.prototype.createViewModel = (data) ->
   template = this
   argCount = 0
@@ -12,12 +27,12 @@ Blaze.Template.prototype.createViewModel = (data) ->
     argCount++
     argResult = getArgumentResult(arg, data)
     if argCount is 1
-      if Helper.isString argResult
+      if VmHelper.isString argResult
         vmName = argResult
       else
         vmObjects.push argResult
     else if argCount is template.viewmodelArgs.length
-      if not (Helper.isString(argResult) or argResult instanceof Array)
+      if not (VmHelper.isString(argResult) or argResult instanceof Array)
         vmObjects.push argResult
     else
       vmObjects.push argResult
@@ -36,7 +51,7 @@ Blaze.Template.prototype.viewmodel = ->
   argTotal = args.length
   vmHelpers = []
   lastArg = args[argTotal - 1]
-  if Helper.isString lastArg
+  if VmHelper.isString lastArg
     vmHelpers.push lastArg
   else if lastArg instanceof Array
     for helper in lastArg
@@ -56,6 +71,34 @@ Blaze.Template.prototype.viewmodel = ->
     this.viewmodel._vm_addParent this.viewmodel, this
     if this.viewmodel.onCreated
       this.viewmodel.onCreated this
+
+    if onUrl = this.viewmodel.onUrl
+      that = this
+      if not that.viewmodel._vm_hasId
+        console.log "Cannot save state on the URL for a view model without a name"
+      else
+        props = if _.isArray(onUrl) then onUrl else [onUrl]
+        tName = that.viewmodel._vm_id.substring("_vm_".length)
+        tName = tName.split(".").join("%2E") if ~tName.indexOf(".")
+        # Update URL from view model
+        this.autorun (c) ->
+          url = window.location.href
+          for prop in props
+            url = VmHelper.updateQueryString( tName + "." + prop, that.viewmodel[prop]().toString(), url)
+          window.history.pushState(null, null, url) if not c.firstRun and document.URL isnt url
+
+        # Update view model from URL
+        updateFromUrl = (state, title, url = document.URL) ->
+          for key, value of VmHelper.url(url).queryKey when ~key.indexOf(".")
+            [template, property] = key.split(".")
+            if property in props
+              template = template.split("%2E").join(".") if ~template.indexOf("%2E")
+              decodedValue = decodeURI(value)
+              if template is tName and that.viewmodel[property]() isnt decodedValue
+                that.viewmodel[property] decodedValue
+        window.onpopstate = window.history.onstatechange = updateFromUrl
+        updateFromUrl()
+
 
     if not created
       if this.viewmodel.blaze_helpers

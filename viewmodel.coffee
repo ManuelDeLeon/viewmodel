@@ -14,7 +14,7 @@ class ViewModel
   @hasBind = (bindName) -> ViewModel.binds[bindName]?
   @addBind = (bindName, func) -> ViewModel.binds[bindName] = func
 
-  @parseBind = Helper.parseBind
+  @parseBind = VmHelper.parseBind
 
   constructor: (p1, p2) ->
     self = this
@@ -50,11 +50,11 @@ class ViewModel
     addRawProperty = (p, value, vm, values, dependencies) ->
       dep = dependencies[p] || (dependencies[p] = new Tracker.Dependency())
       vm[p] = (e) ->
-        if Helper.isArray(e)
+        if VmHelper.isArray(e)
           values[p] = new ReactiveArray(e)
           dep.changed()
         else if arguments.length
-          if Helper.isObject(values[p]) or values[p] isnt e
+          if VmHelper.isObject(values[p]) or values[p] isnt e
             values[p] = e
             dep.changed()
         else
@@ -64,12 +64,12 @@ class ViewModel
           values[p].list()
         else
           values[p]
-      if Helper.isArray(value)
+      if VmHelper.isArray(value)
         values[p] = new ReactiveArray(value)
       else
         values[p] = value
 
-    @_vm_reservedWords = Helper.reservedWords
+    @_vm_reservedWords = VmHelper.reservedWords
 
     addProperty = (p, value, vm) ->
       if not values[p]
@@ -90,7 +90,7 @@ class ViewModel
         else
           addProperty p, value, that
 
-    if Helper.isObject(obj)
+    if VmHelper.isObject(obj)
       addProperties obj, @
 
     @_vm_addParent = (vm, template) ->
@@ -109,13 +109,13 @@ class ViewModel
     @bind = (template) =>
       vm = @
       db = '[data-bind]:not([data-bound])'
-      [container, dataBoundElements] = if Helper.isString(template)
+      [container, dataBoundElements] = if VmHelper.isString(template)
         if Template[template]
           @_vm_addParent vm, Template[template]
           [Template[template], Template[template].$(db)]
         else
           [$(template), $(template).find(db)]
-      else if Helper.isElement(template)
+      else if VmHelper.isElement(template)
         [$(template), $(template).find(db)]
       else if template instanceof jQuery
         [template, template.find(db)]
@@ -141,7 +141,7 @@ class ViewModel
 
       dataBoundElements.each ->
         element = $(this)
-        elementBind = Helper.parseBind element.data('bind')
+        elementBind = VmHelper.parseBind element.data('bind')
         element.attr "data-bound", true
         for bindName of elementBind
           bindFunc = ViewModel.binds[bindName] || ViewModel.binds.default

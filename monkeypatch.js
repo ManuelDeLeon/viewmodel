@@ -12,7 +12,7 @@
 //
 // parent template renders html on the page
 // child template renders html on the page
-// Meteor triggers onRendered of parent
+// Meteor triggers onRendered of *parent*
 // Meteor triggers onRendered of child
 //
 var requestAnimFrame = (function(){
