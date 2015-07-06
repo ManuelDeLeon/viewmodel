@@ -86,7 +86,9 @@ ViewModel.addBind 'value', (p) ->
   p.element.bind "cut paste keypress input change", (ev) ->
     f = ->
       newValue = p.element.val()
-      p.vm[p.property] newValue if getProperty(p.vm, p.property, ev) isnt newValue
+      if ev.type is 'keypress'
+        newValue += String.fromCharCode(ev.which || ev.keyCode)
+      p.vm[p.property] newValue if getProperty(p.vm, p.property) isnt newValue
       if isInput
         VmHelper.delay 500, delayName + "X", ->
           p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue

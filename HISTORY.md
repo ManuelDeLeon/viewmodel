@@ -1,4 +1,10 @@
-﻿## 1.8.2
+﻿## 1.8.3
+
+* value bind now passes the input value to a bound function instead of the jquery event.
+* Fix keypress event on input value bind
+* Fix url state save for templates with dots.
+
+## 1.8.2
 
 * ViewModel is now able to save the state on the URL. To do so add a `onUrl` property to your viewmodels with either a string or array of strings with the names of the properties you want on the URL. You must give the view model a unique name though.
 

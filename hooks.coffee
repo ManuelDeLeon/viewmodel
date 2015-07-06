@@ -79,26 +79,27 @@ Blaze.Template.prototype.viewmodel = ->
       else
         props = if _.isArray(onUrl) then onUrl else [onUrl]
         tName = that.viewmodel._vm_id.substring("_vm_".length)
-        tName = tName.split(".").join("%2E") if ~tName.indexOf(".")
+        tName = encodeURI(tName)
+        tName = tName.split('.').join("%2E") if ~tName.indexOf(".")
         # Update URL from view model
         this.autorun (c) ->
           url = window.location.href
           for prop in props
-            value = that.viewmodel[prop]() or ""
-            url = VmHelper.updateQueryString( tName + "." + prop, value.toString(), url)
+            if that.viewmodel[prop]
+              value = that.viewmodel[prop]() or ""
+              url = VmHelper.updateQueryString( tName + "." + encodeURI(prop), value.toString(), url)
+            else
+              console.log "View model '#{that.viewmodel._vm_id}' doesn't have property '#{prop}'"
           window.history.pushState(null, null, url) if not c.firstRun and document.URL isnt url
 
         # Update view model from URL
         updateFromUrl = (state, title, url = document.URL) ->
-          processed = []
           for key, value of VmHelper.url(url).queryKey when ~key.indexOf(".")
             [template, property] = key.split(".")
+            property = decodeURI(property)
             if property in props
-              processed.push property
-              template = template.split("%2E").join(".") if ~template.indexOf("%2E")
-              decodedValue = decodeURI(value)
               if template is tName
-                that.viewmodel[property] decodedValue
+                that.viewmodel[property] decodeURI(value)
         window.onpopstate = window.history.onstatechange = updateFromUrl
         updateFromUrl()
 
