@@ -10,7 +10,7 @@ Package.onUse(function(api) {
     api.use('coffeescript');
     api.use('blaze', 'client');
     api.use('manuel:reactivearray@1.0.5');
-    api.use('manuel:isdev');
+    api.use('manuel:isdev@1.0.0');
     api.addFiles('helper.coffee', 'client');
     api.addFiles('monkeypatch.js', 'client');
     api.addFiles('viewmodel.coffee', 'client');
