@@ -72,7 +72,9 @@ class ViewModel
     @_vm_reservedWords = VmHelper.reservedWords
 
     addProperty = (p, value, vm) ->
-      if not values[p]
+      if _.has(values, p)
+        vm[p] value
+      else
         if p not in self._vm_reservedWords
           vm._vm_properties.push p
           initialValues[p] = value

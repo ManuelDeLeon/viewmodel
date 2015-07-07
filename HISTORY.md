@@ -1,4 +1,8 @@
-﻿## 1.8.3
+﻿## 1.8.4
+
+* .extend now updates values if the view model already has the properties.
+
+## 1.8.3
 
 * value bind now passes the input value to a bound function instead of the jquery event.
 * Fix keypress event on input value bind
