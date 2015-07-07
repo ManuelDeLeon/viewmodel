@@ -1,4 +1,8 @@
-﻿## 1.8.4
+﻿## 1.8.5
+
+* Show console messages only when in development.
+
+## 1.8.4
 
 * .extend now updates values if the view model already has the properties.
 

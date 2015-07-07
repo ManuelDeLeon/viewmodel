@@ -75,7 +75,8 @@ Blaze.Template.prototype.viewmodel = ->
     if onUrl = this.viewmodel.onUrl
       that = this
       if not that.viewmodel._vm_hasId
-        console.log "Cannot save state on the URL for a view model without a name"
+        if Meteor.isDev
+          console.log "Cannot save state on the URL for a view model without a name"
       else
         props = if _.isArray(onUrl) then onUrl else [onUrl]
         tName = that.viewmodel._vm_id.substring("_vm_".length)
@@ -89,7 +90,8 @@ Blaze.Template.prototype.viewmodel = ->
               value = that.viewmodel[prop]() or ""
               url = VmHelper.updateQueryString( tName + "." + encodeURI(prop), value.toString(), url)
             else
-              console.log "View model '#{that.viewmodel._vm_id}' doesn't have property '#{prop}'"
+              if Meteor.isDev
+                console.log "View model '#{that.viewmodel._vm_id}' doesn't have property '#{prop}'"
           window.history.pushState(null, null, url) if not c.firstRun and document.URL isnt url
 
         # Update view model from URL

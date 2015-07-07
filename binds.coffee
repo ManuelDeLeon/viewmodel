@@ -43,9 +43,10 @@ getProperty = (vm, prop, e) ->
         name = arr[0]
         ret = vm[name].apply vm, (eval(par) for par in arr.slice(1, arr.length - 1))
       else
-        if not vm[prop]
-          console.log "Property '#{prop}' not found on view model:"
-          console.log vm
+        if not _.has(vm, prop)
+          if Meteor.isDev
+            console.log "Property '#{prop}' not found on view model:"
+            console.log vm
         else
           if e
             ret = vm[prop](e)
@@ -293,9 +294,10 @@ ViewModel.addBind 'style', (p) ->
 
 setAttr = (attr, prop, vm, p) ->
   p.autorun ->
-    if not vm[prop]
-      console.log "Property '#{prop}' not found on view model:"
-      console.log vm
+    if not _.has(vm, prop)
+      if Meteor.isDev
+        console.log "Property '#{prop}' not found on view model:"
+        console.log vm
     else
       p.element.attr attr, vm[prop]()
 
