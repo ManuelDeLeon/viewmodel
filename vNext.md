@@ -16,11 +16,10 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Use ES5 properties. So instead of converting properties to functions that you can get by calling them without parameters (e.g. `vm.name()`) and setting them by passing a parameter (e.g. `vm.name('Paco')`), it would just make the property reactive and you would call and set them as regular properties (`var name = vm.name` and `vm.name = 'Paco'`)
 - The `if` binding would remove the element from the DOM and `visible` would leave it on the page. Right now they're synonyms and both leave the element on the page but with the style `display: none`. The same would apply to `hidden`/`unless`.
 - Add a `v-group-value` binding for checkboxes and radios. That way `v-checked` will bind a boolean telling whether the checkbox/radio is ticked or not, and `v-group-value` binds to the value of the group.
-- View models will only be able to bind to Meteor templates and you must give a template instance when creating them.
+- View models will only be able to bind to Meteor templates.
 - Show a console warning when you use a reserved word in your view models.
 - Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto` (it will save the state if it's the only view model for the template or if it has a name), `named` (like right now where you have to give the view model a name for it to save the state), and `none`. You would be able to set it globally via `ViewModel.persist = 'named'` or `ViewModel.saveState = 'named'` and for individual templates via `viewmodel.vmPersist = 'none'`.
 - Figure out a way to make binding definitions/extensions more human readable. The parameters aren't exactly crystal clear.
-- Add a `viewmodel.children()` method.
 - Think of a way to add filters, converters, and validators.
 - Remove `onRendered` and `onCreated` in favor of `beforeRendered`/`afterRendered` and `beforeCreated`/`afterCreated`
-- Remove `text` bind and just use `value` for everything. One thing less to remember.
+
