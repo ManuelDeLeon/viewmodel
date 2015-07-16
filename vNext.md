@@ -8,7 +8,8 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Allow user to change the bind tag from `db=` to anything else (e.g. stay with `data-bind=`). This could be set globally via `ViewModel.BindAttribute` and for specific view models via `vmBindAttribute`.
 - Drop IE8 and IE9 support and use vanilla JS for most things instead of relying so heavily on JQuery.
 - Use ES5 properties. So instead of converting properties to functions that you can get by calling them without parameters (e.g. `vm.name()`) and setting them by passing a parameter (e.g. `vm.name('Paco')`), it would just make the property reactive and you would call and set them as regular properties (`var name = vm.name` and `vm.name = 'Paco'`)
-- The `if` binding would remove the element from the DOM and `visible` would leave it on the page. Right now they're synonyms and both leave the element on the page but with the style `display: none`. The same would apply to `hidden`/`unless`.
+- ~~The `if` binding would remove the element from the DOM and `visible` would leave it on the page. Right now they're synonyms and both leave the element on the page but with the style `display: none`. The same would apply to `hidden`/`unless`.~~
+- Removing the elements within `if` opens up a whole can of worms so I don't think it's worth it.
 - Add a `group-value` binding for checkboxes and radios. That way `checked` will bind a boolean telling whether the checkbox/radio is ticked or not, and `v-group-value` binds to the value of the group.
 - View models will only be able to bind to Meteor templates.
 - Show a console warning when you use a reserved word in your view models.
