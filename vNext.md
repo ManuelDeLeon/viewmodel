@@ -4,7 +4,7 @@ This is a place for me to put ideas I think are worth considering if I ever get 
 Drop me a line at http://viewmodelboard.meteor.com with your questions or comments.
 
 - ~~Use `v-` tags instead of `data-bind`. I can't think of a downside for doing `<button v-click="doSomething"></button>` instead of `<button data-bind="click: doSomething"></button>`.~~
-- The performance of searching for multiple `v-` tags isn't good enough, specially on mobile. We'll stay with a single tag but use `db=` by default instead.
+- The performance of searching for multiple `v-` tags isn't good enough, specially on mobile. It's not horrible and most apps would do just fine, but it degrades the more bindings there are on the page. We'll stay with a single tag but use `db=` by default instead.
 - Allow user to change the bind tag from `db=` to anything else (e.g. stay with `data-bind=`). This could be set globally via `ViewModel.BindAttribute` and for specific view models via `vmBindAttribute`.
 - Drop IE8 and IE9 support and use vanilla JS for most things instead of relying so heavily on JQuery.
 - Use ES5 properties. So instead of converting properties to functions that you can get by calling them without parameters (e.g. `vm.name()`) and setting them by passing a parameter (e.g. `vm.name('Paco')`), it would just make the property reactive and you would call and set them as regular properties (`var name = vm.name` and `vm.name = 'Paco'`)
