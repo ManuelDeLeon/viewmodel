@@ -12,6 +12,7 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Removing the elements within `if` opens up a whole can of worms so I don't think it's worth it.
 - Add a `group-value` binding for checkboxes and radios. That way `checked` will bind a boolean telling whether the checkbox/radio is ticked or not, and `v-group-value` binds to the value of the group.
 - View models will only be able to bind to Meteor templates.
+- Make better use of console log/error/warn/info
 - Show a console warning when you use a reserved word in your view models.
 - Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto` (it will save the state if it's the only view model for the template or if it has a name), `named` (like right now where you have to give the view model a name for it to save the state), and `none`. You would be able to set it globally via `ViewModel.persist = 'named'` or `ViewModel.saveState = 'named'` and for individual templates via `viewmodel.vmPersist = 'none'`.
 - Figure out a way to make binding definitions/extensions more human readable. The parameters aren't exactly crystal clear.
