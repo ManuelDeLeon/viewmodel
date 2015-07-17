@@ -1,4 +1,9 @@
-﻿## 1.8.5
+﻿## 1.8.6
+
+* Trigger a change when the value bind changes programmatically.
+* Fix select element (multiple) not maintaining selections when an element is added to the array.
+
+## 1.8.5
 
 * Show console messages only when in development.
 

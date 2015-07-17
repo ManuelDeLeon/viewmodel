@@ -76,6 +76,7 @@ ViewModel.addBind 'value', (p) ->
         $(this).attr "selected", this.value in newValue
     else if p.element.val() isnt newValue
       p.element.val newValue
+    p.element.trigger 'change'
 
     return if c.firstRun
     if isInput and not VmHelper.delayed[delayName + "X"]
@@ -89,7 +90,17 @@ ViewModel.addBind 'value', (p) ->
       newValue = p.element.val()
       if ev.type is 'keypress'
         newValue += String.fromCharCode(ev.which || ev.keyCode)
-      p.vm[p.property] newValue if getProperty(p.vm, p.property) isnt newValue
+      currentValue = getProperty(p.vm, p.property)
+      if isSelect and isMultiple
+        if not VmHelper.arraysAreEqual(currentValue, newValue)
+          VmHelper.delay 0, ->
+            currentValue.pause()
+            currentValue.clear()
+            currentValue.push v for v in newValue
+            currentValue.resume()
+      else
+        p.vm[p.property] newValue if currentValue isnt newValue
+
       if isInput
         VmHelper.delay 500, delayName + "X", ->
           p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
@@ -135,10 +146,14 @@ ViewModel.addBind 'options', (p) ->
         caption = getProperty(p.vm, optionsCaption)
       p.element.append("<option value='' selected='selected'>#{_.escape(caption)}</option>")
 
+    isMultiple = p.element.prop('multiple')
     for o in arr
       text = _.escape(if optionsText then o[optionsText] else o)
       oValue = _.escape(if optionsValue then o[optionsValue] else o)
-      selected = if value is oValue then "selected='selected'" else ""
+      if isMultiple
+        selected = if oValue in value then "selected='selected'" else ""
+      else
+        selected = if value is oValue then "selected='selected'" else ""
       p.element.append("<option #{selected} value=\"#{oValue}\">#{text}</option>")
 
 ViewModel.addBind 'checked', (p) ->

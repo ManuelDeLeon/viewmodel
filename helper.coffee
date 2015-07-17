@@ -42,6 +42,9 @@ parseUri.options =
     loose: /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
 
 class @VmHelper
+  @arraysAreEqual = (a, b) ->
+    a.length is b.length and a.every (elem, i) -> elem is b[i]
+
   @isObject = (obj) -> Object.prototype.toString.call(obj) is '[object Object]'
   @isString = (obj) -> Object.prototype.toString.call(obj) is '[object String]'
   @isArray = (obj) -> obj instanceof Array
