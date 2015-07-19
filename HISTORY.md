@@ -1,4 +1,8 @@
-﻿## 1.8.7
+﻿## 1.8.8
+
+* Fix backspace on empty input for some browsers.
+
+## 1.8.7
 
 * Keypress disregards non-characters when updating the underlying value
 
