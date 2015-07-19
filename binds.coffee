@@ -88,7 +88,7 @@ ViewModel.addBind 'value', (p) ->
   p.element.bind "cut paste keypress input change", (ev) ->
     f = ->
       newValue = p.element.val()
-      if ev.type is 'keypress'
+      if ev.type is 'keypress' and ev.which != 0 and !ev.ctrlKey and !ev.metaKey and !ev.altKey
         newValue += String.fromCharCode(ev.which || ev.keyCode)
       currentValue = getProperty(p.vm, p.property)
       if isSelect and isMultiple

@@ -1,4 +1,8 @@
-﻿## 1.8.6
+﻿## 1.8.7
+
+* Keypress disregards non-characters when updating the underlying value
+
+## 1.8.6
 
 * Trigger a change when the value bind changes programmatically.
 * Fix select element (multiple) not maintaining selections when an element is added to the array.
