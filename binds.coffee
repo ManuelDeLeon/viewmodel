@@ -63,12 +63,18 @@ ViewModel.addBind 'default', (p) ->
   else
     p.element.bind p.bindName, (e) -> getProperty p.vm, p.property, e
 
+objToString = (obj) ->
+  str = '\n'
+  for p of obj when obj.hasOwnProperty(p) and not _.isFunction(obj[p]) and not _.isObject(obj[p])
+    str += p + '::' + obj[p] + '\n'
+  str
 ViewModel.addBind 'value', (p) ->
   delayTime = p.elementBind['delay'] or 0
   delayName = p.vm._vm_id + '_' + p.bindName + "_" + p.property
   isSelect = p.element.is "select"
   isMultiple = p.element.prop('multiple')
   isInput = p.element.is("input")
+  isIE8 = (document.documentMode || 9) < 9
   p.autorun (c) ->
     newValue = getProperty p.vm, p.property
     if isSelect and isMultiple
@@ -85,11 +91,10 @@ ViewModel.addBind 'value', (p) ->
   if isInput
     p.vm._vm_addDelayedProperty p.property, getProperty(p.vm, p.property), p.vm
 
-  p.element.bind "cut paste keypress input change", (ev) ->
+  p.element.bind "cut paste keyup input change", (ev) ->
     f = ->
       newValue = p.element.val()
-      if ev.type is 'keypress' and ev.which isnt 0 and !ev.ctrlKey and !ev.metaKey and !ev.altKey and ev.which isnt 8
-        newValue += String.fromCharCode(ev.which || ev.keyCode)
+
       currentValue = getProperty(p.vm, p.property)
       if isSelect and isMultiple
         if not VmHelper.arraysAreEqual(currentValue, newValue)
@@ -104,6 +109,7 @@ ViewModel.addBind 'value', (p) ->
       if isInput
         VmHelper.delay 500, delayName + "X", ->
           p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
+    #if ev.type isnt 'keyup' or isIE8
     if delayTime
       VmHelper.delay delayTime, delayName, f
     else
