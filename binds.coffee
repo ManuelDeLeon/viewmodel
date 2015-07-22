@@ -69,7 +69,6 @@ ViewModel.addBind 'value', (p) ->
   isSelect = p.element.is "select"
   isMultiple = p.element.prop('multiple')
   isInput = p.element.is("input")
-  isIE8 = (document.documentMode || 9) < 9
   p.autorun (c) ->
     newValue = getProperty p.vm, p.property
     if isSelect and isMultiple
@@ -89,7 +88,6 @@ ViewModel.addBind 'value', (p) ->
   p.element.bind "cut paste keyup input change", (ev) ->
     f = ->
       newValue = p.element.val()
-
       currentValue = getProperty(p.vm, p.property)
       if isSelect and isMultiple
         if not VmHelper.arraysAreEqual(currentValue, newValue)
@@ -104,7 +102,7 @@ ViewModel.addBind 'value', (p) ->
       if isInput
         VmHelper.delay 500, delayName + "X", ->
           p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
-    #if ev.type isnt 'keyup' or isIE8
+
     if delayTime
       VmHelper.delay delayTime, delayName, f
     else
