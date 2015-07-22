@@ -63,11 +63,6 @@ ViewModel.addBind 'default', (p) ->
   else
     p.element.bind p.bindName, (e) -> getProperty p.vm, p.property, e
 
-objToString = (obj) ->
-  str = '\n'
-  for p of obj when obj.hasOwnProperty(p) and not _.isFunction(obj[p]) and not _.isObject(obj[p])
-    str += p + '::' + obj[p] + '\n'
-  str
 ViewModel.addBind 'value', (p) ->
   delayTime = p.elementBind['delay'] or 0
   delayName = p.vm._vm_id + '_' + p.bindName + "_" + p.property
@@ -157,7 +152,10 @@ ViewModel.addBind 'options', (p) ->
       text = _.escape(if optionsText then o[optionsText] else o)
       oValue = _.escape(if optionsValue then o[optionsValue] else o)
       if isMultiple
-        selected = if oValue in value then "selected='selected'" else ""
+        if value
+          selected = if oValue in value then "selected='selected'" else ""
+        else
+          console.log "value binding is required for options binding on select multiple."
       else
         selected = if value is oValue then "selected='selected'" else ""
       p.element.append("<option #{selected} value=\"#{oValue}\">#{text}</option>")

@@ -1,4 +1,8 @@
-﻿## 1.8.8
+﻿## 1.8.9
+
+* Simplify input value binding
+
+## 1.8.8
 
 * Fix backspace on empty input for some browsers.
 
