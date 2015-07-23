@@ -8,7 +8,7 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Allow user to change the bind tag from `db=` to anything else (e.g. stay with `data-bind=`). This could be set globally via `ViewModel.BindAttribute` and for specific view models via `vmBindAttribute`.
 - ~~Use ES5 properties. So instead of converting properties to functions that you can get by calling them without parameters (e.g. `vm.name()`) and setting them by passing a parameter (e.g. `vm.name('Paco')`), it would just make the property reactive and you would call and set them as regular properties (`var name = vm.name` and `vm.name = 'Paco'`)~~
 - The current system has a really nice side effect of being able to pass properties by reference. That means that a parent template can pass one of its properties to a child and now both view models share the same property.
-- Reactify the whole objects instead of wrapping them in a property.
+- Reactify the whole objects instead of wrapping them in a property. If you want to keep objects as they are then wrap them in a function that returns the object. I'm thinking of maybe adding a config param for the view model to let you choose the behavior.
 - ~~Drop IE8 and IE9 support and use vanilla JS for most things instead of relying so heavily on JQuery.~~
 - Not much reason to drop IE8 support if not going to use ES5 properties.
 - ~~The `if` binding would remove the element from the DOM and `visible` would leave it on the page. Right now they're synonyms and both leave the element on the page but with the style `display: none`. The same would apply to `hidden`/`unless`.~~
