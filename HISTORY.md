@@ -1,4 +1,8 @@
-﻿## 1.8.9
+﻿## 1.9.0
+
+* Allow binding directly to parent properties (`data-bind="value: parent.name"`)
+
+## 1.8.9
 
 * Simplify input value binding
 

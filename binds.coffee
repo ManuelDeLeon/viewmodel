@@ -1,3 +1,16 @@
+setProperty = (vm, prop, value) ->
+  return null if not prop
+  if ~prop.indexOf('.')
+    funcs = prop.split('.')
+    propToUse = vm[funcs[0]]()
+    for i in [1..(funcs.length - 2)] by 1
+      propToUse = propToUse[funcs[i]]()
+    propToUse[funcs[funcs.length - 1]] value
+  else
+    vm[prop] value
+
+  return
+
 getProperty = (vm, prop, e) ->
   return null if not prop
 
@@ -32,7 +45,7 @@ getProperty = (vm, prop, e) ->
           if e
             propToUse = propToUse[funcs[i]](e)
           else
-          propToUse = propToUse[funcs[i]]()
+            propToUse = propToUse[funcs[i]]()
           gotIt = true
         ret = propToUse[funcs[funcs.length - 1]] if gotIt
       else
@@ -71,6 +84,7 @@ ViewModel.addBind 'value', (p) ->
   isInput = p.element.is("input")
   p.autorun (c) ->
     newValue = getProperty p.vm, p.property
+    newValue = newValue() if _.isFunction(newValue)
     if isSelect and isMultiple
       p.element.find("option").each ->
         $(this).attr "selected", this.value in newValue
@@ -97,7 +111,7 @@ ViewModel.addBind 'value', (p) ->
             currentValue.push v for v in newValue
             currentValue.resume()
       else
-        p.vm[p.property] newValue if currentValue isnt newValue
+        setProperty(p.vm, p.property, newValue) if currentValue isnt newValue
 
       if isInput
         VmHelper.delay 500, delayName + "X", ->
@@ -177,7 +191,7 @@ ViewModel.addBind 'checked', (p) ->
         val.remove p.element.val()
     else
       newValue = if p.element.attr('type') is 'checkbox' then p.element.is(':checked') else p.element.val()
-      p.vm[p.property] newValue if val isnt newValue
+      setProperty(p.vm, p.property, newValue) if val isnt newValue
 
 ViewModel.addBind 'change', (p) ->
   propToFunc = {}
@@ -202,12 +216,13 @@ ViewModel.addBind 'change', (p) ->
 ViewModel.addBind 'file', (p) ->
   p.element.bind 'change', (e) ->
     file = if e.target.files?.length then e.target.files[0] else null
-    p.vm[p.property] file
+    setProperty(p.vm, p.property,  file)
 
 ViewModel.addBind 'files', (p) ->
   p.element.bind 'change', (e) ->
-    p.vm[p.property]().clear()
-    p.vm[p.property]().push(f) for f in e.target.files
+    prop = getProperty(p.vm, p.property)
+    prop.clear()
+    prop.push(f) for f in e.target.files
 
 ViewModel.addBind 'focused', (p) ->
   p.autorun (c) ->
@@ -217,8 +232,8 @@ ViewModel.addBind 'focused', (p) ->
         p.element.focus()
       else
         p.element.blur()
-  p.element.focus -> p.vm[p.property] true if not getProperty(p.vm, p.property)
-  p.element.focusout -> p.vm[p.property] false if getProperty(p.vm, p.property)
+  p.element.focus -> setProperty(p.vm, p.property, true) if not getProperty(p.vm, p.property)
+  p.element.focusout -> setProperty(p.vm, p.property, false) if getProperty(p.vm, p.property)
 
 ViewModel.addBind 'text', (p) ->
   p.autorun ->
@@ -327,4 +342,6 @@ for attr in ['src', 'href', 'readonly']
     ViewModel.addBind attr, (p) -> setAttr( attr, p.property, p.vm, p )
 
 ViewModel.addBind 'toggle', (p) ->
-  p.element.bind 'click', -> p.vm[p.property](! p.vm[p.property]())
+  p.element.bind 'click', ->
+    prop = getProperty(p.vm, p.property)
+    setProperty(p.vm, p.property, !prop)
