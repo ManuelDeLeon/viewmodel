@@ -22,5 +22,6 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Think of a way to add filters, converters, and validators.
 - Prefix ViewModel specific methods with `vm` (e.g. `vmToJS()`, `vmParent()`, etc.)
 - Remove `onRendered`, `onCreated`, and `onDestroyed` in favor of `vmBeforeBind`/`vmAfterBind`, `vmBeforeCreate`/`vmAfterCreate`, `vmBeforeDispose`/`vmAfterDispose`
-- Use `vmHelpers` and `vmEvents` to add blaze helpers and events.
+- Use ~~`vmHelpers`~~ and `vmEvents` to add blaze helpers and events.
+- Add all vm properties as blaze helpers.
 - Standardise bind names. Don't use `ed` (`focus` instead of `focused`, `check` instead of `checked`, etc.)
