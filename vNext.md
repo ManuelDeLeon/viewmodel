@@ -16,12 +16,12 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Add a `group-value` binding for checkboxes and radios. That way `checked` will bind a boolean telling whether the checkbox/radio is ticked or not, and `group-value` binds to the value of the group.
 - View models will only be able to bind to Meteor templates.
 - Make better use of console log/error/warn/info
-- Create view models only by passing objects. If you want to name the vm then use the property `vmName`, if you want to add a helper use `vmHelpers`.
 - Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto` (it will save the state if it's the only view model for the template or if it has a name), `named` (like right now where you have to give the view model a name for it to save the state), and `none`. You would be able to set it globally via `ViewModel.persist = 'named'` or `ViewModel.saveState = 'named'` and for individual templates via `viewmodel.vmPersist = 'none'`.
 - Figure out a way to make binding definitions/extensions more human readable. The parameters aren't exactly crystal clear.
 - Think of a way to add filters, converters, and validators.
 - Prefix ViewModel specific methods with `vm` (e.g. `vmToJS()`, `vmParent()`, etc.)
 - Remove `onRendered`, `onCreated`, and `onDestroyed` in favor of `vmBeforeBind`/`vmAfterBind`, `vmBeforeCreate`/`vmAfterCreate`, `vmBeforeDispose`/`vmAfterDispose`
+- Create view models only by passing objects. If you want to name the vm then use the property `vmName`, if you want to add an event use `vmEvents`.
 - Use ~~`vmHelpers`~~ and `vmEvents` to add blaze helpers and events.
 - Add all vm properties as blaze helpers.
 - Standardise bind names. Don't use `ed` (`focus` instead of `focused`, `check` instead of `checked`, etc.)
