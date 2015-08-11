@@ -1,4 +1,9 @@
-﻿## 1.9.0
+﻿## 1.9.1
+
+* .children() is now reactive
+* .children() now accepts a bool predicate function or a string with the desired template name
+
+## 1.9.0
 
 * Allow binding directly to parent properties (`data-bind="value: parent.name"`)
 

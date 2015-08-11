@@ -45,7 +45,19 @@ class ViewModel
     @_vm_delayed = {}
     propertiesDelayed = []
     @_vm_children = new ReactiveArray()
-    @children = -> self._vm_children
+    @children = (predicate) ->
+      list = self._vm_children?.list()
+      return list if not (predicate and list)
+
+      test = null
+      if _.isFunction(predicate)
+        test = predicate
+      else if _.isString(predicate)
+        test = (vm) ->
+          predicate is vm.templateInstance.view.name.substring("Template.".length)
+
+      return (c for c in list when test(c))
+
 
     addRawProperty = (p, value, vm, values, dependencies) ->
       dep = dependencies[p] || (dependencies[p] = new Tracker.Dependency())
