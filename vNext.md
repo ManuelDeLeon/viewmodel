@@ -25,3 +25,4 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Use ~~`vmHelpers`~~ and `vmEvents` to add blaze helpers and events.
 - Add all vm properties as blaze helpers.
 - Standardise bind names. Don't use `ed` (`focus` instead of `focused`, `check` instead of `checked`, etc.)
+- Get rid of `ViewModel.byId` and `ViewModel.byTemplate`, and use `find` and `findOne` instead. They would take a string, object, or function. With a string `find` will work as `byTemplate`, `findOne` would work as `byId`. With an object they would the return the matching view model(s). With a function it will be treated as the predicate to use to retrieve the matching view model(s).
