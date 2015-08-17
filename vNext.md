@@ -18,10 +18,15 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Make better use of console log/error/warn/info
 - Add a setting so ViewModel tries to save the state of the view model (for hot code pushes) if it's the only one used for that template. Settings would be `auto` (it will save the state if it's the only view model for the template or if it has a name), `named` (like right now where you have to give the view model a name for it to save the state), and `none`. You would be able to set it globally via `ViewModel.persist = 'named'` or `ViewModel.saveState = 'named'` and for individual templates via `viewmodel.vmPersist = 'none'`.
 - Figure out a way to make binding definitions/extensions more human readable. The parameters aren't exactly crystal clear.
-- Think of a way to add filters, converters, and validators.
+- Add a fallback binding. This value/property/function will be used if the bound value is null or undefined.
+- Think of a way to add validators.
+- Both filters and converters can be implemented via pipelines `|`. If a function is provided (e.g. `(value) -> "$#{value}"` then the conversion will only happen from the view model to the view (the most common scenario). You can also provide an object with the properties `fromVM` and `toVM`: e.g. `{ fromVM: (value) -> "$#{value}", toVM: (value) -> parseInt(value, 10) }`. If multiple converters are given then their values would cascade from one to the other and return the final value.
 - Prefix ViewModel specific methods with `vm` (e.g. `vmToJS()`, `vmParent()`, etc.)
+- Add `vmChild` to get a single child vm (in addition to `vmParent` and `vmChildren`)
 - Remove `onRendered`, `onCreated`, and `onDestroyed` in favor of `vmBeforeBind`/`vmAfterBind`, `vmBeforeCreate`/`vmAfterCreate`, `vmBeforeDispose`/`vmAfterDispose`
 - Create view models only by passing objects. If you want to name the vm then use the property `vmName`, if you want to add an event use `vmEvents`.
 - Use ~~`vmHelpers`~~ and `vmEvents` to add blaze helpers and events.
 - Add all vm properties as blaze helpers.
 - Standardise bind names. Don't use `ed` (`focus` instead of `focused`, `check` instead of `checked`, etc.)
+- Get rid of `ViewModel.byId` and `ViewModel.byTemplate`, and use `find` and `findOne` instead. They would take a string, object, or function. With a string `find` will work as `byTemplate`, `findOne` would work as `byId`. With an object they would the return the matching view model(s). With a function it will be treated as the predicate to use to retrieve the matching view model(s).
+- Allow the use of most operators for bindings. e.g. `db="text: firstName + ' ' + lastName"`
