@@ -1,4 +1,8 @@
-﻿## 1.9.1
+﻿## 1.9.2
+
+* view model autoruns are now executed after the view model is created.
+
+## 1.9.1
 
 * .children() is now reactive
 * .children() now accepts a bool predicate function or a string with the desired template name
