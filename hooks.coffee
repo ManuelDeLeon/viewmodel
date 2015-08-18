@@ -39,10 +39,7 @@ Blaze.Template.prototype.createViewModel = (data) ->
   viewmodel = new ViewModel vmName, {}
   for obj in vmObjects when obj
     viewmodel.extend obj
-  for obj in vmObjects when obj?.autorun
-    do (obj) ->
-      Tracker.autorun (c) ->
-        obj.autorun.call(viewmodel, c)
+  viewmodel._vm_autoruns = (obj.autorun for obj in vmObjects when obj?.autorun)
   viewmodel
 
 Blaze.Template.prototype.viewmodel = ->
@@ -118,6 +115,13 @@ Blaze.Template.prototype.viewmodel = ->
     created = true
 
   template.onRendered ->
+    that = this
+    if this.viewmodel._vm_autoruns?.length
+      for autorun in this.viewmodel._vm_autoruns
+        do (autorun) ->
+          that.autorun (c) ->
+            autorun.call(that.viewmodel, c)
+
     if this.viewmodel.beforeBind
       this.viewmodel.beforeBind this
 

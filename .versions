@@ -10,7 +10,7 @@ jquery@1.11.3_2
 json@1.0.3
 manuel:isdev@1.0.0
 manuel:reactivearray@1.0.5
-manuel:viewmodel@1.9.1
+manuel:viewmodel@1.9.2
 meteor@1.1.6
 minimongo@1.0.8
 observe-sequence@1.0.6

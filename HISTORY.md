@@ -1,4 +1,8 @@
-﻿## 1.9.2
+﻿## 1.9.3
+
+* Autoruns are now executed on rendered before bind. 
+
+## 1.9.2
 
 * view model autoruns are now executed after the view model is created.
 
