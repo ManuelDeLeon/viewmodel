@@ -118,9 +118,15 @@ Blaze.Template.prototype.viewmodel = ->
     that = this
     if this.viewmodel._vm_autoruns?.length
       for autorun in this.viewmodel._vm_autoruns
-        do (autorun) ->
-          that.autorun (c) ->
-            autorun.call(that.viewmodel, c)
+        if _.isArray(autorun)
+          for ar in autorun
+            do (ar) ->
+              that.autorun (c) ->
+                ar.call(that.viewmodel, c)
+        else
+          do (autorun) ->
+            that.autorun (c) ->
+              autorun.call(that.viewmodel, c)
 
     if this.viewmodel.beforeBind
       this.viewmodel.beforeBind this

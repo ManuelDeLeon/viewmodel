@@ -1,4 +1,8 @@
-﻿## 1.9.3
+﻿## 1.9.4
+
+* Autoruns can now be declared with an array of fuctions. 
+
+## 1.9.3
 
 * Autoruns are now executed on rendered before bind. 
 
