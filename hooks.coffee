@@ -95,10 +95,10 @@ Blaze.Template.prototype.viewmodel = ->
         # Update view model from URL
         updateFromUrl = (state, title, url = document.URL) ->
           for key, value of VmHelper.url(url).queryKey when ~key.indexOf(".")
-            [template, property] = key.split(".")
+            [temp, property] = key.split(".")
             property = decodeURI(property)
             if property in props
-              if template is tName
+              if temp is tName
                 that.viewmodel[property] decodeURI(value)
         window.onpopstate = window.history.onstatechange = updateFromUrl
         updateFromUrl()
@@ -113,6 +113,7 @@ Blaze.Template.prototype.viewmodel = ->
         events = this.viewmodel.blaze_events
         template.events( if _.isFunction(events) then events() else events )
     created = true
+    return
 
   template.onRendered ->
     that = this
@@ -139,10 +140,15 @@ Blaze.Template.prototype.viewmodel = ->
     if this.viewmodel.afterBind
       this.viewmodel.afterBind this
 
+    return
+
   template.onDestroyed ->
     if this.viewmodel.onDestroyed
       this.viewmodel.onDestroyed this
     this.viewmodel.dispose()
+    return
+
+  return
 
 htmls = { }
 Blaze.Template.prototype.elementBind = (selector, data) ->

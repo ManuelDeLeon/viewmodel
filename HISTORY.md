@@ -1,4 +1,8 @@
-﻿## 1.9.4
+﻿## 1.9.5
+
+* Fix issue with onUrl for repeating templates
+
+## 1.9.4
 
 * Autoruns can now be declared with an array of fuctions. 
 
