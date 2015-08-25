@@ -113,7 +113,7 @@ class ViewModel
         t = null
         while parentView
           t = parentView.templateInstance() if parentView.templateInstance
-          break if t
+          break if t?.viewmodel
           parentView = parentView.parentView
         vm.parent = -> t?.viewmodel
         if t?.viewmodel

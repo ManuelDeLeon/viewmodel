@@ -1,4 +1,8 @@
-﻿## 1.9.5
+﻿## 1.9.6
+
+* .parent() uses parent template only if it has a view model  
+
+## 1.9.5
 
 * Fix issue with onUrl for repeating templates
 
