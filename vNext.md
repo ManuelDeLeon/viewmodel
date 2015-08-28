@@ -31,4 +31,5 @@ Drop me a line at http://viewmodelboard.meteor.com with your questions or commen
 - Get rid of `ViewModel.byId` and `ViewModel.byTemplate`, and use `find` and `findOne` instead. They would take a string, object, or function. With a string `find` will work as `byTemplate`, `findOne` would work as `byId`. With an object they would the return the matching view model(s). With a function it will be treated as the predicate to use to retrieve the matching view model(s).
 - Allow the use of most operators for bindings. e.g. `db="text: firstName + ' ' + lastName"`
 - Inherit properties from context so you don't have to write `Template.test.viewmodel( function(data) { return data; } )`
+- Have global view model properties/methods.
 - Fix viewmodel-explorer so it works independent of CSS frameworks
