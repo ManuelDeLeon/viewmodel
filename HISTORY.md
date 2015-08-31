@@ -1,4 +1,9 @@
-﻿## 1.9.6
+﻿## 1.9.7
+
+* Inherit properties from context so you don't have to write `Template.test.viewmodel( function(data) { return data; } )`
+* Properties inherited from the context are reactive and will change if Blaze changes the context.
+
+## 1.9.6
 
 * .parent() uses parent template only if it has a view model  
 

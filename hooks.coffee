@@ -64,14 +64,17 @@ Blaze.Template.prototype.viewmodel = ->
 
   created = false
   template.onCreated ->
+    that = this
     this.viewmodel = template.createViewModel(this.data)
+    if that.data
+      this.autorun ->
+        that.viewmodel.extend Template.currentData()
     this.viewmodel.templateInstance = this;
     this.viewmodel._vm_addParent this.viewmodel, this
     if this.viewmodel.onCreated
       this.viewmodel.onCreated this
 
     if onUrl = this.viewmodel.onUrl
-      that = this
       if not that.viewmodel._vm_hasId
         if Meteor.isDev
           console.log "Cannot save state on the URL for a view model without a name"
