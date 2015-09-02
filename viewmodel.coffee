@@ -176,8 +176,13 @@ class ViewModel
 
     @extend = (newObj) =>
       addProperties newObj, @
-      if @_vm_hasId and Session.get(self._vm_id)
-        self.fromJS Session.get(self._vm_id)
+      objInSession = Session.get(self._vm_id)
+      if @_vm_hasId and objInSession
+        objMatch = {}
+        objMatch[p] = objInSession[p] for p of newObj when _.has(objInSession, p)
+
+        if objMatch.length
+          self.fromJS objMatch
       @
 
     _addHelper = (name, template, that) ->
@@ -250,7 +255,7 @@ class ViewModel
           values[p] = value
           valuesDelayed[p] = obj[p]
 
-      for p of values
+      for p of values when typeof obj[p] isnt "undefined"
         dependencies[p].changed()
         dependenciesDelayed[p].changed() if dependenciesDelayed[p]
       @

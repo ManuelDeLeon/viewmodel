@@ -1,4 +1,8 @@
-﻿## 1.9.7
+﻿## 1.9.8
+
+* Fix .extend when given a blank object 
+
+## 1.9.7
 
 * Inherit properties from context so you don't have to write `Template.test.viewmodel( function(data) { return data; } )`
 * Properties inherited from the context are reactive and will change if Blaze changes the context.
