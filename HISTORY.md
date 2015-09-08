@@ -1,4 +1,8 @@
-﻿## 1.9.8
+﻿## 1.9.9
+
+* Arrays keep being reactive after .reset()
+
+## 1.9.8
 
 * Fix .extend when given a blank object 
 

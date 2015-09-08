@@ -262,8 +262,12 @@ class ViewModel
 
     @reset = ->
       for p in self._vm_properties
-        values[p] = initialValues[p]
-        valuesDelayed[p] = initialValues[p]
+        if initialValues[p] instanceof Array
+          values[p] = new ReactiveArray initialValues[p]
+          valuesDelayed[p] = new ReactiveArray initialValues[p]
+        else
+          values[p] = initialValues[p]
+          valuesDelayed[p] = initialValues[p]
 
       for p of values
         dependencies[p].changed()
