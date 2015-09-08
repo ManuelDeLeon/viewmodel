@@ -1,27 +1,8 @@
-ViewModel: MVVM for Meteor
-==========================
+# A new level of simplicity
 
-Declarative > Imperative
+Go to [viewmodel.org][1] for examples and full documentation.
 
-Reactive > Event Driven
+Go to the [help section][2] if you have any questions, comments, feedback, or just want to talk about anything related to ViewModel and Meteor.
 
-Install:
---------
-meteor add manuel:viewmodel
-
-The Problem
------------
-
-Meteor is a leap forward in web development but one aspect that has remained behind is the way you deal with UI events. I'm referring to the interactions with the user and between UI elements. Right now it's done in an event driven fashion. You listen for events, then run a piece of code that does something, you then update the UI in some way. Develop any interactive UI and you end up with many, many levers and knobs that you have to synchronize to get the experience you want.
-
-The solution
-------------
-
-The solution is to use an MVVM like pattern: You keep the state of the UI in a javascript object and bind the UI elements to properties of that object. You declare what happens and when it happens, and then Meteor will update the UI accordingly and best of all... reactively.
-
-Go to [viewmodel.meteor.com][1] for examples and full documentation.
-
-Go to the [ViewModel Board][2] if you have any questions, comments, feedback, or just want to talk about anything related to ViewModel and Meteor.
-
-[1]:http://viewmodel.meteor.com/
-[2]:http://viewmodelboard.meteor.com
+[1]:https://viewmodel.org/
+[2]:https://viewmodel.org/help
