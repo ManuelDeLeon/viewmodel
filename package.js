@@ -29,7 +29,8 @@ Package.onTest(function(api) {
 
   api.use([
     'coffeescript',
-    'peterellisjones:describe'
+    'peterellisjones:describe',
+    'manuel:viewmodel-debug'
   ], CLIENT);
 
   api.addFiles([
@@ -37,5 +38,5 @@ Package.onTest(function(api) {
     'tests/static.coffee'
   ], CLIENT);
 
-  api.export('ViewModel2', CLIENT);
+  api.export(['ViewModel2'], CLIENT);
 });
