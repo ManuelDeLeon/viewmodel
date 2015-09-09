@@ -16,8 +16,7 @@ Package.onUse(function(api) {
   ], CLIENT);
 
   api.addFiles([
-    'lib/viewmodel.coffee',
-    'lib/viewmodel-debug.coffee'
+    'lib/viewmodel.coffee'
   ], CLIENT);
 
   api.export([
@@ -29,8 +28,7 @@ Package.onTest(function(api) {
 
   api.use([
     'coffeescript',
-    'peterellisjones:describe',
-    'manuel:viewmodel-debug'
+    'peterellisjones:describe'
   ], CLIENT);
 
   api.addFiles([
@@ -38,5 +36,7 @@ Package.onTest(function(api) {
     'tests/static.coffee'
   ], CLIENT);
 
-  api.export(['ViewModel2'], CLIENT);
+  api.export([
+    'ViewModel2'
+  ], CLIENT);
 });
