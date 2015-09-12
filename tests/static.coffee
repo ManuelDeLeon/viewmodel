@@ -14,3 +14,25 @@ describe "ViewModel2", ->
       t.equal used.length, 2
       t.equal used[0], "@@addBinding"
       t.equal used[1], "X"
+
+  context "check", ->
+    it "should not check with ignoreErrors true", (t) ->
+      ignoreErrorsCache = ViewModel2.ignoreErrors
+      debugCache = Package['manuel:viewmodel-debug']
+      used = false
+      ViewModel2.ignoreErrors = true
+      Package['manuel:viewmodel-debug'] =
+        VmCheck: -> used = true
+      ViewModel2.check "A", "B"
+      Package['manuel:viewmodel-debug'] = debugCache
+      ViewModel2.ignoreErrors = ignoreErrorsCache
+      t.isFalse used
+
+    it "should check by default", (t) ->
+      debugCache = Package['manuel:viewmodel-debug']
+      used = false
+      Package['manuel:viewmodel-debug'] =
+        VmCheck: -> used = true
+      ViewModel2.check "A", "B"
+      Package['manuel:viewmodel-debug'] = debugCache
+      t.isTrue used
