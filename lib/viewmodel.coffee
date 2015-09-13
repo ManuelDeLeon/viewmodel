@@ -1,5 +1,3 @@
-
-
 class ViewModel2
   @check = (key, args...) ->
     if not ViewModel2.ignoreErrors
@@ -9,3 +7,4 @@ class ViewModel2
   @addBinding = (binding) ->
     ViewModel2.check '@@addBinding', binding
     ViewModel2.bindings[binding.name] = binding
+
