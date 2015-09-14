@@ -176,12 +176,14 @@ class ViewModel
 
     @extend = (newObj) =>
       addProperties newObj, @
-      objInSession = Session.get(self._vm_id)
+      objInSession = null
+      Tracker.nonreactive ->
+        objInSession = Session.get(self._vm_id)
       if @_vm_hasId and objInSession
         objMatch = {}
         objMatch[p] = objInSession[p] for p of newObj when _.has(objInSession, p)
 
-        if objMatch.length
+        if not _.isEmpty(objMatch)
           self.fromJS objMatch
       @
 

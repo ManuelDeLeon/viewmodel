@@ -1,4 +1,8 @@
-﻿## 1.9.9
+﻿## 1.9.10
+
+* Fix issue when using vm names
+
+## 1.9.9
 
 * Arrays keep being reactive after .reset()
 
