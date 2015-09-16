@@ -345,3 +345,6 @@ ViewModel.addBind 'toggle', (p) ->
   p.element.bind 'click', ->
     prop = getProperty(p.vm, p.property)
     setProperty(p.vm, p.property, !prop)
+
+ViewModel.addBind 'ref', (p) ->
+  p.vm[p.property] = p.element

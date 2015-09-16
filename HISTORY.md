@@ -1,4 +1,8 @@
-﻿## 1.9.11
+﻿## 1.9.12
+
+* Add ref binding
+
+## 1.9.11
 
 * Check that object is an array before using it.
 
