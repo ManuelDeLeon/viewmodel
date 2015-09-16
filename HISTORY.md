@@ -1,4 +1,8 @@
-﻿## 1.9.10
+﻿## 1.9.11
+
+* Check that object is an array before using it.
+
+## 1.9.10
 
 * Fix issue when using vm names
 
