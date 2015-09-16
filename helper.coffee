@@ -43,7 +43,7 @@ parseUri.options =
 
 class @VmHelper
   @arraysAreEqual = (a, b) ->
-    a.length is b.length and a.every (elem, i) -> elem is b[i]
+    VmHelper.isArray(a) and VmHelper.isArray(b) and a.length is b.length and a.every (elem, i) -> elem is b[i]
 
   @isObject = (obj) -> Object.prototype.toString.call(obj) is '[object Object]'
   @isString = (obj) -> Object.prototype.toString.call(obj) is '[object String]'

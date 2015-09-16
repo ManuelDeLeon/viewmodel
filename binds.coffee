@@ -104,7 +104,7 @@ ViewModel.addBind 'value', (p) ->
       newValue = p.element.val()
       currentValue = getProperty(p.vm, p.property)
       if isSelect and isMultiple
-        if not VmHelper.arraysAreEqual(currentValue, newValue)
+        if VmHelper.isArray(currentValue) and VmHelper.isArray(newValue) and not VmHelper.arraysAreEqual(currentValue, newValue)
           VmHelper.delay 0, ->
             currentValue.pause()
             currentValue.clear()
