@@ -1,4 +1,4 @@
-describe "ViewModel2", ->
+describe "ViewModel2 Static", ->
   it "should have bindings object", (t) ->
     t.isTrue _.isObject(ViewModel2.bindings)
   it "should not ignoreErrors", (t) ->
@@ -14,6 +14,13 @@ describe "ViewModel2", ->
       t.equal used.length, 2
       t.equal used[0], "@@addBinding"
       t.equal used[1], "X"
+
+    it "should not return anything", (t) ->
+      cache = ViewModel2.check
+      ViewModel2.check = ->
+      ret = ViewModel2.addBinding "X"
+      ViewModel2.check = cache
+      t.isUndefined ret
 
   context "check", ->
     it "should not check with ignoreErrors true", (t) ->
@@ -36,3 +43,10 @@ describe "ViewModel2", ->
       ViewModel2.check "A", "B"
       Package['manuel:viewmodel-debug'] = debugCache
       t.isTrue used
+
+    it "should return undefined", (t) ->
+      ignoreErrorsCache = ViewModel2.ignoreErrors
+      ViewModel2.ignoreErrors = true
+      ret = ViewModel2.check()
+      ViewModel2.ignoreErrors = ignoreErrorsCache
+      t.isUndefined ret

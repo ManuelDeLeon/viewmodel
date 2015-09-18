@@ -16,7 +16,8 @@ Package.onUse(function(api) {
   ], CLIENT);
 
   api.addFiles([
-    'lib/viewmodel.coffee'
+    'lib/viewmodel.coffee',
+    'lib/blazeHooks.coffee'
   ], CLIENT);
 
   api.export([
@@ -28,12 +29,15 @@ Package.onTest(function(api) {
 
   api.use([
     'coffeescript',
+    'blaze',
     'peterellisjones:describe'
   ], CLIENT);
 
   api.addFiles([
     'lib/viewmodel.coffee',
-    'tests/static.coffee'
+    'lib/blazeHooks.coffee',
+    'tests/viewmodelStatic.coffee',
+    'tests/templateInstance.coffee'
   ], CLIENT);
 
   api.export([
