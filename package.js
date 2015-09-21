@@ -16,8 +16,8 @@ Package.onUse(function(api) {
   ], CLIENT);
 
   api.addFiles([
-    'lib/viewmodel.coffee',
-    'lib/blazeHooks.coffee'
+    'lib/viewmodelStatic.coffee',
+    'lib/template.coffee'
   ], CLIENT);
 
   api.export([
@@ -34,10 +34,10 @@ Package.onTest(function(api) {
   ], CLIENT);
 
   api.addFiles([
-    'lib/viewmodel.coffee',
-    'lib/blazeHooks.coffee',
+    'lib/viewmodelStatic.coffee',
+    'lib/template.coffee',
     'tests/viewmodelStatic.coffee',
-    'tests/templateInstance.coffee'
+    'tests/template.coffee'
   ], CLIENT);
 
   api.export([

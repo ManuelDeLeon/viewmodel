@@ -10,3 +10,8 @@ class ViewModel2
     ViewModel2.bindings[binding.name] = binding
     return
 
+  @onCreated = (template) ->
+    return ->
+      templateInstance = this
+      templateInstance.vm = template.createViewModel(this.data)
+

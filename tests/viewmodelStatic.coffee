@@ -4,6 +4,46 @@ describe "ViewModel2 Static", ->
   it "should not ignoreErrors", (t) ->
     t.isUndefined ViewModel2.ignoreErrors
 
+#  context "onCreated", ->
+#    it "should check the arguments", (t) ->
+#      used = null
+#      template = { onCreated: -> }
+#      ViewModel2.check = (args...) -> used = args
+#      ViewModel2.addOnCreated template, "B"
+#      t.equal used.length, 3
+#      t.equal used[0], "@@addOnCreated"
+#      t.equal used[1], template
+#      t.equal used[2], "B"
+
+#    values = {}
+#    cache = ->
+#      values['check'] = ViewModel2.check
+#      ViewModel2.check = ->
+#    restore = ->
+#      ViewModel2.check = values['check']
+#
+
+#
+#    it "should not return anything", (t) ->
+#      cache()
+#      template = { onCreated: -> }
+#
+#      ret = ViewModel2.addOnCreated template, "B"
+#      restore()
+#      t.isUndefined ret
+#
+#    it "should add a viewmodel to the template instance", (t) ->
+#      cache()
+#      templateInstance = {}
+#      template =
+#        onCreated: (f) ->
+#          f.call templateInstance
+#        createViewModel: -> {}
+#
+#      ret = ViewModel2.addOnCreated template, "B"
+#      restore()
+#      t.isUndefined ret
+
   context "addBinding", ->
     it "should check the arguments", (t) ->
       cache = ViewModel2.check
