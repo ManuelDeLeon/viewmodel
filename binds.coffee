@@ -90,7 +90,7 @@ ViewModel.addBind 'value', (p) ->
         $(this).attr "selected", this.value in newValue
     else if p.element.val() isnt newValue
       p.element.val newValue
-    p.element.trigger 'change'
+    p.element.trigger 'changed'
 
     return if c.firstRun
     if isInput and not VmHelper.delayed[delayName + "X"]
@@ -182,7 +182,7 @@ ViewModel.addBind 'checked', (p) ->
         p.element.prop 'checked', val if p.element.is(':checked') isnt val
       else
         p.element.prop 'checked', val is p.element.val() if p.element.is(':checked') isnt  (val is p.element.val())
-  p.element.bind 'change', ->
+  p.element.bind 'changed', ->
     val = getProperty(p.vm, p.property)
     if VmHelper.isArray val
       if p.element.is(':checked')
@@ -193,15 +193,15 @@ ViewModel.addBind 'checked', (p) ->
       newValue = if p.element.attr('type') is 'checkbox' then p.element.is(':checked') else p.element.val()
       setProperty(p.vm, p.property, newValue) if val isnt newValue
 
-ViewModel.addBind 'change', (p) ->
+ViewModel.addBind 'changed', (p) ->
   propToFunc = {}
-  if _.isObject(p.elementBind.change)
-    propToFunc = p.elementBind.change
+  if _.isObject(p.elementBind.changed)
+    propToFunc = p.elementBind.changed
   else
     b = p.elementBind
     propWithValue = b.value or b.checked or b.text or b.focused or b.hover
     if propWithValue
-      propToFunc[propWithValue] = p.elementBind.change
+      propToFunc[propWithValue] = p.elementBind.changed
 
   if _.size(propToFunc)
     for prop of propToFunc
@@ -214,12 +214,12 @@ ViewModel.addBind 'change', (p) ->
     ViewModel.binds.default(p)
 
 ViewModel.addBind 'file', (p) ->
-  p.element.bind 'change', (e) ->
+  p.element.bind 'changed', (e) ->
     file = if e.target.files?.length then e.target.files[0] else null
     setProperty(p.vm, p.property,  file)
 
 ViewModel.addBind 'files', (p) ->
-  p.element.bind 'change', (e) ->
+  p.element.bind 'changed', (e) ->
     prop = getProperty(p.vm, p.property)
     prop.clear()
     prop.push(f) for f in e.target.files
