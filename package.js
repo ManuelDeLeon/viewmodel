@@ -11,6 +11,7 @@ Package.onUse(function(api) {
   api.use([
     'coffeescript',
     'blaze',
+    'blaze-html-templates',
     'manuel:reactivearray',
     'manuel:viewmodel-debug'
   ], CLIENT);
@@ -30,7 +31,10 @@ Package.onTest(function(api) {
   api.use([
     'coffeescript',
     'blaze',
-    'peterellisjones:describe'
+    'blaze-html-templates',
+    'practicalmeteor:mocha',
+    'practicalmeteor:sinon'
+
   ], CLIENT);
 
   api.addFiles([
@@ -41,6 +45,6 @@ Package.onTest(function(api) {
   ], CLIENT);
 
   api.export([
-    'ViewModel2'
+    'ViewModel'
   ], CLIENT);
 });
