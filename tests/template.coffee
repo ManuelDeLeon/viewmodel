@@ -1,16 +1,36 @@
 describe "Template Instance", ->
+
   beforeEach ->
-    @checkStub = sinon.stub ViewModel, "check"
+    @sandbox = sinon.sandbox.create()
+    @checkStub = @sandbox.stub ViewModel, "check"
+    @vmOnCreatedStub = @sandbox.stub ViewModel, "onCreated"
 
   afterEach ->
-    @checkStub.restore()
+    @sandbox.restore()
 
-  it "has viewmodel method", ->
-    assert.isFunction Template.prototype.viewmodel
+  describe "#viewmodel", ->
+    beforeEach ->
+      @context =
+        onCreated: ->
+      @templateOnCreatedSpy = @sandbox.spy(@context, "onCreated")
 
-  it "checks the arguments", ->
-    Template.prototype.viewmodel()
-    assert.isTrue @checkStub.calledOnce
+    it "has the method", ->
+      assert.isFunction Template.prototype.viewmodel
+
+    it "checks the arguments", ->
+      Template.prototype.viewmodel.call @context, "X"
+      assert.isTrue @checkStub.calledOnce
+      assert.isTrue @checkStub.calledWithExactly('T@viewmodel', "X")
+
+    it "saves the initial object in vmInitial", ->
+      Template.prototype.viewmodel.call @context, "X"
+      assert.equal "X", @context.vmInitial
+
+    it "adds onCreated ", ->
+      @vmOnCreatedStub.returns "Y"
+      Template.prototype.viewmodel.call @context, "X"
+      assert.isTrue @vmOnCreatedStub.calledWithExactly(@context)
+      assert.isTrue @templateOnCreatedSpy.calledWithExactly("Y")
 
 
 #describe "Template", ->

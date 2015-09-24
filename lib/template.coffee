@@ -1,5 +1,8 @@
-Blaze.Template.prototype.viewmodel = ->
-  ViewModel.check()
+Blaze.Template.prototype.viewmodel = (initial) ->
+  ViewModel.check 'T@viewmodel', initial
+  this.vmInitial = initial
+  this.onCreated ViewModel.onCreated(this)
+
 #Blaze.Template.prototype.createViewModel = ->
 #  ViewModel2.create template,
 #

@@ -1,6 +1,9 @@
 class ViewModel
   @check = (key, args...) ->
     console.log "X"
+
+  @onCreated = ->
+
 #    if not ViewModel2.ignoreErrors
 #      Package['manuel:viewmodel-debug']?.VmCheck key, args...
 #    return

@@ -17,7 +17,7 @@ Package.onUse(function(api) {
   ], CLIENT);
 
   api.addFiles([
-    'lib/viewmodelStatic.coffee',
+    'lib/viewmodel.coffee',
     'lib/template.coffee'
   ], CLIENT);
 
@@ -38,9 +38,9 @@ Package.onTest(function(api) {
   ], CLIENT);
 
   api.addFiles([
-    'lib/viewmodelStatic.coffee',
+    'lib/viewmodel.coffee',
     'lib/template.coffee',
-    'tests/viewmodelStatic.coffee',
+    'tests/viewmodel.coffee',
     'tests/template.coffee'
   ], CLIENT);
 
