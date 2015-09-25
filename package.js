@@ -22,7 +22,7 @@ Package.onUse(function(api) {
   ], CLIENT);
 
   api.export([
-    'ViewModel2'
+    'ViewModel'
   ], CLIENT);
 });
 
@@ -40,6 +40,7 @@ Package.onTest(function(api) {
   api.addFiles([
     'lib/viewmodel.coffee',
     'lib/template.coffee',
+    'tests/sinon-restore.js',
     'tests/viewmodel.coffee',
     'tests/viewmodelCheck.coffee',
     'tests/template.coffee'

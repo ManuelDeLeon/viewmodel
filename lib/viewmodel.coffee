@@ -1,4 +1,8 @@
 class ViewModel
+  _nextId = 1
+  @nextId = -> _nextId++
+  @reserved =
+    vmId: 1
 
   @check = (key, args...) ->
     if not ViewModel.ignoreErrors
@@ -7,20 +11,37 @@ class ViewModel
 
   @onCreated = (template) ->
     ViewModel.check '@onCreated', template
+    # The following function returned will run when the template is created
     return ->
+      templateInstance = this
+      vm = template.createViewModel(templateInstance.data)
+      templateInstance.viewmodel = vm
+      helpers = {}
+      for prop of vm when not ViewModel.reserved[prop]
+        do (prop) ->
+          helpers[prop] = -> vm[prop]()
 
-#    if not ViewModel2.ignoreErrors
-#      Package['manuel:viewmodel-debug']?.VmCheck key, args...
-#    return
-#
-#  @bindings = {}
-#  @addBinding = (binding) ->
-#    ViewModel2.check '@@addBinding', binding
-#    ViewModel2.bindings[binding.name] = binding
-#    return
-#
-#  @onCreated = (template) ->
-#    return ->
-#      templateInstance = this
-#      templateInstance.vm = template.createViewModel(this.data)
-#
+      template.helpers helpers
+
+  @onRendered = ->
+    # The following function returned will run when the template is rendered
+    return ->
+      templateInstance = this
+      templateInstance.viewmodel.bind()
+
+  @bindIdAttribute = 'bind-id'
+  @bindHelper = (bindString) ->
+    bindId = ViewModel.nextId()
+    templateInstance = Template.instance()
+
+    bindIdObj = {}
+    bindIdObj[ViewModel.bindIdAttribute] = bindId
+    bindIdObj
+
+  @bindHelperName = 'b'
+  @registerHelper = ->
+    Template.registerHelper ViewModel.bindHelperName, ViewModel.bindHelper
+
+  @new = -> new ViewModel()
+
+  bind: ->

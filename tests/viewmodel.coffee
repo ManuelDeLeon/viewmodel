@@ -1,13 +1,17 @@
 describe "ViewModel", ->
 
   beforeEach ->
-    @sandbox = sinon.sandbox.create()
-    @checkStub = @sandbox.stub ViewModel, "check"
+    @checkStub = sinon.stub ViewModel, "check"
 
   afterEach ->
-    @sandbox.restore()
+    sinon.restoreAll()
 
   describe "@onCreated", ->
+    beforeEach ->
+      @createViewModel = sinon.stub Template.prototype, "createViewModel"
+      @template =
+        createViewModel: @createViewModel
+
     it "has the method", ->
       assert.isFunction ViewModel.onCreated
 
@@ -17,6 +21,20 @@ describe "ViewModel", ->
 
     it "returns a function", ->
       assert.isFunction ViewModel.onCreated()
+
+    describe "return function", ->
+
+      beforeEach ->
+        @retFun = ViewModel.onCreated(@template)
+        @instance =
+          data: "A"
+        #@instanceViewmodelSpy = sinon.spy(@context, "viewmodel")
+
+      it "sets the viewmodel property on the template instance", ->
+        @createViewModel.returns "Y"
+        @retFun.call @instance
+        assert.equal "Y", @instance.viewmodel
+        assert.isTrue @createViewModel.calledWith(@instance.data)
 
 #describe "Template", ->
 #  context "viewmodel method", ->

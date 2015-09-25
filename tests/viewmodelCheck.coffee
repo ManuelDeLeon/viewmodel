@@ -2,13 +2,12 @@ describe "ViewModel", ->
 
   describe "@check", ->
     beforeEach ->
-      @sandbox = sinon.sandbox.create()
       Package['manuel:viewmodel-debug'] =
         VmCheck: ->
-      @vmCheckStub = @sandbox.stub Package['manuel:viewmodel-debug'], "VmCheck"
+      @vmCheckStub = sinon.stub Package['manuel:viewmodel-debug'], "VmCheck"
 
     afterEach ->
-      @sandbox.restore()
+      sinon.restoreAll()
 
     it "doesn't check if ignoreErrors is true", ->
       ViewModel.ignoreErrors = true

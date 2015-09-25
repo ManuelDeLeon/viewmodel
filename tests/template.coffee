@@ -1,18 +1,17 @@
 describe "Template", ->
 
   beforeEach ->
-    @sandbox = sinon.sandbox.create()
-    @checkStub = @sandbox.stub ViewModel, "check"
-    @vmOnCreatedStub = @sandbox.stub ViewModel, "onCreated"
+    @checkStub = sinon.stub ViewModel, "check"
+    @vmOnCreatedStub = sinon.stub ViewModel, "onCreated"
 
   afterEach ->
-    @sandbox.restore()
+    sinon.restoreAll()
 
   describe "#viewmodel", ->
     beforeEach ->
       @context =
         onCreated: ->
-      @templateOnCreatedSpy = @sandbox.spy(@context, "onCreated")
+      @templateOnCreatedSpy = sinon.spy(@context, "onCreated")
 
     it "has the method", ->
       assert.isFunction Template.prototype.viewmodel
@@ -21,9 +20,9 @@ describe "Template", ->
       Template.prototype.viewmodel.call @context, "X"
       assert.isTrue @checkStub.calledWithExactly('T@viewmodel', "X")
 
-    it "saves the initial object in vmInitial", ->
+    it "saves the initial object", ->
       Template.prototype.viewmodel.call @context, "X"
-      assert.equal "X", @context.vmInitial
+      assert.equal "X", @context.viewmodelInitial
 
     it "adds onCreated ", ->
       @vmOnCreatedStub.returns "Y"
@@ -34,6 +33,25 @@ describe "Template", ->
     it "returns undefined", ->
       assert.isUndefined Template.prototype.viewmodel.call(@context, "X")
 
+
+  describe "#createViewModel", ->
+    beforeEach ->
+      @createViewModel = Template.prototype.createViewModel
+      @template =
+        viewmodelInitial: {}
+
+    it "has the method", ->
+      assert.isFunction @createViewModel
+
+#    describe "viewmodelInitial is an object", ->
+#      beforeEach ->
+#        @template =
+#          viewmodelInitial: {}
+
+
+#    it "checks the arguments", ->
+#      @createViewModel "X"
+#      assert.isTrue @checkStub.calledWithExactly('T@createViewModel', "X")
 
 #describe "Template", ->
 #  context "viewmodel method", ->
