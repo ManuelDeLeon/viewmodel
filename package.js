@@ -41,6 +41,7 @@ Package.onTest(function(api) {
     'lib/viewmodel.coffee',
     'lib/template.coffee',
     'tests/viewmodel.coffee',
+    'tests/viewmodelCheck.coffee',
     'tests/template.coffee'
   ], CLIENT);
 

@@ -1,4 +1,4 @@
-describe "Template Instance", ->
+describe "Template", ->
 
   beforeEach ->
     @sandbox = sinon.sandbox.create()
@@ -19,7 +19,6 @@ describe "Template Instance", ->
 
     it "checks the arguments", ->
       Template.prototype.viewmodel.call @context, "X"
-      assert.isTrue @checkStub.calledOnce
       assert.isTrue @checkStub.calledWithExactly('T@viewmodel', "X")
 
     it "saves the initial object in vmInitial", ->
@@ -31,6 +30,9 @@ describe "Template Instance", ->
       Template.prototype.viewmodel.call @context, "X"
       assert.isTrue @vmOnCreatedStub.calledWithExactly(@context)
       assert.isTrue @templateOnCreatedSpy.calledWithExactly("Y")
+
+    it "returns undefined", ->
+      assert.isUndefined Template.prototype.viewmodel.call(@context, "X")
 
 
 #describe "Template", ->

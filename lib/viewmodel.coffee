@@ -1,8 +1,13 @@
 class ViewModel
-  @check = (key, args...) ->
-    console.log "X"
 
-  @onCreated = ->
+  @check = (key, args...) ->
+    if not ViewModel.ignoreErrors
+      Package['manuel:viewmodel-debug']?.VmCheck key, args...
+    return
+
+  @onCreated = (template) ->
+    ViewModel.check '@onCreated', template
+    return ->
 
 #    if not ViewModel2.ignoreErrors
 #      Package['manuel:viewmodel-debug']?.VmCheck key, args...

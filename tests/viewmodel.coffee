@@ -1,92 +1,75 @@
-#describe "ViewModel2 Static", ->
-#  it "should have bindings object", (t) ->
-#    t.isTrue _.isObject(ViewModel2.bindings)
-#  it "should not ignoreErrors", (t) ->
-#    t.isUndefined ViewModel2.ignoreErrors
+describe "ViewModel", ->
+
+  beforeEach ->
+    @sandbox = sinon.sandbox.create()
+    @checkStub = @sandbox.stub ViewModel, "check"
+
+  afterEach ->
+    @sandbox.restore()
+
+  describe "@onCreated", ->
+    it "has the method", ->
+      assert.isFunction ViewModel.onCreated
+
+    it "checks the arguments", ->
+      ViewModel.onCreated "X"
+      assert.isTrue @checkStub.calledWithExactly('@onCreated', "X")
+
+    it "returns a function", ->
+      assert.isFunction ViewModel.onCreated()
+
+#describe "Template", ->
+#  context "viewmodel method", ->
+#    cache = {}
+#    cacheValues = ->
+#      cache['check'] = ViewModel2.check
+#      cache['created'] = ViewModel2.onCreated
+#      ViewModel2.check = ->
+#      ViewModel2.onCreated = ->
 #
-##  context "onCreated", ->
-##    it "should check the arguments", (t) ->
-##      used = null
-##      template = { onCreated: -> }
-##      ViewModel2.check = (args...) -> used = args
-##      ViewModel2.addOnCreated template, "B"
-##      t.equal used.length, 3
-##      t.equal used[0], "@@addOnCreated"
-##      t.equal used[1], template
-##      t.equal used[2], "B"
 #
-##    values = {}
-##    cache = ->
-##      values['check'] = ViewModel2.check
-##      ViewModel2.check = ->
-##    restore = ->
-##      ViewModel2.check = values['check']
-##
+#    restoreValues = ->
+#      ViewModel2.check = cache['check']
+#      ViewModel2.onCreated = cache['created']
 #
-##
-##    it "should not return anything", (t) ->
-##      cache()
-##      template = { onCreated: -> }
-##
-##      ret = ViewModel2.addOnCreated template, "B"
-##      restore()
-##      t.isUndefined ret
-##
-##    it "should add a viewmodel to the template instance", (t) ->
-##      cache()
-##      templateInstance = {}
-##      template =
-##        onCreated: (f) ->
-##          f.call templateInstance
-##        createViewModel: -> {}
-##
-##      ret = ViewModel2.addOnCreated template, "B"
-##      restore()
-##      t.isUndefined ret
+#    it "should have it", (t) ->
+#      t.isTrue _.isFunction Blaze.Template.prototype.viewmodel
 #
-#  context "addBinding", ->
 #    it "should check the arguments", (t) ->
-#      cache = ViewModel2.check
+#      cacheValues()
+#      template =
+#        onCreated: ->
 #      used = null
 #      ViewModel2.check = (args...) -> used = args
-#      ViewModel2.addBinding "X"
-#      ViewModel2.check = cache
+#      Blaze.Template.prototype.viewmodel.call template, "X"
+#      restoreValues()
 #      t.equal used.length, 2
-#      t.equal used[0], "@@addBinding"
+#      t.equal used[0], "T@viewmodel"
 #      t.equal used[1], "X"
 #
 #    it "should not return anything", (t) ->
-#      cache = ViewModel2.check
-#      ViewModel2.check = ->
-#      ret = ViewModel2.addBinding "X"
-#      ViewModel2.check = cache
+#      cacheValues()
+#      template =
+#        onCreated: ->
+#      ret = Blaze.Template.prototype.viewmodel.call template, "X"
+#      restoreValues()
 #      t.isUndefined ret
 #
-#  context "check", ->
-#    it "should not check with ignoreErrors true", (t) ->
-#      ignoreErrorsCache = ViewModel2.ignoreErrors
-#      debugCache = Package['manuel:viewmodel-debug']
-#      used = false
-#      ViewModel2.ignoreErrors = true
-#      Package['manuel:viewmodel-debug'] =
-#        VmCheck: -> used = true
-#      ViewModel2.check "A", "B"
-#      Package['manuel:viewmodel-debug'] = debugCache
-#      ViewModel2.ignoreErrors = ignoreErrorsCache
-#      t.isFalse used
+#    it "should set vmInitial", (t) ->
+#      cacheValues()
+#      template =
+#        onCreated: ->
+#      Blaze.Template.prototype.viewmodel.call template, "X"
+#      restoreValues()
+#      t.equal "X", template.vmInitial
 #
-#    it "should check by default", (t) ->
-#      debugCache = Package['manuel:viewmodel-debug']
-#      used = false
-#      Package['manuel:viewmodel-debug'] =
-#        VmCheck: -> used = true
-#      ViewModel2.check "A", "B"
-#      Package['manuel:viewmodel-debug'] = debugCache
-#      t.isTrue used
-#
-#    it "should return undefined", (t) ->
-#      ignoreErrorsCache = ViewModel2.ignoreErrors
-#      ViewModel2.ignoreErrors = true
-#      ret = ViewModel2.check()
-#      ViewModel2.ignoreErrors = ignoreErrorsCache
-#      t.isUndefined ret
+#    it "should call onCreated", (t) ->
+#      cacheValues()
+#      called = false
+#      template =
+#        onCreated: (obj) ->
+#          called = obj is template
+#      ViewModel2.onCreated = (v) -> v
+#      Blaze.Template.prototype.viewmodel.call template, "X"
+#      restoreValues()
+#      t.isTrue called
