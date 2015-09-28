@@ -18,10 +18,6 @@ describe "ViewModel", ->
 
   describe "@onCreated", ->
 
-    it "checks the arguments", ->
-      ViewModel.onCreated "X"
-      assert.isTrue @checkStub.calledWithExactly('@onCreated', "X")
-
     it "returns a function", ->
       assert.isFunction ViewModel.onCreated()
 
@@ -46,11 +42,15 @@ describe "ViewModel", ->
         @retFun.call @instance
         assert.isTrue @instance.viewmodel instanceof ViewModel
 
+      it "adds templateInstance to the view model", ->
+        @retFun.call @instance
+        assert.equal @instance.viewmodel.templateInstance, @instance
+
       it "adds view model properties as helpers", ->
         @retFun.call @instance
         assert.ok @helper.id
 
-      it "doesn't add reserved words to the view model", ->
+      it "doesn't add reserved words as helpers", ->
         @retFun.call @instance
         assert.notOk @helper.vmId
 
@@ -65,10 +65,6 @@ describe "ViewModel", ->
       @onViewReadyFunction = null
       Blaze.currentView =
         onViewReady: (f) => @onViewReadyFunction = f
-
-    it "checks the arguments", ->
-      ViewModel.bindHelper "X"
-      assert.isTrue @checkStub.calledWithExactly('@bindHelper', "X")
 
     it "returns object with the next bind id", ->
       ret = ViewModel.bindHelper()
@@ -85,6 +81,23 @@ describe "ViewModel", ->
       @onViewReadyFunction()
       assert.isTrue bindStub.calledWith 99, { text: 'name' }, templateInstance
 
-  describe "@bindHelperName", ->
-    it "has has default value", ->
-      assert.equal "b", ViewModel.bindHelperName
+  describe "@getInitialObject", ->
+    it "returns the context when initial is an object", ->
+      initial = {}
+      context = "X"
+      ret = ViewModel.getInitialObject(initial, context)
+      assert.equal "X", ret
+
+    it "returns the result of the function when initial is a function", ->
+      initial = (context) -> context + 1
+      context = 1
+      ret = ViewModel.getInitialObject(initial, context)
+      assert.equal 2, ret
+
+  describe "constructor", ->
+    it "adds property as function", ->
+      vm = new ViewModel({ name: 'A'})
+      assert.isFunction vm.name
+      assert.equal 'A', vm.name()
+      vm.name('B')
+      assert.equal 'B', vm.name()

@@ -34,6 +34,16 @@ describe "Template", ->
   describe "#createViewModel", ->
     beforeEach ->
       @createViewModel = Template.prototype.createViewModel
+      @getInitialObjectStub = sinon.stub ViewModel, 'getInitialObject'
+      @getInitialObjectStub.returns "X"
       @template =
-        viewmodelInitial: {}
+        viewmodelInitial: "A"
 
+
+    it "calls getInitialObject", ->
+      @createViewModel.call @template, "B"
+      assert.isTrue @getInitialObjectStub.calledWith("A", "B")
+
+    it "returns a view model", ->
+      vm = @createViewModel.call @template, "B"
+      assert.isTrue vm instanceof ViewModel

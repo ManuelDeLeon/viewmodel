@@ -13,6 +13,7 @@ Package.onUse(function(api) {
     'blaze',
     'blaze-html-templates',
     'jquery',
+    'underscore',
     'manuel:reactivearray',
     'manuel:viewmodel-debug'
   ], CLIENT);
@@ -35,6 +36,7 @@ Package.onTest(function(api) {
     'blaze',
     'blaze-html-templates',
     'jquery',
+    'underscore',
     'practicalmeteor:mocha',
     'practicalmeteor:sinon'
 

@@ -6,7 +6,6 @@ _keywordRegexLookBehind =
   typeof: 1
 
 ViewModel.parseBind = (objectLiteralString) ->
-  ViewModel.check '@parseBind', objectLiteralString
   str = $.trim(objectLiteralString)
   str = str.slice(1, -1) if str.charCodeAt(0) is 123
   result = {}

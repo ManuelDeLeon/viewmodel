@@ -8,6 +8,7 @@ describe "ViewModel", ->
 
   describe "@parseBind", ->
 
-    it "checks the arguments", ->
-      ViewModel.parseBind "X"
-      assert.isTrue @checkStub.calledWithExactly('@parseBind', "X")
+    it "parses object", ->
+      obj = ViewModel.parseBind "text: name, full: first + ' ' + last"
+      assert.isTrue _.isEqual({ text: "name", full: "first +' '+ last" }, obj)
+
