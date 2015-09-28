@@ -6,14 +6,17 @@ describe "ViewModel", ->
   afterEach ->
     sinon.restoreAll()
 
-  describe "@onCreated", ->
-    beforeEach ->
-      @createViewModel = sinon.stub Template.prototype, "createViewModel"
-      @template =
-        createViewModel: @createViewModel
+  describe "@nextId", ->
+    it "increments the numbers", ->
+      a = ViewModel.nextId()
+      b = ViewModel.nextId()
+      assert.equal b, a + 1
 
-    it "has the method", ->
-      assert.isFunction ViewModel.onCreated
+  describe "@reserved", ->
+    it "has reserved words", ->
+      assert.ok ViewModel.reserved.vmId
+
+  describe "@onCreated", ->
 
     it "checks the arguments", ->
       ViewModel.onCreated "X"
@@ -25,69 +28,63 @@ describe "ViewModel", ->
     describe "return function", ->
 
       beforeEach ->
+        @helper = null
+        @template =
+          createViewModel: ->
+            vm = new ViewModel()
+            vm.vmId = ->
+            vm.id = ->
+            return vm
+          helpers: (obj) => @helper = obj
+
         @retFun = ViewModel.onCreated(@template)
+        @helpersSpy = sinon.spy @template, 'helpers'
         @instance =
           data: "A"
-        #@instanceViewmodelSpy = sinon.spy(@context, "viewmodel")
 
       it "sets the viewmodel property on the template instance", ->
-        @createViewModel.returns "Y"
         @retFun.call @instance
-        assert.equal "Y", @instance.viewmodel
-        assert.isTrue @createViewModel.calledWith(@instance.data)
+        assert.isTrue @instance.viewmodel instanceof ViewModel
 
-#describe "Template", ->
-#  context "viewmodel method", ->
-#    cache = {}
-#    cacheValues = ->
-#      cache['check'] = ViewModel2.check
-#      cache['created'] = ViewModel2.onCreated
-#      ViewModel2.check = ->
-#      ViewModel2.onCreated = ->
-#
-#
-#    restoreValues = ->
-#      ViewModel2.check = cache['check']
-#      ViewModel2.onCreated = cache['created']
-#
-#    it "should have it", (t) ->
-#      t.isTrue _.isFunction Blaze.Template.prototype.viewmodel
-#
-#    it "should check the arguments", (t) ->
-#      cacheValues()
-#      template =
-#        onCreated: ->
-#      used = null
-#      ViewModel2.check = (args...) -> used = args
-#      Blaze.Template.prototype.viewmodel.call template, "X"
-#      restoreValues()
-#      t.equal used.length, 2
-#      t.equal used[0], "T@viewmodel"
-#      t.equal used[1], "X"
-#
-#    it "should not return anything", (t) ->
-#      cacheValues()
-#      template =
-#        onCreated: ->
-#      ret = Blaze.Template.prototype.viewmodel.call template, "X"
-#      restoreValues()
-#      t.isUndefined ret
-#
-#    it "should set vmInitial", (t) ->
-#      cacheValues()
-#      template =
-#        onCreated: ->
-#      Blaze.Template.prototype.viewmodel.call template, "X"
-#      restoreValues()
-#      t.equal "X", template.vmInitial
-#
-#    it "should call onCreated", (t) ->
-#      cacheValues()
-#      called = false
-#      template =
-#        onCreated: (obj) ->
-#          called = obj is template
-#      ViewModel2.onCreated = (v) -> v
-#      Blaze.Template.prototype.viewmodel.call template, "X"
-#      restoreValues()
-#      t.isTrue called
+      it "adds view model properties as helpers", ->
+        @retFun.call @instance
+        assert.ok @helper.id
+
+      it "doesn't add reserved words to the view model", ->
+        @retFun.call @instance
+        assert.notOk @helper.vmId
+
+  describe "@bindIdAttribute", ->
+    it "has has default value", ->
+      assert.equal "bind-id", ViewModel.bindIdAttribute
+
+  describe "@bindHelper", ->
+    beforeEach ->
+      @nextIdStub = sinon.stub ViewModel, 'nextId'
+      @nextIdStub.returns 99
+      @onViewReadyFunction = null
+      Blaze.currentView =
+        onViewReady: (f) => @onViewReadyFunction = f
+
+    it "checks the arguments", ->
+      ViewModel.bindHelper "X"
+      assert.isTrue @checkStub.calledWithExactly('@bindHelper', "X")
+
+    it "returns object with the next bind id", ->
+      ret = ViewModel.bindHelper()
+      assert.equal ret[ViewModel.bindIdAttribute], 99
+
+    it "binds the view model when the view is ready", ->
+      viewmodel = new ViewModel()
+      bindStub = sinon.stub viewmodel, 'bind'
+      instanceStub = sinon.stub Template, 'instance'
+      templateInstance =
+        viewmodel: viewmodel
+      instanceStub.returns templateInstance
+      ViewModel.bindHelper("text: name")
+      @onViewReadyFunction()
+      assert.isTrue bindStub.calledWith 99, { text: 'name' }, templateInstance
+
+  describe "@bindHelperName", ->
+    it "has has default value", ->
+      assert.equal "b", ViewModel.bindHelperName

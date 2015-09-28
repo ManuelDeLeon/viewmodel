@@ -12,12 +12,14 @@ Package.onUse(function(api) {
     'coffeescript',
     'blaze',
     'blaze-html-templates',
+    'jquery',
     'manuel:reactivearray',
     'manuel:viewmodel-debug'
   ], CLIENT);
 
   api.addFiles([
     'lib/viewmodel.coffee',
+    'lib/viewmodel-parseBind.coffee',
     'lib/template.coffee'
   ], CLIENT);
 
@@ -32,6 +34,7 @@ Package.onTest(function(api) {
     'coffeescript',
     'blaze',
     'blaze-html-templates',
+    'jquery',
     'practicalmeteor:mocha',
     'practicalmeteor:sinon'
 
@@ -39,10 +42,12 @@ Package.onTest(function(api) {
 
   api.addFiles([
     'lib/viewmodel.coffee',
+    'lib/viewmodel-parseBind.coffee',
     'lib/template.coffee',
     'tests/sinon-restore.js',
     'tests/viewmodel.coffee',
-    'tests/viewmodelCheck.coffee',
+    'tests/viewmodel-check.coffee',
+    'tests/viewmodel-parseBind.coffee',
     'tests/template.coffee'
   ], CLIENT);
 

@@ -1,6 +1,11 @@
 class ViewModel
+
+  #@@@@@@@@@@@@@@
+  # Class methods
+
   _nextId = 1
   @nextId = -> _nextId++
+
   @reserved =
     vmId: 1
 
@@ -22,26 +27,45 @@ class ViewModel
           helpers[prop] = -> vm[prop]()
 
       template.helpers helpers
-
-  @onRendered = ->
-    # The following function returned will run when the template is rendered
-    return ->
-      templateInstance = this
-      templateInstance.viewmodel.bind()
+      return
 
   @bindIdAttribute = 'bind-id'
   @bindHelper = (bindString) ->
+    ViewModel.check '@bindHelper', bindString
+
     bindId = ViewModel.nextId()
+    bindObject = ViewModel.parseBind bindString
+
     templateInstance = Template.instance()
+    Blaze.currentView.onViewReady ->
+      templateInstance.viewmodel.bind bindId, bindObject, templateInstance
+      return
 
     bindIdObj = {}
     bindIdObj[ViewModel.bindIdAttribute] = bindId
-    bindIdObj
+    return bindIdObj
 
   @bindHelperName = 'b'
-  @registerHelper = ->
-    Template.registerHelper ViewModel.bindHelperName, ViewModel.bindHelper
 
-  @new = -> new ViewModel()
 
-  bind: ->
+
+  ##################
+  # Instance methods
+
+  bind: (bindId, bindObject, templateInstance) ->
+    console.log "bindId: #{bindId}"
+
+
+  #############
+  # Constructor
+
+  _initializing = false
+  constructor: ->
+    if not _initializing
+      throw new Error "ViewModel constructor is private. Please use ViewModel.new"
+
+  @new = (initial) ->
+    _initializing = true
+    viewmodel = new ViewModel(initial)
+    _initializing = false
+    return viewmodel
