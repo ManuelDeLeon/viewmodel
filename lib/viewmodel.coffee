@@ -48,16 +48,35 @@ class ViewModel
     if _.isFunction(initial)
       return initial(context)
     else
-      return context
+      return initial
 
-  @makeReactiveProperty = (value) ->
-    return ->
+  @makeReactiveProperty = (initial) ->
+    dependency = new Tracker.Dependency()
+    initialValue = if _.isArray(initial) then new ReactiveArray(initial, dependency) else initial
+    _value = initialValue
+    funProp = (value) ->
+      if arguments.length
+        if _value isnt value
+          _value = value
+          dependency.changed()
+      else
+        dependency.depend()
+      return _value;
+    funProp.reset = ->
+      if _value instanceof ReactiveArray
+        _value = new ReactiveArray(initial, dependency)
+      else
+        _value = initialValue
+    funProp.depend = -> dependency.depend()
+    funProp.changed = -> dependency.changed()
+    return funProp
 
   ##################
   # Instance methods
 
   bind: (bindId, bindObject, templateInstance) ->
     console.log "bindId: #{bindId}"
+    console.log this
 
 
   #############
