@@ -36,6 +36,7 @@ class ViewModel
     bindObject = ViewModel.parseBind bindString
 
     templateInstance = Template.instance()
+
     Blaze.currentView.onViewReady ->
       templateInstance.viewmodel.bind bindId, bindObject, templateInstance
       return
@@ -71,12 +72,44 @@ class ViewModel
     funProp.changed = -> dependency.changed()
     return funProp
 
+  @bindings = {}
+  @addBinding = (args...) ->
+    ViewModel.check "@addBinding", args...
+    binding = args[0]
+    if not @bindings[binding.name]
+      @bindings[binding.name] = []
+    bindingArray = @bindings[binding.name]
+    bindingArray[bindingArray.length] = binding
+    return
+
   ##################
   # Instance methods
 
   bind: (bindId, bindObject, templateInstance) ->
-    console.log "bindId: #{bindId}"
-    console.log this
+    ViewModel.check "#bind", bindId, bindObject, templateInstance, ViewModel.bindings
+
+    element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']").first()
+
+    for bindName, bindValue of bindObject
+      bindingArray = ViewModel.bindings[bindName]
+      binding = null
+      if bindingArray.length is 1
+        binding = bindingArray[0]
+      else
+        binding = null
+
+      binding.bind
+        templateInstance: templateInstance
+        autorun: (f) ->
+          fun = (c) -> f(c)
+          templateInstance.autorun fun
+        element: element
+        getVmValue: => this[bindValue]()
+
+
+    return
+
+
 
 
   #############

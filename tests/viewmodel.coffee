@@ -138,3 +138,36 @@ describe "ViewModel", ->
       actual.reset()
       assert.equal 1, actual().length
       assert.equal 1, actual()[0]
+
+  describe "@addBinding", ->
+
+    it "checks the arguments", ->
+      ViewModel.addBinding "X"
+      assert.isTrue @checkStub.calledWithExactly('@addBinding', "X")
+
+    it "returns nothing", ->
+      ret = ViewModel.addBinding "X"
+      assert.isUndefined ret
+
+    it "adds the binding to @bindings", ->
+      ViewModel.addBinding
+        name: 'test1'
+        bind: -> "X"
+      assert.equal 1, ViewModel.bindings.test1.length
+      assert.equal "X", ViewModel.bindings.test1[0].bind()
+
+    it "adds the binding to @bindings array", ->
+      ViewModel.addBinding
+        name: 'test2'
+        bind: -> "X"
+      ViewModel.addBinding
+        name: 'test2'
+        bind: -> "Y"
+      assert.equal 2, ViewModel.bindings.test2.length
+      assert.equal "X", ViewModel.bindings.test2[0].bind()
+      assert.equal "Y", ViewModel.bindings.test2[1].bind()
+
+
+
+
+

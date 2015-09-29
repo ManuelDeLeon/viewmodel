@@ -15,13 +15,13 @@ Package.onUse(function(api) {
     'jquery',
     'underscore',
     'tracker',
-    'manuel:reactivearray',
-    'manuel:viewmodel-debug'
+    'manuel:reactivearray'
   ], CLIENT);
 
   api.addFiles([
     'lib/viewmodel.coffee',
     'lib/viewmodel-parseBind.coffee',
+    'lib/bindings.coffee',
     'lib/template.coffee'
   ], CLIENT);
 
