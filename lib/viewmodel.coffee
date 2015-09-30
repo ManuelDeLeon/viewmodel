@@ -87,25 +87,35 @@ class ViewModel
 
   bind: (bindId, bindObject, templateInstance) ->
     ViewModel.check "#bind", bindId, bindObject, templateInstance, ViewModel.bindings
-
+    viewmodel = this
     element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']").first()
 
     for bindName, bindValue of bindObject
-      bindingArray = ViewModel.bindings[bindName]
+      console.log ViewModel.bindings
+      bindingArray = ViewModel.bindings[bindName] or ViewModel.bindings['default']
       binding = null
       if bindingArray.length is 1
         binding = bindingArray[0]
       else
         binding = null
 
-      binding.bind
+      bindArg =
         templateInstance: templateInstance
         autorun: (f) ->
-          fun = (c) -> f(c)
+          fun = (c) -> f(c, bindArg)
           templateInstance.autorun fun
         element: element
-        getVmValue: => this[bindValue]()
+        elementBind: bindObject
+        getVmValue: => viewmodel[bindValue]()
+        bindName: bindName
+        bindValue: bindValue
+        viewmodel: viewmodel
 
+      if binding.autorun
+        bindArg.autorun binding.autorun
+
+      if binding.bind
+        binding.bind bindArg
 
     return
 

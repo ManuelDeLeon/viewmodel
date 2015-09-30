@@ -1,5 +1,9 @@
 ViewModel.addBinding
   name: 'text'
+  autorun: (c, bindArg) ->
+    bindArg.element.text bindArg.getVmValue()
+    
+ViewModel.addBinding
+  name: 'default'
   bind: (bindArg) ->
-    bindArg.autorun ->
-      bindArg.element.text bindArg.getVmValue()
+    bindArg.element.on bindArg.bindName, bindArg.viewmodel[bindArg.bindValue]
