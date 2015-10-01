@@ -141,6 +141,9 @@ describe "ViewModel", ->
 
   describe "@addBinding", ->
 
+    last = 1
+    getBindingName = -> "test" + last++
+
     it "checks the arguments", ->
       ViewModel.addBinding "X"
       assert.isTrue @checkStub.calledWithExactly('@addBinding', "X")
@@ -150,24 +153,61 @@ describe "ViewModel", ->
       assert.isUndefined ret
 
     it "adds the binding to @bindings", ->
+      name = getBindingName()
       ViewModel.addBinding
-        name: 'test1'
+        name: name
         bind: -> "X"
-      assert.equal 1, ViewModel.bindings.test1.length
-      assert.equal "X", ViewModel.bindings.test1[0].bind()
+      assert.equal 1, ViewModel.bindings[name].length
+      assert.equal "X", ViewModel.bindings[name][0].bind()
 
     it "adds the binding to @bindings array", ->
+      name = getBindingName()
       ViewModel.addBinding
-        name: 'test2'
+        name: name
         bind: -> "X"
       ViewModel.addBinding
-        name: 'test2'
+        name: name
         bind: -> "Y"
-      assert.equal 2, ViewModel.bindings.test2.length
-      assert.equal "X", ViewModel.bindings.test2[0].bind()
-      assert.equal "Y", ViewModel.bindings.test2[1].bind()
+      assert.equal 2, ViewModel.bindings[name].length
+      assert.equal "X", ViewModel.bindings[name][0].bind()
+      assert.equal "Y", ViewModel.bindings[name][1].bind()
 
+    it "adds default priority 1 to the binding", ->
+      name = getBindingName()
+      ViewModel.addBinding
+        name: name
+      assert.equal 1, ViewModel.bindings[name][0].priority
 
+    it "adds priority 2 with a selector", ->
+      name = getBindingName()
+      ViewModel.addBinding
+        name: name
+        selector: 'A'
+      assert.equal 2, ViewModel.bindings[name][0].priority
 
+    it "adds priority 2 with a bindIf", ->
+      name = getBindingName()
+      ViewModel.addBinding
+        name: name
+        bindIf: ->
+      assert.equal 2, ViewModel.bindings[name][0].priority
 
+    it "adds priority 3 with a selector and bindIf", ->
+      name = getBindingName()
+      ViewModel.addBinding
+        name: name
+        selector: 'A'
+        bindIf: ->
+      assert.equal 3, ViewModel.bindings[name][0].priority
 
+  ##################
+  # Instance methods
+
+  describe "#bind", ->
+
+    beforeEach ->
+      @viewmodel = new ViewModel()
+
+    xit "checks the arguments", ->
+      @viewmodel.bind "A", "B", "C"
+      assert.isTrue @checkStub.calledWithExactly('@addBinding', "A", "B", "C", ViewModel.bindings)

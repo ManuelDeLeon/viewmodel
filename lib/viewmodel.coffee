@@ -76,6 +76,10 @@ class ViewModel
   @addBinding = (args...) ->
     ViewModel.check "@addBinding", args...
     binding = args[0]
+    binding.priority = 1
+    binding.priority++ if binding.selector
+    binding.priority++ if binding.bindIf
+
     if not @bindings[binding.name]
       @bindings[binding.name] = []
     bindingArray = @bindings[binding.name]
@@ -88,7 +92,7 @@ class ViewModel
   bind: (bindId, bindObject, templateInstance) ->
     ViewModel.check "#bind", bindId, bindObject, templateInstance, ViewModel.bindings
     viewmodel = this
-    element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']").first()
+    element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
 
     for bindName, bindValue of bindObject
       bindingArray = ViewModel.bindings[bindName] or ViewModel.bindings['default']
@@ -96,7 +100,11 @@ class ViewModel
       if bindingArray.length is 1
         binding = bindingArray[0]
       else
-        binding = null
+        binding = _.find(_.sortBy(bindingArray, ((b)-> -b.priority)), (b) ->
+          
+        )
+
+      continue if not binding
 
       bindArg =
         templateInstance: templateInstance
@@ -106,6 +114,7 @@ class ViewModel
         element: element
         elementBind: bindObject
         getVmValue: -> viewmodel[bindValue]()
+        setVmValue: (value) -> viewmodel[bindValue](value)
         bindName: bindName
         bindValue: bindValue
         viewmodel: viewmodel
@@ -115,6 +124,10 @@ class ViewModel
 
       if binding.bind
         binding.bind bindArg
+
+      if binding.events
+        for eventName, eventFunc of binding.events
+          element.bind eventName, (e) -> eventFunc(e, bindArg)
 
     return
 
