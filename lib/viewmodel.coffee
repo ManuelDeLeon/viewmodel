@@ -86,6 +86,33 @@ class ViewModel
     bindingArray[bindingArray.length] = binding
     return
 
+  @getBinding = (bindName, bindArg) ->
+    bindingArray = ViewModel.bindings[bindName]
+    binding = null
+    if bindingArray
+      if bindingArray.length is 1
+        binding = bindingArray[0]
+      else
+        binding = _.find(_.sortBy(bindingArray, ((b)-> -b.priority)), (b) ->
+          not ( (b.bindIf and not b.bindIf(bindArg)) or (b.selector and not bindArg.element.is(b.selector)) )
+        )
+    return binding or (bindName isnt 'default' and ViewModel.getBinding('default', bindArg))
+
+  @getBindArgument = (templateInstance, element, bindName, bindValue, bindObject, viewmodel) ->
+    bindArg = {}
+    _.extend bindArg,
+      templateInstance: templateInstance
+      autorun: (f) ->
+        fun = (c) -> f(c, bindArg)
+        templateInstance.autorun fun
+      element: element
+      elementBind: bindObject
+      getVmValue: -> viewmodel[bindValue]()
+      setVmValue: (value) -> viewmodel[bindValue](value)
+      bindName: bindName
+      bindValue: bindValue
+      viewmodel: viewmodel
+
   ##################
   # Instance methods
 
@@ -95,29 +122,11 @@ class ViewModel
     element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
 
     for bindName, bindValue of bindObject
-      bindingArray = ViewModel.bindings[bindName] or ViewModel.bindings['default']
-      binding = null
-      if bindingArray.length is 1
-        binding = bindingArray[0]
-      else
-        binding = _.find(_.sortBy(bindingArray, ((b)-> -b.priority)), (b) ->
-          
-        )
 
-      continue if not binding
+      bindArg = ViewModel.getBindArgument templateInstance, element, bindName, bindValue, bindObject, viewmodel
 
-      bindArg =
-        templateInstance: templateInstance
-        autorun: (f) ->
-          fun = (c) -> f(c, bindArg)
-          templateInstance.autorun fun
-        element: element
-        elementBind: bindObject
-        getVmValue: -> viewmodel[bindValue]()
-        setVmValue: (value) -> viewmodel[bindValue](value)
-        bindName: bindName
-        bindValue: bindValue
-        viewmodel: viewmodel
+      binding = ViewModel.getBinding(bindName, bindArg)
+      return if not binding
 
       if binding.autorun
         bindArg.autorun binding.autorun
