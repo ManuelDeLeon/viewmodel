@@ -9,15 +9,15 @@ var CLIENT = 'client';
 
 Package.onUse(function(api) {
   api.use([
-    'coffeescript',
-    'blaze',
-    'blaze-html-templates',
-    'jquery',
-    'underscore',
-    'tracker',
-    'session',
-    'manuel:reactivearray',
-    'manuel:isdev'
+    'coffeescript@1.0.10',
+    'blaze@2.1.3',
+    'blaze-html-templates@1.0.1',
+    'jquery@1.11.4',
+    'underscore@1.0.4',
+    'tracker@1.0.9',
+    'session@1.1.1',
+    'manuel:reactivearray@1.0.5',
+    'manuel:isdev@1.0.0'
   ], CLIENT);
 
   api.addFiles([
