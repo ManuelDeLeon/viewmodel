@@ -1,4 +1,8 @@
-﻿## 1.9.12
+﻿## 1.9.13
+
+* Update packages.js for Meteor 1.2
+
+## 1.9.12
 
 * Add ref binding
 
