@@ -187,3 +187,15 @@ describe "ViewModel", ->
         bindIf: ->
       assert.equal 3, ViewModel.bindings[name][0].priority
 
+
+  describe "@bindSingle", ->
+
+    beforeEach ->
+      @getBindArgumentStub = sinon.stub ViewModel, 'getBindArgument'
+      @getBindingStub = sinon.stub ViewModel, 'getBinding'
+
+    it "returns undefined", ->
+      @getBindingStub.returns
+        events: { a: 1 }
+      ret = ViewModel.bindSingle()
+      assert.isUndefined ret

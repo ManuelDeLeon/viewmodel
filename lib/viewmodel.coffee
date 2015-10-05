@@ -127,6 +127,7 @@ class ViewModel
     if binding.events
       for eventName, eventFunc of binding.events
         element.bind eventName, (e) -> eventFunc(e, bindArg)
+    #return
 
   ##################
   # Instance methods
@@ -137,9 +138,6 @@ class ViewModel
       bindingArray = bindings[bindName]
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindingArray
     return
-
-
-
 
   #############
   # Constructor

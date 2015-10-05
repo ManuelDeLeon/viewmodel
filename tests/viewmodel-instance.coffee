@@ -30,5 +30,16 @@ describe "ViewModel instance", ->
       bindObject =
         a: 1
         b: 2
-      @viewmodel.bind 
+      vm = {}
+      bindings =
+        a: 1
+        b: 2
+      @viewmodel.bind.call vm, bindObject, 'templateInstance', 'element', bindings
+      assert.isTrue @bindSingleStub.calledTwice
+      assert.isTrue @bindSingleStub.calledWith 'templateInstance', 'element', 'a', 1, bindObject, vm, 1
+      assert.isTrue @bindSingleStub.calledWith 'templateInstance', 'element', 'b', 2, bindObject, vm, 2
 
+    it "returns undefined", ->
+      bindObject = {}
+      ret = @viewmodel.bind bindObject, 'templateInstance', 'element', 'bindings'
+      assert.isUndefined ret
