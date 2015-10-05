@@ -6,20 +6,6 @@ describe "ViewModel", ->
   afterEach ->
     sinon.restoreAll()
 
-  describe "constructor", ->
-    it "adds property as function", ->
-      vm = new ViewModel({ name: 'A'})
-      assert.isFunction vm.name
-      assert.equal 'A', vm.name()
-      vm.name('B')
-      assert.equal 'B', vm.name()
-
-    it "doesn't convert functions", ->
-      f = ->
-      vm = new ViewModel
-        fun: f
-      assert.equal f, vm.fun
-
   describe "@nextId", ->
     it "increments the numbers", ->
       a = ViewModel.nextId()
@@ -90,10 +76,11 @@ describe "ViewModel", ->
       instanceStub = sinon.stub Template, 'instance'
       templateInstance =
         viewmodel: viewmodel
+        '$': -> "X"
       instanceStub.returns templateInstance
       ViewModel.bindHelper("text: name")
       @onViewReadyFunction()
-      assert.isTrue bindStub.calledWith 99, { text: 'name' }, templateInstance
+      assert.isTrue bindStub.calledWith { text: 'name' }, templateInstance, "X", ViewModel.bindings
 
   describe "@getInitialObject", ->
     it "returns initial when initial is an object", ->
@@ -200,14 +187,3 @@ describe "ViewModel", ->
         bindIf: ->
       assert.equal 3, ViewModel.bindings[name][0].priority
 
-  ##################
-  # Instance methods
-
-  describe "#bind", ->
-
-    beforeEach ->
-      @viewmodel = new ViewModel()
-
-    xit "checks the arguments", ->
-      @viewmodel.bind "A", "B", "C"
-      assert.isTrue @checkStub.calledWithExactly('@addBinding', "A", "B", "C", ViewModel.bindings)

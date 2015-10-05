@@ -36,9 +36,10 @@ class ViewModel
     bindObject = ViewModel.parseBind bindString
 
     templateInstance = Template.instance()
-
+    bindings = ViewModel.bindings
     Blaze.currentView.onViewReady ->
-      templateInstance.viewmodel.bind bindId, bindObject, templateInstance
+      element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
+      templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings
       return
 
     bindIdObj = {}
@@ -86,8 +87,7 @@ class ViewModel
     bindingArray[bindingArray.length] = binding
     return
 
-  @getBinding = (bindName, bindArg) ->
-    bindingArray = ViewModel.bindings[bindName]
+  @getBinding = (bindName, bindArg, bindingArray) ->
     binding = null
     if bindingArray
       if bindingArray.length is 1
@@ -96,7 +96,7 @@ class ViewModel
         binding = _.find(_.sortBy(bindingArray, ((b)-> -b.priority)), (b) ->
           not ( (b.bindIf and not b.bindIf(bindArg)) or (b.selector and not bindArg.element.is(b.selector)) )
         )
-    return binding or (bindName isnt 'default' and ViewModel.getBinding('default', bindArg))
+    return binding or (bindName isnt 'default' and ViewModel.getBinding('default', bindArg, bindingArray))
 
   @getBindArgument = (templateInstance, element, bindName, bindValue, bindObject, viewmodel) ->
     bindArg = {}
@@ -113,31 +113,29 @@ class ViewModel
       bindValue: bindValue
       viewmodel: viewmodel
 
+  @bindSingle = (templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindingArray) ->
+    bindArg = ViewModel.getBindArgument templateInstance, element, bindName, bindValue, bindObject, viewmodel
+    binding = ViewModel.getBinding(bindName, bindArg, bindingArray)
+    return if not binding
+
+    if binding.autorun
+      bindArg.autorun binding.autorun
+
+    if binding.bind
+      binding.bind bindArg
+
+    if binding.events
+      for eventName, eventFunc of binding.events
+        element.bind eventName, (e) -> eventFunc(e, bindArg)
+
   ##################
   # Instance methods
 
-  bind: (bindId, bindObject, templateInstance) ->
-    ViewModel.check "#bind", bindId, bindObject, templateInstance, ViewModel.bindings
+  bind: (bindObject, templateInstance, element, bindings) ->
     viewmodel = this
-    element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
-
     for bindName, bindValue of bindObject
-
-      bindArg = ViewModel.getBindArgument templateInstance, element, bindName, bindValue, bindObject, viewmodel
-
-      binding = ViewModel.getBinding(bindName, bindArg)
-      return if not binding
-
-      if binding.autorun
-        bindArg.autorun binding.autorun
-
-      if binding.bind
-        binding.bind bindArg
-
-      if binding.events
-        for eventName, eventFunc of binding.events
-          element.bind eventName, (e) -> eventFunc(e, bindArg)
-
+      bindingArray = bindings[bindName]
+      ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindingArray
     return
 
 

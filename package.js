@@ -51,6 +51,7 @@ Package.onTest(function(api) {
     'lib/template.coffee',
     'tests/sinon-restore.js',
     'tests/viewmodel.coffee',
+    'tests/viewmodel-instance.coffee',
     'tests/viewmodel-check.coffee',
     'tests/viewmodel-parseBind.coffee',
     'tests/template.coffee'
