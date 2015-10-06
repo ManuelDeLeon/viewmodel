@@ -29,7 +29,8 @@ class ViewModel
       template.helpers helpers
       return
 
-  @bindIdAttribute = 'bind-id'
+  @bindIdAttribute = 'b-id'
+  @viewPrefix = 'v-'
   @bindHelper = (bindString) ->
 
     bindId = ViewModel.nextId()

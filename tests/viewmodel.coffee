@@ -56,7 +56,11 @@ describe "ViewModel", ->
 
   describe "@bindIdAttribute", ->
     it "has has default value", ->
-      assert.equal "bind-id", ViewModel.bindIdAttribute
+      assert.equal "b-id", ViewModel.bindIdAttribute
+
+  describe "@viewPrefix", ->
+    it "has has default value", ->
+      assert.equal "v-", ViewModel.viewPrefix
 
   describe "@bindHelper", ->
     beforeEach ->
