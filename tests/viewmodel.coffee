@@ -201,5 +201,50 @@ describe "ViewModel", ->
     it "returns undefined", ->
       @getBindingStub.returns
         events: { a: 1 }
-      ret = ViewModel.bindSingle()
+      element =
+        bind: ->
+      ret = ViewModel.bindSingle(null, element)
       assert.isUndefined ret
+
+    it "uses getBindArgument", ->
+      ViewModel.bindSingle 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel', 'bindingArray'
+      assert.isTrue @getBindArgumentStub.calledWithExactly 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
+
+    it "uses getBinding", ->
+      bindArg = {}
+      @getBindArgumentStub.returns bindArg
+      ViewModel.bindSingle 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel', 'bindingArray'
+      assert.isTrue @getBindingStub.calledWithExactly 'bindName', bindArg, 'bindingArray'
+
+    it "executes autorun", ->
+      bindArg =
+        autorun: ->
+      @getBindArgumentStub.returns bindArg
+      spy = sinon.spy bindArg, 'autorun'
+      bindingAutorun = ->
+      @getBindingStub.returns
+        autorun: bindingAutorun
+
+      ViewModel.bindSingle()
+      assert.isTrue spy.calledWithExactly bindingAutorun
+
+    it "executes bind", ->
+      @getBindArgumentStub.returns 'X'
+      arg =
+        bind: ->
+      spy = sinon.spy arg, 'bind'
+      @getBindingStub.returns arg
+
+      ViewModel.bindSingle()
+      assert.isTrue spy.calledWithExactly 'X'
+
+    it "binds events", ->
+      @getBindingStub.returns
+        events: { a: 1, b: 2 }
+      element =
+        bind: ->
+      spy = sinon.spy element, 'bind'
+      ViewModel.bindSingle(null, element)
+      assert.isTrue spy.calledTwice
+      assert.isTrue spy.calledWith 'a'
+      assert.isTrue spy.calledWith 'b'

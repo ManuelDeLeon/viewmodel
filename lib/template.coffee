@@ -1,11 +1,5 @@
 Template.registerHelper 'b', ViewModel.bindHelper
 
-wrapit = (template) ->
-  BODY = "body"
-  name = ViewModel.viewPrefix + if template.viewName is BODY then BODY else template.viewName.split(".")[1]
-  oldRenderFunc = template.renderFunction
-  template.renderFunction = -> HTML.getTag(name)(oldRenderFunc.call(this))
-
 getPathTo = (element) ->
   if element.tagName == 'HTML'
     return '/HTML[1]'
@@ -26,12 +20,11 @@ getPathTo = (element) ->
 Blaze.Template.prototype.viewmodel = (args...) ->
   ViewModel.check 'T#viewmodel', args...
   template = this
-  wrapit template
+  ViewModel.wrapTemplate template
   initial = args[0]
   template.viewmodelInitial = initial
   template.onCreated ViewModel.onCreated(template)
-  template.onRendered ->
-    console.log getPathTo(this.firstNode)
+
   return
 
 Blaze.Template.prototype.createViewModel = (args...) ->

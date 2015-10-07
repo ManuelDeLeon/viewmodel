@@ -128,7 +128,14 @@ class ViewModel
     if binding.events
       for eventName, eventFunc of binding.events
         element.bind eventName, (e) -> eventFunc(e, bindArg)
-    #return
+    return
+
+  @wrapTemplate = (template) ->
+    BODY = "body"
+    vName = template.viewName
+    name = ViewModel.viewPrefix + if vName is BODY then BODY else vName.substr(vName.indexOf('.' + 1))
+    oldRenderFunc = template.renderFunction
+    template.renderFunction = -> HTML.getTag(name)(oldRenderFunc.call(this))
 
   ##################
   # Instance methods

@@ -3,6 +3,7 @@ describe "Template", ->
   beforeEach ->
     @checkStub = sinon.stub ViewModel, "check"
     @vmOnCreatedStub = sinon.stub ViewModel, "onCreated"
+    @vmWrapTemplateStub = sinon.stub ViewModel, "wrapTemplate"
 
   afterEach ->
     sinon.restoreAll()
