@@ -30,7 +30,7 @@ class ViewModel
       return
 
   @bindIdAttribute = 'b-id'
-  @viewPrefix = 'v-'
+  @viewPrefix = 't-'
   @bindHelper = (bindString) ->
 
     bindId = ViewModel.nextId()
@@ -88,8 +88,9 @@ class ViewModel
     bindingArray[bindingArray.length] = binding
     return
 
-  @getBinding = (bindName, bindArg, bindingArray) ->
+  @getBinding = (bindName, bindArg, bindings) ->
     binding = null
+    bindingArray = bindings[bindName]
     if bindingArray
       if bindingArray.length is 1
         binding = bindingArray[0]
@@ -97,15 +98,15 @@ class ViewModel
         binding = _.find(_.sortBy(bindingArray, ((b)-> -b.priority)), (b) ->
           not ( (b.bindIf and not b.bindIf(bindArg)) or (b.selector and not bindArg.element.is(b.selector)) )
         )
-    return binding or (bindName isnt 'default' and ViewModel.getBinding('default', bindArg, bindingArray))
+    return binding or ViewModel.getBinding('default', bindArg, bindings)
 
   @getBindArgument = (templateInstance, element, bindName, bindValue, bindObject, viewmodel) ->
-    bindArg = {}
-    _.extend bindArg,
+    bindArg =
       templateInstance: templateInstance
       autorun: (f) ->
         fun = (c) -> f(c, bindArg)
         templateInstance.autorun fun
+        return
       element: element
       elementBind: bindObject
       getVmValue: -> viewmodel[bindValue]()
@@ -113,10 +114,11 @@ class ViewModel
       bindName: bindName
       bindValue: bindValue
       viewmodel: viewmodel
+    return bindArg
 
-  @bindSingle = (templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindingArray) ->
+  @bindSingle = (templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings) ->
     bindArg = ViewModel.getBindArgument templateInstance, element, bindName, bindValue, bindObject, viewmodel
-    binding = ViewModel.getBinding(bindName, bindArg, bindingArray)
+    binding = ViewModel.getBinding(bindName, bindArg, bindings)
     return if not binding
 
     if binding.autorun
@@ -131,9 +133,9 @@ class ViewModel
     return
 
   @wrapTemplate = (template) ->
-    BODY = "body"
-    vName = template.viewName
-    name = ViewModel.viewPrefix + if vName is BODY then BODY else vName.substr(vName.indexOf('.' + 1))
+    viewName = template.viewName
+    return if viewName is "body"
+    name = ViewModel.viewPrefix + viewName.substr(viewName.indexOf('.') + 1)
     oldRenderFunc = template.renderFunction
     template.renderFunction = -> HTML.getTag(name)(oldRenderFunc.call(this))
 
@@ -141,10 +143,10 @@ class ViewModel
   # Instance methods
 
   bind: (bindObject, templateInstance, element, bindings) ->
+    ViewModel.check '#bind', arguments
     viewmodel = this
     for bindName, bindValue of bindObject
-      bindingArray = bindings[bindName]
-      ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindingArray
+      ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings
     return
 
   #############

@@ -26,6 +26,10 @@ describe "ViewModel instance", ->
     beforeEach ->
       @bindSingleStub = sinon.stub ViewModel, 'bindSingle'
 
+    it "checks the arguments", ->
+      @viewmodel.bind {}
+      assert.isTrue @checkStub.calledWith '#bind'
+
     it "calls bindSingle for each entry in bindObject", ->
       bindObject =
         a: 1
@@ -36,8 +40,8 @@ describe "ViewModel instance", ->
         b: 2
       @viewmodel.bind.call vm, bindObject, 'templateInstance', 'element', bindings
       assert.isTrue @bindSingleStub.calledTwice
-      assert.isTrue @bindSingleStub.calledWith 'templateInstance', 'element', 'a', 1, bindObject, vm, 1
-      assert.isTrue @bindSingleStub.calledWith 'templateInstance', 'element', 'b', 2, bindObject, vm, 2
+      assert.isTrue @bindSingleStub.calledWith 'templateInstance', 'element', 'a', 1, bindObject, vm, bindings
+      assert.isTrue @bindSingleStub.calledWith 'templateInstance', 'element', 'b', 2, bindObject, vm, bindings
 
     it "returns undefined", ->
       bindObject = {}

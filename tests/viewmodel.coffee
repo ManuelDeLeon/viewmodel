@@ -60,7 +60,7 @@ describe "ViewModel", ->
 
   describe "@viewPrefix", ->
     it "has has default value", ->
-      assert.equal "v-", ViewModel.viewPrefix
+      assert.equal "t-", ViewModel.viewPrefix
 
   describe "@bindHelper", ->
     beforeEach ->
@@ -248,3 +248,196 @@ describe "ViewModel", ->
       assert.isTrue spy.calledTwice
       assert.isTrue spy.calledWith 'a'
       assert.isTrue spy.calledWith 'b'
+
+  describe "@getBinding", ->
+
+    it "returns default binding if can't find one", ->
+      bindName = 'default'
+      defaultB =
+        name: bindName
+      bindings = {}
+      bindings[bindName] = [defaultB]
+
+      ret = ViewModel.getBinding 'bindName', 'bindArg', bindings
+      assert.equal ret, defaultB
+
+    it "returns first binding in one element array", ->
+      bindName = 'one'
+      oneBinding =
+        name: bindName
+      bindings = {}
+      bindings[bindName] = [oneBinding]
+
+      ret = ViewModel.getBinding bindName, 'bindArg', bindings
+      assert.equal ret, oneBinding
+
+    it "returns highest priority binding", ->
+      oneBinding =
+        name: 'X'
+        priority: 1
+      twoBinding =
+        name: 'X'
+        priority: 2
+      bindings =
+        X: [oneBinding, twoBinding]
+
+      ret = ViewModel.getBinding 'X', 'bindArg', bindings
+      assert.equal ret, twoBinding
+
+    it "returns first that passes bindIf", ->
+      oneBinding =
+        name: 'X'
+        priority: 1
+        bindIf: -> false
+      twoBinding =
+        name: 'X'
+        priority: 1
+        bindIf: -> true
+      bindings =
+        X: [oneBinding, twoBinding]
+
+      ret = ViewModel.getBinding 'X', 'bindArg', bindings
+      assert.equal ret, twoBinding
+
+    it "returns first that passes selector", ->
+      oneBinding =
+        name: 'X'
+        priority: 1
+        selector: "A"
+      twoBinding =
+        name: 'X'
+        priority: 1
+        selector: "B"
+      bindings =
+        X: [oneBinding, twoBinding]
+
+      bindArg =
+        element:
+          is: (s) -> s is "B"
+      ret = ViewModel.getBinding 'X', bindArg, bindings
+      assert.equal ret, twoBinding
+
+    it "returns first that passes bindIf and selector", ->
+      oneBinding =
+        name: 'X'
+        priority: 1
+        selector: "B"
+        bindIf: -> false
+      twoBinding =
+        name: 'X'
+        priority: 1
+        selector: "B"
+        bindIf: -> true
+      bindings =
+        X: [oneBinding, twoBinding]
+
+      bindArg =
+        element:
+          is: (s) -> s is "B"
+      ret = ViewModel.getBinding 'X', bindArg, bindings
+      assert.equal ret, twoBinding
+
+    it "returns first that passes bindIf and selector with highest priority", ->
+      oneBinding =
+        name: 'X'
+        priority: 1
+        selector: "B"
+        bindIf: -> true
+      twoBinding =
+        name: 'X'
+        priority: 2
+        selector: "B"
+        bindIf: -> true
+      bindings =
+        X: [oneBinding, twoBinding]
+
+      bindArg =
+        element:
+          is: (s) -> s is "B"
+      ret = ViewModel.getBinding 'X', bindArg, bindings
+      assert.equal ret, twoBinding
+
+  describe "@getBindArgument", ->
+
+    it "returns right object", ->
+      ret = ViewModel.getBindArgument 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
+      ret = _.omit(ret, 'autorun', 'getVmValue', 'setVmValue')
+      expected =
+        templateInstance: 'templateInstance'
+        element: 'element'
+        elementBind: 'bindObject'
+        bindName: 'bindName'
+        bindValue: 'bindValue'
+        viewmodel: 'viewmodel'
+      assert.isTrue _.isEqual(expected, ret)
+
+    it "returns argument with autorun", ->
+      templateInstance =
+        autorun: ->
+      spy = sinon.spy templateInstance, 'autorun'
+      bindArg = ViewModel.getBindArgument templateInstance, 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
+      bindArg.autorun ->
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

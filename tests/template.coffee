@@ -15,8 +15,8 @@ describe "Template", ->
       @templateOnCreatedSpy = sinon.spy(@context, "onCreated")
 
     it "checks the arguments", ->
-      Template.prototype.viewmodel.call @context, "X"
-      assert.isTrue @checkStub.calledWithExactly('T#viewmodel', "X")
+      Template.prototype.viewmodel.call @context
+      assert.isTrue @checkStub.calledWith 'T#viewmodel'
 
     it "saves the initial object", ->
       Template.prototype.viewmodel.call @context, "X"
@@ -40,6 +40,9 @@ describe "Template", ->
       @template =
         viewmodelInitial: "A"
 
+    it "checks the arguments", ->
+      @createViewModel.call @template, "B"
+      assert.isTrue @checkStub.calledWith 'T#createViewModel'
 
     it "calls getInitialObject", ->
       @createViewModel.call @template, "B"

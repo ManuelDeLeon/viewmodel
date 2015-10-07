@@ -17,20 +17,18 @@ getPathTo = (element) ->
     i++
   return
 
-Blaze.Template.prototype.viewmodel = (args...) ->
-  ViewModel.check 'T#viewmodel', args...
+Blaze.Template.prototype.viewmodel = (initial) ->
+  ViewModel.check 'T#viewmodel', arguments
   template = this
   ViewModel.wrapTemplate template
-  initial = args[0]
   template.viewmodelInitial = initial
   template.onCreated ViewModel.onCreated(template)
 
   return
 
-Blaze.Template.prototype.createViewModel = (args...) ->
-  ViewModel.check 'T#createViewModel', args...
+Blaze.Template.prototype.createViewModel = (context) ->
+  ViewModel.check 'T#createViewModel', arguments
   template = this
-  context = args[0]
   initial = ViewModel.getInitialObject template.viewmodelInitial, context
   viewmodel = new ViewModel(initial)
   viewmodel
