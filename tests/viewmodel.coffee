@@ -359,6 +359,10 @@ describe "ViewModel", ->
 
   describe "@getBindArgument", ->
 
+    beforeEach ->
+      @getVmValueGetterStub = sinon.stub ViewModel, 'getVmValueGetter'
+      @getVmValueSetterStub = sinon.stub ViewModel, 'getVmValueSetter'
+
     it "returns right object", ->
       ret = ViewModel.getBindArgument 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
       ret = _.omit(ret, 'autorun', 'getVmValue', 'setVmValue')
@@ -377,16 +381,312 @@ describe "ViewModel", ->
       spy = sinon.spy templateInstance, 'autorun'
       bindArg = ViewModel.getBindArgument templateInstance, 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
       bindArg.autorun ->
-      
+      assert.isTrue spy.calledOnce
+
+    it "returns argument with vmValueGetter", ->
+      @getVmValueGetterStub.returns -> "A"
+      bindArg = ViewModel.getBindArgument 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
+      assert.equal "A", bindArg.getVmValue()
+
+    it "returns argument with vmValueSetter", ->
+      @getVmValueSetterStub.returns -> "A"
+      bindArg = ViewModel.getBindArgument 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
+      assert.equal "A", bindArg.setVmValue()
+
+  describe "@getVmValueGetter", ->
+
+    it "returns value from name", ->
+      viewmodel =
+        name: -> "A"
+      bindValue = 'name'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "returns false from !'A'", ->
+      viewmodel =
+        name: -> "A"
+      bindValue = '!name'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal false, getVmValue()
+
+    it "returns value from name.first (first is prop)", ->
+      viewmodel =
+        name: ->
+          first: "A"
+      bindValue = 'name.first'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "returns value from name.first (first is func)", ->
+      viewmodel =
+        name: ->
+          first: -> "A"
+      bindValue = 'name.first'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "returns value from name()", ->
+      viewmodel =
+        name: -> "A"
+      bindValue = 'name()'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "doesn't give arguments to name()", ->
+      viewmodel =
+        name: -> arguments.length
+      bindValue = 'name()'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 0, getVmValue()
+
+    it "returns value from name('a')", ->
+      viewmodel =
+        name: (a) -> a
+      bindValue = "name('a')"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "a", getVmValue()
+
+    it "returns value from name('a', 1)", ->
+      viewmodel =
+        name: (a, b) -> a + b
+      bindValue = "name('a', 1)"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "a1", getVmValue()
+
+    it "returns value from name(first) with string", ->
+      viewmodel =
+        name: (v) -> v
+        first: -> "A"
+      bindValue = 'name(first)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "returns value from name(first, second)", ->
+      viewmodel =
+        name: (a, b) -> a + b
+        first: -> "A"
+        second: -> "B"
+      bindValue = 'name(first, second)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "AB", getVmValue()
+
+    it "returns value from name(first, second) with numbers", ->
+      viewmodel =
+        name: (a, b) -> a + b
+        first: -> 1
+        second: -> 2
+      bindValue = 'name(first, second)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 3, getVmValue()
+
+    it "returns value from name(first, second) with booleans", ->
+      viewmodel =
+        name: (a, b) -> a or b
+        first: -> false
+        second: -> true
+      bindValue = 'name(first, second)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+
+    it "returns value from name(first) with null", ->
+      viewmodel =
+        name: (a) -> a
+        first: -> null
+      bindValue = 'name(first)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isNull getVmValue()
+
+    it "returns value from name(first) with undefined", ->
+      viewmodel =
+        name: (a) -> a
+        first: -> undefined
+      bindValue = 'name(first)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isUndefined getVmValue()
+
+    it "returns value from name(first)", ->
+      viewmodel =
+        name: (v) -> v
+      bindValue = 'name(first)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "first", getVmValue()
+
+    it "returns value from name(1, 2)", ->
+      viewmodel =
+        name: (a, b) -> a + b
+      bindValue = 'name(1, 2)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 3, getVmValue()
+
+    it "returns value from name(false, true)", ->
+      viewmodel =
+        name: (a, b) -> a or b
+      bindValue = 'name(false, true)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+
+    it "returns value from name(null)", ->
+      viewmodel =
+        name: (a) -> a
+      bindValue = 'name(null)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isNull getVmValue()
+
+    it "returns value from name(undefined)", ->
+      viewmodel =
+        name: (a) -> a
+      bindValue = 'name(undefined)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isUndefined getVmValue()
+
+    it "returns value from name(!first, !second) with booleans", ->
+      viewmodel =
+        name: (a, b) -> a and b
+        first: -> false
+        second: -> false
+      bindValue = 'name(!first, !second)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+
+    it "returns value from name().first (first is prop)", ->
+      viewmodel =
+        name: ->
+          first: "A"
+      bindValue = 'name.first'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "returns value from name().first (first is func)", ->
+      viewmodel =
+        name: ->
+          first: -> "A"
+      bindValue = 'name.first'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "returns value from name(1).first (first is prop)", ->
+      viewmodel =
+        name: (v) ->
+          if v is 1
+            first: "A"
+      bindValue = 'name(1).first'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
+
+    it "returns value from name(1)", ->
+      viewmodel =
+        name: (a) -> a
+      bindValue = 'name(1)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue 1 is getVmValue()
+
+    it "returns value from name().first()", ->
+      viewmodel =
+        name: ->
+          first: -> "A"
+      bindValue = 'name().first()'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
 
 
+    it "returns value from name().first.second", ->
+      viewmodel =
+        name: ->
+          first:
+            second: "A"
+      bindValue = 'name().first.second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
 
+    it "returns value from name().first.second()", ->
+      viewmodel =
+        name: ->
+          first:
+            second: -> "A"
+      bindValue = 'name().first.second()'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
 
+    it "returns value from name().first.second()", ->
+      viewmodel =
+        name: ->
+          first:
+            second: -> "A"
+      bindValue = 'name().first.second()'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "A", getVmValue()
 
+    it "returns value from first + second", ->
+      viewmodel =
+        first: 1
+        second: 2
+      bindValue = 'first + second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 3, getVmValue()
+      return
 
+    it "returns value from first - second", ->
+      viewmodel =
+        first: 3
+        second: 2
+      bindValue = 'first - second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 1, getVmValue()
+      return
 
+    it "returns value from first * second", ->
+      viewmodel =
+        first: 3
+        second: 2
+      bindValue = 'first * second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 6, getVmValue()
+      return
 
+    it "returns value from first / second", ->
+      viewmodel =
+        first: 6
+        second: 2
+      bindValue = 'first / second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 3, getVmValue()
+      return
 
+    it "returns value from first && second", ->
+      viewmodel =
+        first: true
+        second: true
+      bindValue = 'first && second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
+    it "returns value from first || second", ->
+      viewmodel =
+        first: false
+        second: true
+      bindValue = 'first || second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
+    it "returns value from first == second", ->
+      viewmodel =
+        first: 1
+        second: '1'
+      bindValue = 'first == second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
+    it "returns value from first === second", ->
+      viewmodel =
+        first: 1
+        second: 1
+      bindValue = 'first === second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
 
 
 

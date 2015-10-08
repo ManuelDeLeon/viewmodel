@@ -109,8 +109,8 @@ class ViewModel
         return
       element: element
       elementBind: bindObject
-      getVmValue: -> viewmodel[bindValue]()
-      setVmValue: (value) -> viewmodel[bindValue](value)
+      getVmValue: ViewModel.getVmValueGetter(viewmodel, bindValue)
+      setVmValue: ViewModel.getVmValueSetter(viewmodel, bindValue)
       bindName: bindName
       bindValue: bindValue
       viewmodel: viewmodel
@@ -131,6 +131,76 @@ class ViewModel
       for eventName, eventFunc of binding.events
         element.bind eventName, (e) -> eventFunc(e, bindArg)
     return
+
+  quoted = (str) -> str.charAt(0) is '"' or str.charAt(0) is "'"
+  removeQuotes = (str) -> str.substr(1, str.length - 2)
+  getPrimitive = (val) ->
+    switch val
+      when "true" then true
+      when "false" then false
+      when "null" then null
+      when "undefined" then undefined
+      else (if $.isNumeric(val) then parseFloat(val) else val)
+
+  tokens =
+    ' + ': (a, b) -> a + b
+    ' - ': (a, b) -> a - b
+    ' * ': (a, b) -> a * b
+    ' / ': (a, b) -> a / b
+    ' && ': (a, b) -> a && b
+    ' || ': (a, b) -> a || b
+    ' == ': (a, b) -> `a == b`
+    ' === ': (a, b) -> a is b
+
+  getToken = (str) ->
+    for token of tokens
+      return token if ~str.indexOf(token)
+    return null
+
+  getValue = (container, bindValue, viewmodel) ->
+    negate = bindValue.charAt(0) is '!'
+    bindValue = bindValue.substring 1 if negate
+    token = getToken(bindValue)
+    if token
+      i = bindValue.indexOf(token)
+      left = getValue(container, bindValue.substring(0, i), viewmodel)
+      right = getValue(container, bindValue.substring(i + token.length), viewmodel)
+      value = tokens[token]( left, right )
+    else if ~bindValue.indexOf('.')
+      i = bindValue.indexOf('.')
+      newContainer = getValue container, bindValue.substring(0, i), viewmodel
+      newBindValue = bindValue.substring(i + 1)
+      value = getValue newContainer, newBindValue, viewmodel
+    else
+      name = bindValue
+      args = []
+      if ~bindValue.indexOf('(')
+        parsed = ViewModel.parseBind(bindValue)
+        name = Object.keys(parsed)[0]
+        if parsed[name].length > 2
+          for arg in parsed[name].substr(1, parsed[name].length - 2).split(',') #remove parenthesis
+            newArg = undefined
+            if quoted(arg)
+              newArg = removeQuotes(arg)
+            else
+              neg = arg.charAt(0) is '!'
+              arg = arg.substring 1 if neg
+              if viewmodel[arg]
+                newArg = getValue(viewmodel, arg, viewmodel)
+              else
+                newArg = getPrimitive(arg)
+              newArg = !newArg if neg
+            args.push newArg
+      value = if _.isFunction(container[name]) then container[name].apply(undefined, args) else container[name]
+    return if negate then !value else value
+
+  @getVmValueGetter = (viewmodel, bindValue) ->
+    return  -> getValue(viewmodel, bindValue, viewmodel)
+
+  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  # Untested
+
+  @getVmValueSetter = ->
 
   @wrapTemplate = (template) ->
     viewName = template.viewName
