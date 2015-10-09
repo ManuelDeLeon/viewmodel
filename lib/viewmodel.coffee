@@ -151,6 +151,15 @@ class ViewModel
     ' || ': (a, b) -> a || b
     ' == ': (a, b) -> `a == b`
     ' === ': (a, b) -> a is b
+    ' !== ': (a, b) -> `a !== b`
+    ' !=== ': (a, b) -> a isnt b
+    ' > ': (a, b) -> a > b
+    ' >= ': (a, b) -> a >= b
+    ' < ': (a, b) -> a < b
+    ' <= ': (a, b) -> a <= b
+
+  tokenRegex = /[\+\-\*\/&\|=><]/
+  dotRegex = /(\D\.)|(\.\D)/
 
   getToken = (str) ->
     for token of tokens
@@ -160,14 +169,15 @@ class ViewModel
   getValue = (container, bindValue, viewmodel) ->
     negate = bindValue.charAt(0) is '!'
     bindValue = bindValue.substring 1 if negate
-    token = getToken(bindValue)
+    token = tokenRegex.test(bindValue) and getToken(bindValue)
     if token
       i = bindValue.indexOf(token)
       left = getValue(container, bindValue.substring(0, i), viewmodel)
       right = getValue(container, bindValue.substring(i + token.length), viewmodel)
       value = tokens[token]( left, right )
-    else if ~bindValue.indexOf('.')
-      i = bindValue.indexOf('.')
+    else if dotRegex.test(bindValue)
+      i = bindValue.search(dotRegex)
+      i += 1 if bindValue.charAt(i) isnt '.'
       newContainer = getValue container, bindValue.substring(0, i), viewmodel
       newBindValue = bindValue.substring(i + 1)
       value = getValue newContainer, newBindValue, viewmodel
@@ -197,10 +207,17 @@ class ViewModel
   @getVmValueGetter = (viewmodel, bindValue) ->
     return  -> getValue(viewmodel, bindValue, viewmodel)
 
+  setValue = (value, container, bindValue, viewmodel) ->
+    if _.isFunction(container[bindValue]) then container[bindValue](value) else container[bindValue] = value
+    return
+
+  @getVmValueSetter = (viewmodel, bindValue) ->
+    return  (value) -> setValue(value, viewmodel, bindValue, viewmodel)
+
   # !!!!!!!!!!!!!!!!!!!!!!!!!!!!
   # Untested
 
-  @getVmValueSetter = ->
+
 
   @wrapTemplate = (template) ->
     viewName = template.viewName
