@@ -416,6 +416,7 @@ describe "ViewModel", ->
       bindValue = 'name.first'
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "A", getVmValue()
+      return
 
     it "returns value from name.first (first is func)", ->
       viewmodel =
@@ -688,22 +689,178 @@ describe "ViewModel", ->
       assert.isTrue getVmValue()
       return
 
+    it "returns value from first !== second", ->
+      viewmodel =
+        first: 1
+        second: 1
+      bindValue = 'first !== second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first !=== second", ->
+      viewmodel =
+        first: 1
+        second: 1
+      bindValue = 'first !=== second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first > second", ->
+      viewmodel =
+        first: 1
+        second: 0
+      bindValue = 'first > second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
 
+    it "returns value from first > second", ->
+      viewmodel =
+        first: 1
+        second: 1
+      bindValue = 'first > second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first > second", ->
+      viewmodel =
+        first: 1
+        second: 2
+      bindValue = 'first > second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first >= second", ->
+      viewmodel =
+        first: 1
+        second: 0
+      bindValue = 'first >= second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
 
+    it "returns value from first >= second", ->
+      viewmodel =
+        first: 1
+        second: 1
+      bindValue = 'first >= second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
 
+    it "returns value from first >= second", ->
+      viewmodel =
+        first: 1
+        second: 2
+      bindValue = 'first >= second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first < second", ->
+      viewmodel =
+        first: 1
+        second: 0
+      bindValue = 'first < second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first < second", ->
+      viewmodel =
+        first: 1
+        second: 1
+      bindValue = 'first < second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first < second", ->
+      viewmodel =
+        first: 1
+        second: 2
+      bindValue = 'first < second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
 
+    it "returns value from first <= second", ->
+      viewmodel =
+        first: 1
+        second: 0
+      bindValue = 'first <= second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
 
+    it "returns value from first <= second", ->
+      viewmodel =
+        first: 1
+        second: 1
+      bindValue = 'first <= second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
 
+    it "returns value from first <= second", ->
+      viewmodel =
+        first: 1
+        second: 2
+      bindValue = 'first <= second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
 
+    it "returns value from first(1.1)", ->
+      viewmodel =
+        first: (v) -> v
+      bindValue = 'first(1.1)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 1.1, getVmValue()
+      return
 
+    it "returns value from first1.second", ->
+      viewmodel =
+        first1:
+          second: 2
+      bindValue = 'first1.second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 2, getVmValue()
+      return
 
+    it "returns value from first.1second", ->
+      viewmodel =
+        first:
+          '1second': 2
+      bindValue = 'first.1second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 2, getVmValue()
+      return
+
+  describe "@getVmValueSetter", ->
+
+    it "sets first func", ->
+      val = null
+      viewmodel =
+        first: (v) -> val = v
+      bindValue = 'first'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(2)
+      assert.equal 2, val
+      return
+
+    it "sets first prop", ->
+      viewmodel =
+        first: 1
+      bindValue = 'first'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(2)
+      assert.equal 2, viewmodel.first
+      return
 
 
 
