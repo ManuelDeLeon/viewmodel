@@ -31,21 +31,26 @@ class ViewModel
 
   @bindIdAttribute = 'b-id'
   @viewPrefix = 't-'
-  @bindHelper = (bindString) ->
 
-    bindId = ViewModel.nextId()
-    bindObject = ViewModel.parseBind bindString
 
-    templateInstance = Template.instance()
-    bindings = ViewModel.bindings
-    Blaze.currentView.onViewReady ->
-      element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
-      templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings
-      return
+  getBindHelper = (useBindings) ->
+    return (bindString) ->
+      bindId = ViewModel.nextId()
+      bindObject = ViewModel.parseBind bindString
 
-    bindIdObj = {}
-    bindIdObj[ViewModel.bindIdAttribute] = bindId
-    return bindIdObj
+      templateInstance = Template.instance()
+      bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
+      Blaze.currentView.onViewReady ->
+        element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
+        templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings
+        return
+
+      bindIdObj = {}
+      bindIdObj[ViewModel.bindIdAttribute] = bindId
+      return bindIdObj
+
+  @bindHelper = getBindHelper(true)
+  @eventHelper = getBindHelper(false)
 
   @getInitialObject = (initial, context) ->
     if _.isFunction(initial)
@@ -82,9 +87,10 @@ class ViewModel
     binding.priority++ if binding.selector
     binding.priority++ if binding.bindIf
 
-    if not @bindings[binding.name]
-      @bindings[binding.name] = []
-    bindingArray = @bindings[binding.name]
+    bindings = ViewModel.bindings
+    if not bindings[binding.name]
+      bindings[binding.name] = []
+    bindingArray = bindings[binding.name]
     bindingArray[bindingArray.length] = binding
     return
 
@@ -190,7 +196,9 @@ class ViewModel
         if parsed[name].length > 2
           for arg in parsed[name].substr(1, parsed[name].length - 2).split(',') #remove parenthesis
             newArg = undefined
-            if quoted(arg)
+            if arg is "this"
+              newArg = Template.instance().data
+            else if quoted(arg)
               newArg = removeQuotes(arg)
             else
               neg = arg.charAt(0) is '!'
@@ -208,7 +216,14 @@ class ViewModel
     return  -> getValue(viewmodel, bindValue, viewmodel)
 
   setValue = (value, container, bindValue, viewmodel) ->
-    if _.isFunction(container[bindValue]) then container[bindValue](value) else container[bindValue] = value
+    if dotRegex.test(bindValue)
+      i = bindValue.search(dotRegex)
+      i += 1 if bindValue.charAt(i) isnt '.'
+      newContainer = getValue container, bindValue.substring(0, i), viewmodel
+      newBindValue = bindValue.substring(i + 1)
+      setValue value, newContainer, newBindValue, viewmodel
+    else
+      if _.isFunction(container[bindValue]) then container[bindValue](value) else container[bindValue] = value
     return
 
   @getVmValueSetter = (viewmodel, bindValue) ->

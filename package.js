@@ -48,6 +48,7 @@ Package.onTest(function(api) {
   api.addFiles([
     'lib/viewmodel.coffee',
     'lib/viewmodel-parseBind.coffee',
+    'lib/bindings.coffee',
     'lib/template.coffee',
     'tests/sinon-restore.js',
     'tests/viewmodel.coffee',

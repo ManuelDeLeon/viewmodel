@@ -841,6 +841,19 @@ describe "ViewModel", ->
       assert.equal 2, getVmValue()
       return
 
+    it "returns value from first(this)", ->
+      instance =
+        data:
+          a: 1
+      stub = sinon.stub Template, 'instance'
+      stub.returns instance
+      viewmodel =
+        first: (ins) -> ins.a is 1
+      bindValue = 'first(this)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
   describe "@getVmValueSetter", ->
 
     it "sets first func", ->
@@ -862,11 +875,38 @@ describe "ViewModel", ->
       assert.equal 2, viewmodel.first
       return
 
+    it "sets first.second func.func", ->
+      val = null
+      viewmodel =
+        first: ->
+          second: (v) -> val = v
+      bindValue = 'first.second'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(2)
+      assert.equal 2, val
+      return
 
+    it "sets first().second func.func", ->
+      val = null
+      viewmodel =
+        first: ->
+          second: (v) -> val = v
+      bindValue = 'first().second'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(2)
+      assert.equal 2, val
+      return
 
-
-
-
+    it "sets first.second.third p.p.p", ->
+      viewmodel =
+        first:
+          second:
+            third: false
+      bindValue = 'first.second.third'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(true)
+      assert.isTrue viewmodel.first.second.third
+      return
 
 
 

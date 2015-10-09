@@ -1,4 +1,5 @@
 Template.registerHelper 'b', ViewModel.bindHelper
+Template.registerHelper 'on', ViewModel.eventHelper
 
 getPathTo = (element) ->
   if element.tagName == 'HTML'
