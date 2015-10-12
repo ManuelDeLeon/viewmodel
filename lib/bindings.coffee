@@ -4,11 +4,14 @@ addBinding
   name: 'text'
   autorun: (c, bindArg) ->
     bindArg.element.text bindArg.getVmValue()
+    return
 
 addBinding
   name: 'default'
   bind: (bindArg) ->
-    bindArg.element.on bindArg.bindName, bindArg.viewmodel[bindArg.bindValue]
+    ViewModel.check 'vmProp', bindArg.bindValue, bindArg.viewmodel, "method"
+    bindArg.element.on bindArg.bindName, (event) -> bindArg.setVmValue(event)
+    return
 
 addBinding
   name: 'toggle'
@@ -16,6 +19,7 @@ addBinding
     click: (event, bindArg) ->
       value = bindArg.getVmValue()
       bindArg.setVmValue(!value)
+      return
 
 addBinding
   name: 'if'
@@ -24,3 +28,4 @@ addBinding
       bindArg.element.show()
     else
       bindArg.element.hide()
+    return

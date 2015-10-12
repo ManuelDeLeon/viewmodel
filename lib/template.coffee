@@ -28,8 +28,8 @@ Blaze.Template.prototype.viewmodel = (initial) ->
   return
 
 Blaze.Template.prototype.createViewModel = (context) ->
-  ViewModel.check 'T#createViewModel', context
   template = this
+  ViewModel.check 'T#createViewModel', context, template
   initial = ViewModel.getInitialObject template.viewmodelInitial, context
   viewmodel = new ViewModel(initial)
   viewmodel

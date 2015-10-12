@@ -26,10 +26,6 @@ describe "ViewModel instance", ->
     beforeEach ->
       @bindSingleStub = sinon.stub ViewModel, 'bindSingle'
 
-    it "checks the arguments", ->
-      @viewmodel.bind {}
-      assert.isTrue @checkStub.calledWith '#bind'
-
     it "calls bindSingle for each entry in bindObject", ->
       bindObject =
         a: 1

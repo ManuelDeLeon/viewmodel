@@ -15,7 +15,7 @@ class ViewModel
     return
 
   @onCreated = (template) ->
-    # The following function returned will run when the template is created
+    # The following function will run when the template is created
     return ->
       templateInstance = this
       vm = template.createViewModel(templateInstance.data)
@@ -209,7 +209,14 @@ class ViewModel
                 newArg = getPrimitive(arg)
               newArg = !newArg if neg
             args.push newArg
-      value = if _.isFunction(container[name]) then container[name].apply(undefined, args) else container[name]
+
+      if _.isFunction(container[name])
+        value = container[name].apply(undefined, args)
+      else
+        if container is viewmodel
+          ViewModel.check 'vmProp', name, viewmodel
+        value = container[name]
+
     return if negate then !value else value
 
   @getVmValueGetter = (viewmodel, bindValue) ->
@@ -235,7 +242,6 @@ class ViewModel
   # Instance methods
 
   bind: (bindObject, templateInstance, element, bindings) ->
-    ViewModel.check '#bind', bindObject, templateInstance, element, bindings
     viewmodel = this
     for bindName, bindValue of bindObject
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings
@@ -257,10 +263,7 @@ class ViewModel
   # Not Tested
 
   @onRendered = ->
-    # The following function returned will run when the template is rendered
+    # The following function will run when the template is rendered
     return ->
       templateInstance = this
-      ViewModel.check '@onRendered', templateInstance
-#      console.log templateInstance.firstNode
-#      console.log templateInstance.lastNode
-#      console.log templateInstance.firstNode is templateInstance.lastNode
+      ViewModel.check 'T#onRendered', templateInstance

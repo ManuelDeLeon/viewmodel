@@ -44,7 +44,7 @@ describe "Template", ->
 
     it "checks the arguments", ->
       @createViewModel.call @template, "B"
-      assert.isTrue @checkStub.calledWithExactly 'T#createViewModel', @template
+      assert.isTrue @checkStub.calledWithExactly 'T#createViewModel', "B", @template
 
     it "calls getInitialObject", ->
       @createViewModel.call @template, "B"
