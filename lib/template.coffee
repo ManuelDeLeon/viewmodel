@@ -19,16 +19,16 @@ getPathTo = (element) ->
   return
 
 Blaze.Template.prototype.viewmodel = (initial) ->
-  ViewModel.check 'T#viewmodel', arguments
   template = this
-  ViewModel.wrapTemplate template
+  ViewModel.check 'T#viewmodel', initial, template
   template.viewmodelInitial = initial
   template.onCreated ViewModel.onCreated(template)
+  template.onRendered ViewModel.onRendered(template)
 
   return
 
 Blaze.Template.prototype.createViewModel = (context) ->
-  ViewModel.check 'T#createViewModel', arguments
+  ViewModel.check 'T#createViewModel', context
   template = this
   initial = ViewModel.getInitialObject template.viewmodelInitial, context
   viewmodel = new ViewModel(initial)

@@ -15,7 +15,8 @@ Package.onUse(function(api) {
     'jquery@1.11.4',
     'underscore@1.0.4',
     'tracker@1.0.9',
-    'manuel:reactivearray@1.0.5'
+    'manuel:reactivearray@1.0.5',
+    'manuel:viewmodel-debug@2.0.0'
   ], CLIENT);
 
   api.addFiles([

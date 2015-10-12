@@ -3,7 +3,7 @@ describe "Template", ->
   beforeEach ->
     @checkStub = sinon.stub ViewModel, "check"
     @vmOnCreatedStub = sinon.stub ViewModel, "onCreated"
-    @vmWrapTemplateStub = sinon.stub ViewModel, "wrapTemplate"
+    @vmOnRenderedStub = sinon.stub ViewModel, "onRendered"
 
   afterEach ->
     sinon.restoreAll()
@@ -12,11 +12,13 @@ describe "Template", ->
     beforeEach ->
       @context =
         onCreated: ->
-      @templateOnCreatedSpy = sinon.spy(@context, "onCreated")
+        onRendered: ->
+      @templateOnCreatedStub = sinon.stub(@context, "onCreated")
+      @templateOnRenderedStub = sinon.stub(@context, "onRendered")
 
     it "checks the arguments", ->
-      Template.prototype.viewmodel.call @context
-      assert.isTrue @checkStub.calledWith 'T#viewmodel'
+      Template.prototype.viewmodel.call @context, "X"
+      assert.isTrue @checkStub.calledWithExactly 'T#viewmodel', "X", @context
 
     it "saves the initial object", ->
       Template.prototype.viewmodel.call @context, "X"
@@ -26,7 +28,7 @@ describe "Template", ->
       @vmOnCreatedStub.returns "Y"
       Template.prototype.viewmodel.call @context, "X"
       assert.isTrue @vmOnCreatedStub.calledWithExactly(@context)
-      assert.isTrue @templateOnCreatedSpy.calledWithExactly("Y")
+      assert.isTrue @templateOnCreatedStub.calledWithExactly("Y")
 
     it "returns undefined", ->
       assert.isUndefined Template.prototype.viewmodel.call(@context, "X")
@@ -42,7 +44,7 @@ describe "Template", ->
 
     it "checks the arguments", ->
       @createViewModel.call @template, "B"
-      assert.isTrue @checkStub.calledWith 'T#createViewModel'
+      assert.isTrue @checkStub.calledWithExactly 'T#createViewModel', @template
 
     it "calls getInitialObject", ->
       @createViewModel.call @template, "B"

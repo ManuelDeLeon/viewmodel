@@ -39,6 +39,7 @@ class ViewModel
       bindObject = ViewModel.parseBind bindString
 
       templateInstance = Template.instance()
+      ViewModel.check 'getBindHelper', templateInstance
       bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
       Blaze.currentView.onViewReady ->
         element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
@@ -80,9 +81,8 @@ class ViewModel
     return funProp
 
   @bindings = {}
-  @addBinding = (args...) ->
-    ViewModel.check "@addBinding", args...
-    binding = args[0]
+  @addBinding = (binding) ->
+    ViewModel.check "@addBinding", binding
     binding.priority = 1
     binding.priority++ if binding.selector
     binding.priority++ if binding.bindIf
@@ -229,23 +229,13 @@ class ViewModel
   @getVmValueSetter = (viewmodel, bindValue) ->
     return  (value) -> setValue(value, viewmodel, bindValue, viewmodel)
 
-  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  # Untested
 
-
-
-  @wrapTemplate = (template) ->
-    viewName = template.viewName
-    return if viewName is "body"
-    name = ViewModel.viewPrefix + viewName.substr(viewName.indexOf('.') + 1)
-    oldRenderFunc = template.renderFunction
-    template.renderFunction = -> HTML.getTag(name)(oldRenderFunc.call(this))
 
   ##################
   # Instance methods
 
   bind: (bindObject, templateInstance, element, bindings) ->
-    ViewModel.check '#bind', arguments
+    ViewModel.check '#bind', bindObject, templateInstance, element, bindings
     viewmodel = this
     for bindName, bindValue of bindObject
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings
@@ -262,3 +252,15 @@ class ViewModel
       else
         viewmodel[key] = ViewModel.makeReactiveProperty(value);
     return
+
+  ############
+  # Not Tested
+
+  @onRendered = ->
+    # The following function returned will run when the template is rendered
+    return ->
+      templateInstance = this
+      ViewModel.check '@onRendered', templateInstance
+#      console.log templateInstance.firstNode
+#      console.log templateInstance.lastNode
+#      console.log templateInstance.firstNode is templateInstance.lastNode

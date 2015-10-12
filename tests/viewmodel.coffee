@@ -86,6 +86,18 @@ describe "ViewModel", ->
       @onViewReadyFunction()
       assert.isTrue bindStub.calledWith { text: 'name' }, templateInstance, "X", ViewModel.bindings
 
+    it "checks the arguments when the view is ready", ->
+      viewmodel = new ViewModel()
+      bindStub = sinon.stub viewmodel, 'bind'
+      instanceStub = sinon.stub Template, 'instance'
+      templateInstance =
+        viewmodel: viewmodel
+        '$': -> "X"
+      instanceStub.returns templateInstance
+      ViewModel.bindHelper("text: name")
+      @onViewReadyFunction()
+      assert.isTrue @checkStub.calledWithExactly('getBindHelper', templateInstance)
+
   describe "@getInitialObject", ->
     it "returns initial when initial is an object", ->
       initial = {}
