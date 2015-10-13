@@ -54,6 +54,12 @@ describe "ViewModel", ->
         @retFun.call @instance
         assert.notOk @helper.vmId
 
+      it "extends the view model with the data context", ->
+        @instance.data =
+          name: 'Alan'
+        @retFun.call @instance
+        assert.equal 'Alan', @instance.viewmodel.name()
+
   describe "@bindIdAttribute", ->
     it "has has default value", ->
       assert.equal "b-id", ViewModel.bindIdAttribute
@@ -71,6 +77,11 @@ describe "ViewModel", ->
         onViewReady: (f) => @onViewReadyFunction = f
 
     it "returns object with the next bind id", ->
+      instanceStub = sinon.stub Template, 'instance'
+      templateInstance =
+        viewmodel: {}
+        '$': -> "X"
+      instanceStub.returns templateInstance
       ret = ViewModel.bindHelper()
       assert.equal ret[ViewModel.bindIdAttribute], 99
 
@@ -86,17 +97,14 @@ describe "ViewModel", ->
       @onViewReadyFunction()
       assert.isTrue bindStub.calledWith { text: 'name' }, templateInstance, "X", ViewModel.bindings
 
-    it "checks the arguments when the view is ready", ->
-      viewmodel = new ViewModel()
-      bindStub = sinon.stub viewmodel, 'bind'
+    it "adds a view model if the template doesn't have one", ->
+      addEmptyViewModelStub = sinon.stub ViewModel, 'addEmptyViewModel'
       instanceStub = sinon.stub Template, 'instance'
       templateInstance =
-        viewmodel: viewmodel
         '$': -> "X"
       instanceStub.returns templateInstance
       ViewModel.bindHelper("text: name")
-      @onViewReadyFunction()
-      assert.isTrue @checkStub.calledWithExactly('getBindHelper', templateInstance)
+      assert.isTrue addEmptyViewModelStub.calledWith templateInstance
 
   describe "@getInitialObject", ->
     it "returns initial when initial is an object", ->
@@ -920,33 +928,17 @@ describe "ViewModel", ->
       assert.isTrue viewmodel.first.second.third
       return
 
+  describe "@addEmptyViewModel", ->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    it "adds a view model to the template instance", ->
+      context = null
+      f = ->
+        context = this
+      onCreatedStub = sinon.stub ViewModel, 'onCreated'
+      onCreatedStub.returns f
+      templateInstance =
+        view:
+          template:
+            viewmodel: ->
+      ViewModel.addEmptyViewModel(templateInstance)
+      assert.equal context, templateInstance

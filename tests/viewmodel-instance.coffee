@@ -43,3 +43,25 @@ describe "ViewModel instance", ->
       bindObject = {}
       ret = @viewmodel.bind bindObject, 'templateInstance', 'element', 'bindings'
       assert.isUndefined ret
+
+  describe "#extend", ->
+
+    it "adds a property to the view model", ->
+      @viewmodel.extend({ name: 'Alan' })
+      assert.equal 'Alan', @viewmodel.name()
+
+    it "adds function to the view model", ->
+      f = ->
+      @viewmodel.extend({ fun: f })
+      assert.equal f, @viewmodel.fun
+
+    it "doesn't create a new property when extending the same name", ->
+      @viewmodel.extend({ name: 'Alan' })
+      old = @viewmodel.name
+      @viewmodel.extend({ name: 'Brito' })
+      assert.equal 'Brito', @viewmodel.name()
+      assert.equal old, @viewmodel.name
+
+    it "doesn't do anything with null and undefined", ->
+      @viewmodel.extend(undefined )
+      @viewmodel.extend(null)

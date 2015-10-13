@@ -32,6 +32,12 @@ class ViewModel
   @bindIdAttribute = 'b-id'
   @viewPrefix = 't-'
 
+  @addEmptyViewModel = (templateInstance) ->
+    template = templateInstance.view.template
+    template.viewmodel({})
+    onCreated = ViewModel.onCreated(template)
+    onCreated.call templateInstance
+    return
 
   getBindHelper = (useBindings) ->
     return (bindString) ->
@@ -39,7 +45,10 @@ class ViewModel
       bindObject = ViewModel.parseBind bindString
 
       templateInstance = Template.instance()
-      ViewModel.check 'getBindHelper', templateInstance
+
+      if not templateInstance.viewmodel
+        ViewModel.addEmptyViewModel(templateInstance)
+
       bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
       Blaze.currentView.onViewReady ->
         element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
@@ -247,17 +256,26 @@ class ViewModel
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings
     return
 
+  extend: (obj) ->
+    viewmodel = this
+    for key, value of obj
+      if _.isFunction(value)
+        # we don't care, just take the new function
+        viewmodel[key] = value
+      else if viewmodel[key]
+        # keep the reference to the old property we already have
+        viewmodel[key] value
+      else
+        # Create a new property
+        viewmodel[key] = ViewModel.makeReactiveProperty(value);
+    return
+
   #############
   # Constructor
 
   constructor: (initial) ->
     viewmodel = this
-    for key, value of initial
-      if _.isFunction(value)
-        viewmodel[key] = value
-      else
-        viewmodel[key] = ViewModel.makeReactiveProperty(value);
-    return
+    viewmodel.extend(initial)
 
   ############
   # Not Tested
