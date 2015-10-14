@@ -18,13 +18,21 @@ class ViewModel
     # The following function will run when the template is created
     return ->
       templateInstance = this
-      vm = template.createViewModel(templateInstance.data)
-      templateInstance.viewmodel = vm
-      vm.templateInstance = templateInstance
+      viewmodel = template.createViewModel(templateInstance.data)
+      templateInstance.viewmodel = viewmodel
+      viewmodel.templateInstance = templateInstance
+
+      viewmodel.extend Template.currentData()
+      setAutorun = ->
+        templateInstance.autorun ->
+          viewmodel.extend Template.currentData()
+
+      Meteor.setTimeout setAutorun, 0
+
       helpers = {}
-      for prop of vm when not ViewModel.reserved[prop]
+      for prop of viewmodel when not ViewModel.reserved[prop]
         do (prop) ->
-          helpers[prop] = -> vm[prop]()
+          helpers[prop] = -> viewmodel[prop]()
 
       template.helpers helpers
       return

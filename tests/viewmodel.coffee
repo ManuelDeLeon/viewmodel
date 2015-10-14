@@ -35,8 +35,11 @@ describe "ViewModel", ->
 
         @retFun = ViewModel.onCreated(@template)
         @helpersSpy = sinon.spy @template, 'helpers'
+        @currentDataStub = sinon.stub Template , 'currentData'
+        @setTimeoutStub = sinon.stub Meteor, 'setTimeout'
         @instance =
           data: "A"
+          autorun: (f) -> f()
 
       it "sets the viewmodel property on the template instance", ->
         @retFun.call @instance
@@ -57,8 +60,21 @@ describe "ViewModel", ->
       it "extends the view model with the data context", ->
         @instance.data =
           name: 'Alan'
+        @currentDataStub.onCall(0).returns @instance.data
         @retFun.call @instance
         assert.equal 'Alan', @instance.viewmodel.name()
+
+      it "extends the view model with the data context setTimeout", ->
+        cache = Meteor.setTimeout
+        @instance.data =
+          name: 'Alan'
+        @currentDataStub.onCall(0).returns @instance.data
+        @currentDataStub.onCall(1).returns { name: 'Brito' }
+        Meteor.setTimeout = (f) -> f()
+        @retFun.call @instance
+        Meteor.setTimeout = cache
+        assert.equal 'Brito', @instance.viewmodel.name()
+
 
   describe "@bindIdAttribute", ->
     it "has has default value", ->
