@@ -65,3 +65,18 @@ describe "ViewModel instance", ->
     it "doesn't do anything with null and undefined", ->
       @viewmodel.extend(undefined )
       @viewmodel.extend(null)
+
+  describe "#parent", ->
+
+    it "has parent function", ->
+      assert.isFunction @viewmodel.parent
+
+    it "returns the view model of the parent template", ->
+      @viewmodel.templateInstance =
+        view:
+          parentView:
+            name: 'Template.A'
+            templateInstance: ->
+              viewmodel: "X"
+      parent = @viewmodel.parent()
+      assert.equal "X", parent

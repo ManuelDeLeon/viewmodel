@@ -9,8 +9,12 @@ addBinding
 addBinding
   name: 'default'
   bind: (bindArg) ->
-    ViewModel.check 'vmProp', bindArg.bindValue, bindArg.viewmodel, "method"
-    bindArg.element.on bindArg.bindName, (event) -> bindArg.setVmValue(event)
+    bindArg.element.on bindArg.bindName, (event) ->
+      if ~bindArg.bindValue.indexOf(')', bindArg.bindValue.length - 1)
+        bindArg.getVmValue()
+      else
+        bindArg.setVmValue(event)
+      return
     return
 
 addBinding
@@ -29,3 +33,12 @@ addBinding
     else
       bindArg.element.hide()
     return
+
+addBinding
+  name: 'value'
+  selector: 'input'
+  events:
+    'input propertychange': (event, bindArg) ->
+      bindArg.setVmValue bindArg.element.val()
+  autorun: (c, bindArg) ->
+    bindArg.element.val bindArg.getVmValue()

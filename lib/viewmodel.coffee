@@ -224,11 +224,12 @@ class ViewModel
               newArg = !newArg if neg
             args.push newArg
 
+      if container instanceof ViewModel
+        ViewModel.check 'vmProp', name, container
+
       if _.isFunction(container[name])
-        value = container[name].apply(undefined, args)
+        value = container[name].apply(container, args)
       else
-        if container is viewmodel
-          ViewModel.check 'vmProp', name, viewmodel
         value = container[name]
 
     return if negate then !value else value
@@ -250,7 +251,13 @@ class ViewModel
   @getVmValueSetter = (viewmodel, bindValue) ->
     return  (value) -> setValue(value, viewmodel, bindValue, viewmodel)
 
-
+  @parentTemplate = (templateInstance) ->
+    view = templateInstance.view?.parentView
+    while view
+      if view.name.substring(0, 9) == 'Template.'
+        return view.templateInstance()
+      view = view.parentView
+    return
 
   ##################
   # Instance methods
@@ -275,6 +282,11 @@ class ViewModel
         viewmodel[key] = ViewModel.makeReactiveProperty(value);
     return
 
+  parent: ->
+    viewmodel = this
+    parentTemplate = ViewModel.parentTemplate(viewmodel.templateInstance)
+    return parentTemplate.viewmodel
+
   #############
   # Constructor
 
@@ -289,4 +301,3 @@ class ViewModel
     # The following function will run when the template is rendered
     return ->
       templateInstance = this
-      ViewModel.check 'T#onRendered', templateInstance

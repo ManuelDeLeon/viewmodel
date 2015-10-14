@@ -882,6 +882,28 @@ describe "ViewModel", ->
       assert.isTrue getVmValue()
       return
 
+    it "returns value from parent.first", ->
+      viewmodel =
+        name: -> 'A'
+        parent: ->
+          val = this.name()
+          first: val
+      bindValue = 'parent.first'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 'A', getVmValue()
+      return
+
+    it "checks vmProp when parent is a view model", ->
+      parentVm = new ViewModel( { first: 'A' } )
+      viewmodel = new ViewModel( {  } )
+      viewmodel.parent = -> parentVm
+      bindValue = 'parent.first'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      getVmValue()
+      assert.isTrue @checkStub.calledWith 'vmProp', 'parent', viewmodel
+      assert.isTrue @checkStub.calledWith 'vmProp', 'first', parentVm
+      return
+
   describe "@getVmValueSetter", ->
 
     it "sets first func", ->
@@ -950,3 +972,28 @@ describe "ViewModel", ->
             viewmodel: ->
       ViewModel.addEmptyViewModel(templateInstance)
       assert.equal context, templateInstance
+
+  describe "@parentTemplate", ->
+
+    it "returns undefined if it doesn't have a parent view", ->
+      templateInstance =
+        view: {}
+      parent = ViewModel.parentTemplate templateInstance
+      assert.isUndefined parent
+
+    it "returns undefined if parent view isn't a template", ->
+      templateInstance =
+        view:
+          parentView:
+            name: 'X'
+      parent = ViewModel.parentTemplate templateInstance
+      assert.isUndefined parent
+
+    it "returns template instance if parent view is a template", ->
+      templateInstance =
+        view:
+          parentView:
+            name: 'Template.A'
+            templateInstance: -> "X"
+      parent = ViewModel.parentTemplate templateInstance
+      assert.equal "X", parent
