@@ -36,7 +36,7 @@ describe "ViewModel", ->
         @retFun = ViewModel.onCreated(@template)
         @helpersSpy = sinon.spy @template, 'helpers'
         @currentDataStub = sinon.stub Template , 'currentData'
-        @setTimeoutStub = sinon.stub Meteor, 'setTimeout'
+        @afterFlushStub = sinon.stub Tracker, 'afterFlush'
         @instance =
           data: "A"
           autorun: (f) -> f()
@@ -58,22 +58,14 @@ describe "ViewModel", ->
         assert.notOk @helper.vmId
 
       it "extends the view model with the data context", ->
+        cache = Tracker.afterFlush
+        Tracker.afterFlush = (f) -> f()
         @instance.data =
           name: 'Alan'
-        @currentDataStub.onCall(0).returns @instance.data
+        @currentDataStub.returns @instance.data
         @retFun.call @instance
+        Tracker.afterFlush = cache
         assert.equal 'Alan', @instance.viewmodel.name()
-
-      it "extends the view model with the data context setTimeout", ->
-        cache = Meteor.setTimeout
-        @instance.data =
-          name: 'Alan'
-        @currentDataStub.onCall(0).returns @instance.data
-        @currentDataStub.onCall(1).returns { name: 'Brito' }
-        Meteor.setTimeout = (f) -> f()
-        @retFun.call @instance
-        Meteor.setTimeout = cache
-        assert.equal 'Brito', @instance.viewmodel.name()
 
 
   describe "@bindIdAttribute", ->

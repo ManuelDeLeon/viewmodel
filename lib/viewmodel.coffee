@@ -22,12 +22,9 @@ class ViewModel
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
 
-      viewmodel.extend Template.currentData()
-      setAutorun = ->
+      Tracker.afterFlush ->
         templateInstance.autorun ->
           viewmodel.extend Template.currentData()
-
-      Meteor.setTimeout setAutorun, 0
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
