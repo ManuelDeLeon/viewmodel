@@ -186,6 +186,23 @@ class ViewModel
       return token if ~str.indexOf(token)
     return null
 
+  getMatchingParenIndex = (bindValue, parenIndexStart) ->
+    return -1 if !~parenIndexStart
+    openParenCount = 0
+    for i in [parenIndexStart + 1 .. bindValue.length]
+      currentChar = bindValue.charAt(i)
+      if currentChar is ')'
+        if openParenCount is 0
+          return i
+        else
+          openParenCount--
+      else if currentChar is '('
+        openParenCount++
+
+    throw new Error("Unbalanced parenthesis")
+    return
+
+
   getValue = (container, bindValue, viewmodel) ->
     negate = bindValue.charAt(0) is '!'
     bindValue = bindValue.substring 1 if negate
@@ -195,42 +212,60 @@ class ViewModel
       left = getValue(container, bindValue.substring(0, i), viewmodel)
       right = getValue(container, bindValue.substring(i + token.length), viewmodel)
       value = tokens[token]( left, right )
-    else if dotRegex.test(bindValue)
-      i = bindValue.search(dotRegex)
-      i += 1 if bindValue.charAt(i) isnt '.'
-      newContainer = getValue container, bindValue.substring(0, i), viewmodel
-      newBindValue = bindValue.substring(i + 1)
-      value = getValue newContainer, newBindValue, viewmodel
+      return if negate then !value else value
+
+    if bindValue is "this"
+      value = Template.instance().data
+    else if quoted(bindValue)
+      value = removeQuotes(bindValue)
     else
-      name = bindValue
-      args = []
-      if ~bindValue.indexOf('(')
-        parsed = ViewModel.parseBind(bindValue)
-        name = Object.keys(parsed)[0]
-        if parsed[name].length > 2
-          for arg in parsed[name].substr(1, parsed[name].length - 2).split(',') #remove parenthesis
-            newArg = undefined
-            if arg is "this"
-              newArg = Template.instance().data
-            else if quoted(arg)
-              newArg = removeQuotes(arg)
-            else
-              neg = arg.charAt(0) is '!'
-              arg = arg.substring 1 if neg
-              if viewmodel[arg]
-                newArg = getValue(viewmodel, arg, viewmodel)
-              else
-                newArg = getPrimitive(arg)
-              newArg = !newArg if neg
-            args.push newArg
+      dotIndex = bindValue.search(dotRegex)
+      dotIndex += 1 if ~dotIndex and bindValue.charAt(dotIndex) isnt '.'
+      parenIndexStart = bindValue.indexOf('(')
+      parenIndexEnd = getMatchingParenIndex(bindValue, parenIndexStart)
 
-      if container instanceof ViewModel
-        ViewModel.check 'vmProp', name, container
+      breakOnFirstDot = ~dotIndex and (!~parenIndexStart or dotIndex < parenIndexStart or dotIndex is (parenIndexEnd + 1))
 
-      if _.isFunction(container[name])
-        value = container[name].apply(container, args)
+      if breakOnFirstDot
+        newContainer = getValue container, bindValue.substring(0, dotIndex), viewmodel
+        newBindValue = bindValue.substring(dotIndex + 1)
+        value = getValue newContainer, newBindValue, viewmodel
       else
-        value = container[name]
+        name = bindValue
+        args = []
+        if ~parenIndexStart
+          parsed = ViewModel.parseBind(bindValue)
+          name = Object.keys(parsed)[0]
+          second = parsed[name]
+          if second.length > 2
+            for arg in second.substr(1, second.length - 2).split(',') #remove parenthesis
+              newArg = undefined
+              if arg is "this"
+                newArg = Template.instance().data
+              else if quoted(arg)
+                newArg = removeQuotes(arg)
+              else
+                neg = arg.charAt(0) is '!'
+                arg = arg.substring 1 if neg
+
+                arg = getValue(container, arg, viewmodel)
+                if _.has(viewmodel, arg)
+                  newArg = getValue(viewmodel, arg, viewmodel)
+                else
+                  newArg = getPrimitive(arg)
+                newArg = !newArg if neg
+              args.push newArg
+
+        if container instanceof ViewModel
+          ViewModel.check 'vmProp', name, container
+
+        if _.has(container, name)
+          if _.isFunction(container[name])
+            value = container[name].apply(container, args)
+          else
+            value = container[name]
+        else
+          value = getPrimitive(name)
 
     return if negate then !value else value
 

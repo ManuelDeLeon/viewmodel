@@ -430,6 +430,16 @@ describe "ViewModel", ->
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "A", getVmValue()
 
+    it "returns value from name(address.zip)", ->
+      viewmodel =
+        name: (val) -> val is 100
+        address:
+          zip: 100
+      bindValue = 'name(address.zip)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
     it "returns false from !'A'", ->
       viewmodel =
         name: -> "A"
@@ -481,6 +491,7 @@ describe "ViewModel", ->
       bindValue = "name('a', 1)"
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "a1", getVmValue()
+      return
 
     it "returns value from name(first) with string", ->
       viewmodel =
@@ -601,6 +612,7 @@ describe "ViewModel", ->
       bindValue = 'name(1).first'
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "A", getVmValue()
+      return
 
     it "returns value from name(1)", ->
       viewmodel =
@@ -882,6 +894,19 @@ describe "ViewModel", ->
       assert.isTrue getVmValue()
       return
 
+    it "returns value from first(this.a)", ->
+      instance =
+        data:
+          a: 1
+      stub = sinon.stub Template, 'instance'
+      stub.returns instance
+      viewmodel =
+        first: (ins) -> ins is 1
+      bindValue = 'first(this.a)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
     it "returns value from parent.first", ->
       viewmodel =
         name: -> 'A'
@@ -902,6 +927,20 @@ describe "ViewModel", ->
       getVmValue()
       assert.isTrue @checkStub.calledWith 'vmProp', 'parent', viewmodel
       assert.isTrue @checkStub.calledWith 'vmProp', 'first', parentVm
+      return
+
+    it "returns quoted string", ->
+      viewmodel = {}
+      bindValue = '"Hi"'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 'Hi', getVmValue()
+      return
+
+    it "returns single quoted string", ->
+      viewmodel = {}
+      bindValue = "'Hi'"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 'Hi', getVmValue()
       return
 
   describe "@getVmValueSetter", ->
