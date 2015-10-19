@@ -4,6 +4,7 @@ describe "Template", ->
     @checkStub = sinon.stub ViewModel, "check"
     @vmOnCreatedStub = sinon.stub ViewModel, "onCreated"
     @vmOnRenderedStub = sinon.stub ViewModel, "onRendered"
+    @vmOnDestroyedStub = sinon.stub ViewModel, "onDestroyed"
 
   afterEach ->
     sinon.restoreAll()
@@ -13,8 +14,10 @@ describe "Template", ->
       @context =
         onCreated: ->
         onRendered: ->
+        onDestroyed: ->
       @templateOnCreatedStub = sinon.stub(@context, "onCreated")
       @templateOnRenderedStub = sinon.stub(@context, "onRendered")
+      @templateOnDestroyedStub = sinon.stub(@context, "onDestroyed")
 
     it "checks the arguments", ->
       Template.prototype.viewmodel.call @context, "X"
@@ -24,12 +27,24 @@ describe "Template", ->
       Template.prototype.viewmodel.call @context, "X"
       assert.equal "X", @context.viewmodelInitial
 
-    it "adds onCreated ", ->
+    it "adds onCreated", ->
       @vmOnCreatedStub.returns "Y"
       Template.prototype.viewmodel.call @context, "X"
       assert.isTrue @vmOnCreatedStub.calledWithExactly(@context)
       assert.isTrue @templateOnCreatedStub.calledWithExactly("Y")
 
+    it "adds onRendered", ->
+      @vmOnRenderedStub.returns "Y"
+      Template.prototype.viewmodel.call @context, "X"
+      assert.isTrue @vmOnRenderedStub.calledWithExactly(@context)
+      assert.isTrue @templateOnRenderedStub.calledWithExactly("Y")
+
+    it "adds onDestroyed", ->
+      @vmOnDestroyedStub.returns "Y"
+      Template.prototype.viewmodel.call @context, "X"
+      assert.isTrue @vmOnDestroyedStub.calledWithExactly(@context)
+      assert.isTrue @templateOnDestroyedStub.calledWithExactly("Y")
+      
     it "returns undefined", ->
       assert.isUndefined Template.prototype.viewmodel.call(@context, "X")
 

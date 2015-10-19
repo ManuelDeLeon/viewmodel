@@ -24,6 +24,7 @@ Blaze.Template.prototype.viewmodel = (initial) ->
   template.viewmodelInitial = initial
   template.onCreated ViewModel.onCreated(template)
   template.onRendered ViewModel.onRendered(template)
+  template.onDestroyed ViewModel.onDestroyed(template)
 
   return
 

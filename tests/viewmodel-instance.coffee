@@ -68,18 +68,21 @@ describe "ViewModel instance", ->
 
   describe "#parent", ->
 
-    it "has parent function", ->
-      assert.isFunction @viewmodel.parent
-
-    it "returns the view model of the parent template", ->
+    beforeEach ->
       @viewmodel.templateInstance =
         view:
           parentView:
             name: 'Template.A'
             templateInstance: ->
               viewmodel: "X"
+
+    it "returns the view model of the parent template", ->
       parent = @viewmodel.parent()
       assert.equal "X", parent
+
+    it "checks the arguments", ->
+      @viewmodel.parent('X')
+      assert.isTrue @checkStub.calledWith '#parent', 'X'
 
   describe "#children", ->
 
@@ -119,3 +122,16 @@ describe "ViewModel instance", ->
       assert.equal 1, arr.length
       assert.equal "BB", arr[0].name()
 
+    it "calls .depend", ->
+      array = @viewmodel.children()
+      spy = sinon.spy array, 'depend'
+      @viewmodel.children()
+      assert.isTrue spy.called
+
+    it "doesn't check without arguments", ->
+      @viewmodel.children()
+      assert.isFalse @checkStub.called
+
+    it "checks with arguments", ->
+      @viewmodel.children('X')
+      assert.isTrue @checkStub.calledWith '#children', 'X'

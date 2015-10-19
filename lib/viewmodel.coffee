@@ -92,6 +92,7 @@ class ViewModel
         _value = new ReactiveArray(initial, dependency)
       else
         _value = initialValue
+      dependency.changed()
     funProp.depend = -> dependency.depend()
     funProp.changed = -> dependency.changed()
 
@@ -329,7 +330,7 @@ class ViewModel
     return
 
   parent: (args...) ->
-    ViewModel.check "#children", args...
+    ViewModel.check "#parent", args...
     viewmodel = this
     parentTemplate = ViewModel.parentTemplate(viewmodel.templateInstance)
     return parentTemplate.viewmodel
@@ -340,6 +341,7 @@ class ViewModel
   childrenProperty = ->
     array = new ReactiveArray()
     funProp = (search) ->
+      array.depend()
       if arguments.length
         ViewModel.check "#children", search
         predicate = if _.isString(search) then ((vm) -> ViewModel.templateName(vm.templateInstance) is search) else search
@@ -351,6 +353,7 @@ class ViewModel
 
   constructor: (initial) ->
     viewmodel = this
+    viewmodel.vmId = ViewModel.nextId()
     viewmodel.extend(initial)
     @children = childrenProperty()
 
@@ -359,14 +362,32 @@ class ViewModel
   # Not Tested
 
   @onRendered = ->
-    # The following function will run when the template is rendered
     return ->
       templateInstance = this
       if templateInstance.viewmodel.autorun
         fun = (c) -> templateInstance.viewmodel.autorun.apply(templateInstance.viewmodel, c)
         templateInstance.autorun fun
 
+  @onDestroyed = ->
+    return ->
+      templateInstance = this
+      viewmodel = templateInstance.viewmodel
+      parent = viewmodel.parent()
+      if parent
+        children = parent.children()
+        indexToRemove = -1
+        for child in children
+          indexToRemove++
+          if child.vmId is viewmodel.vmId
+            children.splice(indexToRemove, 1)
+            break
+
   @templateName = (templateInstance) ->
     name = templateInstance.view.name
     if name is 'body' then name else name.substr(name.indexOf('.') + 1)
+
+
+  reset: ->
+    viewmodel = this
+    viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop].reset)
 
