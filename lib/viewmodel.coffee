@@ -94,6 +94,7 @@ class ViewModel
         _value = initialValue
     funProp.depend = -> dependency.depend()
     funProp.changed = -> dependency.changed()
+
     return funProp
 
   @bindings = {}
@@ -327,7 +328,8 @@ class ViewModel
         viewmodel[key] = ViewModel.makeReactiveProperty(value);
     return
 
-  parent: ->
+  parent: (args...) ->
+    ViewModel.check "#children", args...
     viewmodel = this
     parentTemplate = ViewModel.parentTemplate(viewmodel.templateInstance)
     return parentTemplate.viewmodel
@@ -352,6 +354,7 @@ class ViewModel
     viewmodel.extend(initial)
     @children = childrenProperty()
 
+
   ############
   # Not Tested
 
@@ -359,8 +362,11 @@ class ViewModel
     # The following function will run when the template is rendered
     return ->
       templateInstance = this
-      console.log templateInstance
+      if templateInstance.viewmodel.autorun
+        fun = (c) -> templateInstance.viewmodel.autorun.apply(templateInstance.viewmodel, c)
+        templateInstance.autorun fun
 
   @templateName = (templateInstance) ->
     name = templateInstance.view.name
     if name is 'body' then name else name.substr(name.indexOf('.') + 1)
+
