@@ -80,3 +80,42 @@ describe "ViewModel instance", ->
               viewmodel: "X"
       parent = @viewmodel.parent()
       assert.equal "X", parent
+
+  describe "#children", ->
+
+    beforeEach ->
+      @viewmodel.children().push
+        age: -> 1
+        name: -> "AA"
+        templateInstance:
+          view:
+            name: 'Template.A'
+      @viewmodel.children().push
+        age: -> 2
+        name: -> "BB"
+        templateInstance:
+          view:
+            name: 'Template.B'
+      @viewmodel.children().push
+        age: -> 1
+        templateInstance:
+          view:
+            name: 'Template.A'
+
+    it "returns all without arguments", ->
+      assert.equal 3, @viewmodel.children().length
+      @viewmodel.children().push("X")
+      assert.equal 4, @viewmodel.children().length
+      assert.equal "X", @viewmodel.children()[3]
+
+    it "returns by template when passed a string", ->
+      arr = @viewmodel.children('A')
+      assert.equal 2, arr.length
+      assert.equal 1, arr[0].age()
+      assert.equal 1, arr[1].age()
+
+    it "returns array from a predicate", ->
+      arr = @viewmodel.children((vm) -> vm.age() is 2)
+      assert.equal 1, arr.length
+      assert.equal "BB", arr[0].name()
+

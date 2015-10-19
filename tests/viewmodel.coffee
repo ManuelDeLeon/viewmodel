@@ -33,6 +33,7 @@ describe "ViewModel", ->
             return vm
           helpers: (obj) => @helper = obj
 
+        @assignChildStub = sinon.stub ViewModel, 'assignChild'
         @retFun = ViewModel.onCreated(@template)
         @helpersSpy = sinon.spy @template, 'helpers'
         @currentDataStub = sinon.stub Template , 'currentData'
@@ -67,6 +68,12 @@ describe "ViewModel", ->
         Tracker.afterFlush = cache
         assert.equal 'Alan', @instance.viewmodel.name()
 
+      it "assigns viewmodel as child of the parent", ->
+        cache = Tracker.afterFlush
+        Tracker.afterFlush = (f) -> f()
+        @retFun.call @instance
+        Tracker.afterFlush = cache
+        assert.isTrue @assignChildStub.calledWithExactly @instance.viewmodel
 
   describe "@bindIdAttribute", ->
     it "has has default value", ->
@@ -943,6 +950,28 @@ describe "ViewModel", ->
       assert.equal 'Hi', getVmValue()
       return
 
+    it "returns value from parent.first.second", ->
+      viewmodel =
+        parent:
+          first:
+            second: 'A'
+      bindValue = 'parent.first.second'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 'A', getVmValue()
+      return
+
+    it "returns value from parent.first(second)", ->
+      parent = new ViewModel()
+      parent.first = (v) -> v is 'A'
+      viewmodel = new ViewModel()
+      viewmodel.second = 'A'
+      viewmodel.parent = parent
+
+      bindValue = 'parent.first(second)'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
   describe "@getVmValueSetter", ->
 
     it "sets first func", ->
@@ -1036,3 +1065,42 @@ describe "ViewModel", ->
             templateInstance: -> "X"
       parent = ViewModel.parentTemplate templateInstance
       assert.equal "X", parent
+
+    it "returns template instance if parent view is body", ->
+      templateInstance =
+        view:
+          parentView:
+            name: 'body'
+            templateInstance: -> "X"
+      parent = ViewModel.parentTemplate templateInstance
+      assert.equal "X", parent
+
+  describe "@assignChild", ->
+    beforeEach ->
+      @parentTemplateStub = sinon.stub ViewModel, 'parentTemplate'
+
+    it "adds viewmodel to children", ->
+      arr = []
+      @parentTemplateStub.returns
+        viewmodel:
+          children: -> arr
+      ViewModel.assignChild "X"
+      assert.equal 1, arr.length
+      assert.equal "X", arr[0]
+
+    it "doesn't do anything without a parent template", ->
+      @parentTemplateStub.returns null
+      ViewModel.assignChild "X"
+
+  describe "@templateName", ->
+    it "returns body if the template is the body", ->
+      name = ViewModel.templateName
+        view:
+          name: 'body'
+      assert.equal 'body', name
+
+    it "returns name of the template", ->
+      name = ViewModel.templateName
+        view:
+          name: 'Template.mine'
+      assert.equal 'mine', name

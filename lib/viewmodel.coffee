@@ -25,6 +25,8 @@ class ViewModel
       Tracker.afterFlush ->
         templateInstance.autorun ->
           viewmodel.extend Template.currentData()
+        ViewModel.assignChild(viewmodel)
+
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -248,8 +250,8 @@ class ViewModel
                 neg = arg.charAt(0) is '!'
                 arg = arg.substring 1 if neg
 
-                arg = getValue(container, arg, viewmodel)
-                if _.has(viewmodel, arg)
+                arg = getValue(viewmodel, arg, viewmodel)
+                if `arg in viewmodel`
                   newArg = getValue(viewmodel, arg, viewmodel)
                 else
                   newArg = getPrimitive(arg)
@@ -259,7 +261,7 @@ class ViewModel
         if container instanceof ViewModel
           ViewModel.check 'vmProp', name, container
 
-        if _.has(container, name)
+        if `name in container`
           if _.isFunction(container[name])
             value = container[name].apply(container, args)
           else
@@ -289,9 +291,17 @@ class ViewModel
   @parentTemplate = (templateInstance) ->
     view = templateInstance.view?.parentView
     while view
-      if view.name.substring(0, 9) == 'Template.'
+      if view.name.substring(0, 9) is 'Template.' or view.name is 'body'
         return view.templateInstance()
       view = view.parentView
+    return
+
+  @assignChild = (viewmodel) ->
+    parentTemplateInstance = ViewModel.parentTemplate(viewmodel.templateInstance)
+    while parentTemplateInstance and not parentTemplateInstance.viewmodel
+      parentTemplateInstance = ViewModel.parentTemplate(parentTemplateInstance)
+
+    parentTemplateInstance?.viewmodel.children().push(viewmodel)
     return
 
   ##################
@@ -325,9 +335,22 @@ class ViewModel
   #############
   # Constructor
 
+  childrenProperty = ->
+    array = new ReactiveArray()
+    funProp = (search) ->
+      if arguments.length
+        ViewModel.check "#children", search
+        predicate = if _.isString(search) then ((vm) -> ViewModel.templateName(vm.templateInstance) is search) else search
+        return _.filter array, predicate
+      else
+        return array
+
+    return funProp
+
   constructor: (initial) ->
     viewmodel = this
     viewmodel.extend(initial)
+    @children = childrenProperty()
 
   ############
   # Not Tested
@@ -336,3 +359,8 @@ class ViewModel
     # The following function will run when the template is rendered
     return ->
       templateInstance = this
+      console.log templateInstance
+
+  @templateName = (templateInstance) ->
+    name = templateInstance.view.name
+    if name is 'body' then name else name.substr(name.indexOf('.') + 1)
