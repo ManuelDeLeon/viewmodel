@@ -135,3 +135,21 @@ describe "ViewModel instance", ->
     it "checks with arguments", ->
       @viewmodel.children('X')
       assert.isTrue @checkStub.calledWith '#children', 'X'
+
+  describe "#reset", ->
+
+    beforeEach ->
+      @viewmodel.extend
+        name: 'A'
+        arr: ['A']
+
+    it "resets a string", ->
+      @viewmodel.name('B')
+      @viewmodel.reset()
+      assert.equal "A", @viewmodel.name()
+
+    it "resets an array", ->
+      @viewmodel.arr().push('B')
+      @viewmodel.reset()
+      assert.equal 1, @viewmodel.arr().length
+      assert.equal 'A', @viewmodel.arr()[0]

@@ -339,6 +339,11 @@ class ViewModel
     parentTemplate = ViewModel.parentTemplate(viewmodel.templateInstance)
     return parentTemplate.viewmodel
 
+  reset: ->
+    viewmodel = this
+    viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop].reset)
+
+
   #############
   # Constructor
 
@@ -389,9 +394,4 @@ class ViewModel
   @templateName = (templateInstance) ->
     name = templateInstance.view.name
     if name is 'body' then name else name.substr(name.indexOf('.') + 1)
-
-
-  reset: ->
-    viewmodel = this
-    viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop].reset)
 

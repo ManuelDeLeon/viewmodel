@@ -79,10 +79,6 @@ describe "ViewModel", ->
     it "has has default value", ->
       assert.equal "b-id", ViewModel.bindIdAttribute
 
-  describe "@viewPrefix", ->
-    it "has has default value", ->
-      assert.equal "t-", ViewModel.viewPrefix
-
   describe "@bindHelper", ->
     beforeEach ->
       @nextIdStub = sinon.stub ViewModel, 'nextId'
@@ -1030,16 +1026,20 @@ describe "ViewModel", ->
 
     it "adds a view model to the template instance", ->
       context = null
+      onViewDestroyedCalled = false
       f = ->
         context = this
       onCreatedStub = sinon.stub ViewModel, 'onCreated'
       onCreatedStub.returns f
       templateInstance =
+        viewmodel: {}
         view:
+          onViewDestroyed: -> onViewDestroyedCalled = true
           template:
             viewmodel: ->
       ViewModel.addEmptyViewModel(templateInstance)
       assert.equal context, templateInstance
+      assert.isTrue onViewDestroyedCalled
 
   describe "@parentTemplate", ->
 
