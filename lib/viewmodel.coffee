@@ -15,10 +15,10 @@ class ViewModel
     return
 
   @onCreated = (template) ->
-    # The following function will run when the template is created
     return ->
       templateInstance = this
       viewmodel = template.createViewModel(templateInstance.data)
+
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
 
@@ -37,13 +37,15 @@ class ViewModel
       return
 
   @bindIdAttribute = 'b-id'
-  @viewPrefix = 't-'
 
   @addEmptyViewModel = (templateInstance) ->
     template = templateInstance.view.template
-    template.viewmodel({})
+    template.viewmodelInitial = {}
     onCreated = ViewModel.onCreated(template)
     onCreated.call templateInstance
+    onRendered = ViewModel.onRendered(template)
+    onRendered.call templateInstance
+    template.onDestroyed ViewModel.onDestroyed(template)
     return
 
   getBindHelper = (useBindings) ->
