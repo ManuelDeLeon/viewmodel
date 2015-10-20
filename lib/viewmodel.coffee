@@ -45,7 +45,9 @@ class ViewModel
     onCreated.call templateInstance
     onRendered = ViewModel.onRendered(template)
     onRendered.call templateInstance
-    template.onDestroyed ViewModel.onDestroyed(template)
+    onDestroyed = ViewModel.onDestroyed(template)
+    templateInstance.view.onViewDestroyed ->
+      onDestroyed.call templateInstance
     return
 
   getBindHelper = (useBindings) ->
