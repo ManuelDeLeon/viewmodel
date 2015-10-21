@@ -35,10 +35,12 @@ addBinding
   selector: 'input'
   events:
     'input propertychange': (event, bindArg) ->
-      bindArg.setVmValue bindArg.element.val()
+      newVal = bindArg.element.val()
+      bindArg.setVmValue(newVal) if newVal isnt bindArg.getVmValue()
       return
   autorun: (c, bindArg) ->
-    bindArg.element.val bindArg.getVmValue()
+    newVal = bindArg.getVmValue()
+    bindArg.element.val(newVal) if newVal isnt bindArg.element.val()
     return
 
 addBinding
