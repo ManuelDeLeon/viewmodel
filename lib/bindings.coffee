@@ -6,12 +6,7 @@ addBinding
   name: 'default'
   bind: (bindArg) ->
     bindArg.element.on bindArg.bindName, (event) ->
-      if ~bindArg.bindValue.indexOf(')', bindArg.bindValue.length - 1)
-        bindArg.getVmValue()
-      else
-        bindArg.setVmValue(event)
-      return
-    return
+      bindArg.setVmValue(event)
 
 addBinding
   name: 'toggle'
@@ -19,7 +14,7 @@ addBinding
     click: (event, bindArg) ->
       value = bindArg.getVmValue()
       bindArg.setVmValue(!value)
-      return
+
 
 addBinding
   name: 'if'
@@ -28,29 +23,53 @@ addBinding
       bindArg.element.show()
     else
       bindArg.element.hide()
-    return
+
 
 addBinding
   name: 'value'
-  selector: 'input'
   events:
     'input propertychange': (event, bindArg) ->
       newVal = bindArg.element.val()
       bindArg.setVmValue(newVal) if newVal isnt bindArg.getVmValue()
-      return
+
   autorun: (c, bindArg) ->
     newVal = bindArg.getVmValue()
     bindArg.element.val(newVal) if newVal isnt bindArg.element.val()
-    return
 
 addBinding
   name: 'text'
   autorun: (c, bindArg) ->
     bindArg.element.text bindArg.getVmValue()
-    return
 
 addBinding
   name: 'html'
   autorun: (c, bindArg) ->
     bindArg.element.html bindArg.getVmValue()
-    return
+
+changeBinding = (eb) ->
+  eb.value or eb.check or eb.text or eb.focus or eb.hover or eb.if or eb.toggle
+
+addBinding
+  name: 'change'
+  bind: (bindArg)->
+    bindValue = changeBinding(bindArg.elementBind)
+    bindArg.autorun (c) ->
+      newValue = bindArg.getVmValue(bindValue)
+      bindArg.setVmValue newValue if not c.firstRun
+
+  bindIf: (bindArg)-> changeBinding(bindArg.elementBind)
+
+addBinding
+  name: 'enter'
+  events:
+    'keyup': (event, bindArg) ->
+      if event.which is 13 or event.keyCode is 13
+        bindArg.setVmValue(event)
+
+addBinding
+  name: 'attr'
+  bind: (bindArg) ->
+    for attr of bindArg.bindValue
+      do (attr) ->
+        bindArg.autorun ->
+          bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])

@@ -105,7 +105,7 @@ class ViewModel
   @bindings = {}
   @addBinding = (binding) ->
     ViewModel.check "@addBinding", binding
-    binding.priority = 1
+    binding.priority = 1 if not binding.priority
     binding.priority++ if binding.selector
     binding.priority++ if binding.bindIf
 
@@ -120,7 +120,7 @@ class ViewModel
     binding = null
     bindingArray = bindings[bindName]
     if bindingArray
-      if bindingArray.length is 1
+      if bindingArray.length is 1 and not (bindingArray[0].bindIf or bindingArray[0].selector)
         binding = bindingArray[0]
       else
         binding = _.find(_.sortBy(bindingArray, ((b)-> -b.priority)), (b) ->
@@ -162,6 +162,9 @@ class ViewModel
 
   quoted = (str) -> str.charAt(0) is '"' or str.charAt(0) is "'"
   removeQuotes = (str) -> str.substr(1, str.length - 2)
+  isPrimitive = (val) ->
+    val is "true" or val is "false" or val is "null" or val is "undefined" or $.isNumeric(val)
+
   getPrimitive = (val) ->
     switch val
       when "true" then true
@@ -264,7 +267,7 @@ class ViewModel
                 newArg = !newArg if neg
               args.push newArg
 
-        if container instanceof ViewModel
+        if container instanceof ViewModel and not isPrimitive(name)
           ViewModel.check 'vmProp', name, container
 
         if `name in container`
@@ -278,7 +281,7 @@ class ViewModel
     return if negate then !value else value
 
   @getVmValueGetter = (viewmodel, bindValue) ->
-    return  -> getValue(viewmodel, bindValue, viewmodel)
+    return  (optBindValue = bindValue) -> getValue(viewmodel, optBindValue, viewmodel)
 
   setValue = (value, container, bindValue, viewmodel) ->
     if dotRegex.test(bindValue)
@@ -292,7 +295,12 @@ class ViewModel
     return
 
   @getVmValueSetter = (viewmodel, bindValue) ->
-    return  (value) -> setValue(value, viewmodel, bindValue, viewmodel)
+    return (->) if not _.isString(bindValue)
+    if ~bindValue.indexOf(')', bindValue.length - 1)
+      return -> getValue(viewmodel, bindValue, viewmodel)
+    else
+      return (value) -> setValue(value, viewmodel, bindValue, viewmodel)
+
 
   @parentTemplate = (templateInstance) ->
     view = templateInstance.view?.parentView

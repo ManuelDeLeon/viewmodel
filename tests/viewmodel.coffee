@@ -200,6 +200,13 @@ describe "ViewModel", ->
         name: name
       assert.equal 1, ViewModel.bindings[name][0].priority
 
+    it "adds priority 10 to the binding", ->
+      name = getBindingName()
+      ViewModel.addBinding
+        name: name
+        priority: 10
+      assert.equal 10, ViewModel.bindings[name][0].priority
+
     it "adds priority 2 with a selector", ->
       name = getBindingName()
       ViewModel.addBinding
@@ -301,6 +308,21 @@ describe "ViewModel", ->
 
       ret = ViewModel.getBinding bindName, 'bindArg', bindings
       assert.equal ret, oneBinding
+
+    it "returns default binding if can't find one that passes bindIf", ->
+      bindName = 'default'
+      defaultB =
+        name: bindName
+      bindings = {}
+      bindings[bindName] = [defaultB]
+      oneBinding =
+        name: 'none'
+        bindIf: -> false
+      bindings['none'] = [oneBinding]
+
+      ret = ViewModel.getBinding 'none', 'bindArg', bindings
+      assert.equal ret, defaultB
+      return
 
     it "returns highest priority binding", ->
       oneBinding =
@@ -978,6 +1000,24 @@ describe "ViewModel", ->
       setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
       setVmValue(2)
       assert.equal 2, val
+      return
+
+    it "sets first(true)", ->
+      val = null
+      viewmodel =
+        first: (v) -> val = v
+      bindValue = 'first(true)'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(2)
+      assert.isTrue val
+      return
+
+    it "doesn't do anything if bindValue isn't a string", ->
+      val = null
+      viewmodel =
+        first: (v) -> val = v
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, {})
+      setVmValue(2)
       return
 
     it "sets first prop", ->
