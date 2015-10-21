@@ -1,10 +1,6 @@
 addBinding = ViewModel.addBinding
 
-addBinding
-  name: 'text'
-  autorun: (c, bindArg) ->
-    bindArg.element.text bindArg.getVmValue()
-    return
+
 
 addBinding
   name: 'default'
@@ -40,5 +36,19 @@ addBinding
   events:
     'input propertychange': (event, bindArg) ->
       bindArg.setVmValue bindArg.element.val()
+      return
   autorun: (c, bindArg) ->
     bindArg.element.val bindArg.getVmValue()
+    return
+
+addBinding
+  name: 'text'
+  autorun: (c, bindArg) ->
+    bindArg.element.text bindArg.getVmValue()
+    return
+
+addBinding
+  name: 'html'
+  autorun: (c, bindArg) ->
+    bindArg.element.html bindArg.getVmValue()
+    return
