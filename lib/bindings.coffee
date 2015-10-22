@@ -91,20 +91,45 @@ addBinding
 
 addBinding
   name: 'class'
+  bindIf: (bindArg) -> _.isString(bindArg.bindValue)
   bind: (bindArg) ->
-    if _.isString(bindArg.bindValue)
-      prevValue = ''
-      bindArg.autorun ->
-        newValue = bindArg.getVmValue()
-        bindArg.element.removeClass prevValue
-        bindArg.element.addClass newValue
-        prevValue = newValue
-    else
-      for cssClass of bindArg.bindValue
-        do (cssClass) ->
-          bindArg.autorun ->
-            if bindArg.getVmValue(bindArg.bindValue[cssClass])
-              bindArg.element.addClass cssClass
-            else
-              bindArg.element.removeClass cssClass
-      return
+    bindArg.prevValue = ''
+  autorun: (c, bindArg) ->
+    newValue = bindArg.getVmValue()
+    bindArg.element.removeClass bindArg.prevValue
+    bindArg.element.addClass newValue
+    bindArg.prevValue = newValue
+
+addBinding
+  name: 'class'
+  bindIf: (bindArg) -> not _.isString(bindArg.bindValue)
+  bind: (bindArg) ->
+    for cssClass of bindArg.bindValue
+      do (cssClass) ->
+        bindArg.autorun ->
+          if bindArg.getVmValue(bindArg.bindValue[cssClass])
+            bindArg.element.addClass cssClass
+          else
+            bindArg.element.removeClass cssClass
+          return
+    return
+
+addBinding
+  name: 'style'
+  bindIf: (bindArg) -> _.isString(bindArg.bindValue)
+  autorun: (c, bindArg) ->
+    newValue = bindArg.getVmValue()
+    if _.isString(newValue)
+      newValue = ViewModel.parseBind(newValue)
+    bindArg.element.css newValue
+
+addBinding
+  name: 'style'
+  bindIf: (bindArg) -> not _.isString(bindArg.bindValue)
+  bind: (bindArg) ->
+    for style of bindArg.bindValue
+      do (style) ->
+        bindArg.autorun ->
+          bindArg.element.css style, bindArg.getVmValue(bindArg.bindValue[style])
+          return
+    return

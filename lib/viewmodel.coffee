@@ -149,11 +149,11 @@ class ViewModel
     binding = ViewModel.getBinding(bindName, bindArg, bindings)
     return if not binding
 
-    if binding.autorun
-      bindArg.autorun binding.autorun
-
     if binding.bind
       binding.bind bindArg
+
+    if binding.autorun
+      bindArg.autorun binding.autorun
 
     if binding.events
       for eventName, eventFunc of binding.events
