@@ -1,7 +1,5 @@
 addBinding = ViewModel.addBinding
 
-
-
 addBinding
   name: 'default'
   bind: (bindArg) ->
@@ -73,3 +71,40 @@ addBinding
       do (attr) ->
         bindArg.autorun ->
           bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])
+    return
+
+addBinding
+  name: 'check'
+  events:
+    'change': (event, bindArg) ->
+      vmValue = bindArg.getVmValue()
+      elementValue = bindArg.element.val()
+      if vmValue instanceof Array
+        if bindArg.element.is(':checked')
+          vmValue.push elementValue if elementValue not in vmValue
+        else
+          vmValue.remove elementValue
+      else
+        newValue = if bindArg.element.attr('type') is 'checkbox' then bindArg.element.is(':checked') else elementValue
+        bindArg.setVmValue newValue
+
+
+addBinding
+  name: 'class'
+  bind: (bindArg) ->
+    if _.isString(bindArg.bindValue)
+      prevValue = ''
+      bindArg.autorun ->
+        newValue = bindArg.getVmValue()
+        bindArg.element.removeClass prevValue
+        bindArg.element.addClass newValue
+        prevValue = newValue
+    else
+      for cssClass of bindArg.bindValue
+        do (cssClass) ->
+          bindArg.autorun ->
+            if bindArg.getVmValue(bindArg.bindValue[cssClass])
+              bindArg.element.addClass cssClass
+            else
+              bindArg.element.removeClass cssClass
+      return
