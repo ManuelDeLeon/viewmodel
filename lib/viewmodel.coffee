@@ -63,6 +63,7 @@ class ViewModel
       bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
       Blaze.currentView.onViewReady ->
         element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
+        bindObject.view = this
         templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings
         return
 
@@ -137,8 +138,8 @@ class ViewModel
         return
       element: element
       elementBind: bindObject
-      getVmValue: ViewModel.getVmValueGetter(viewmodel, bindValue)
-      setVmValue: ViewModel.getVmValueSetter(viewmodel, bindValue)
+      getVmValue: ViewModel.getVmValueGetter(viewmodel, bindValue, bindObject.view)
+      setVmValue: ViewModel.getVmValueSetter(viewmodel, bindValue, bindObject.view)
       bindName: bindName
       bindValue: bindValue
       viewmodel: viewmodel
@@ -213,6 +214,9 @@ class ViewModel
     throw new Error("Unbalanced parenthesis")
     return
 
+  currentView = null
+  currentContext = ->
+    Template.instance()?.data or currentView?.dataVar?.curValue
 
   getValue = (container, bindValue, viewmodel) ->
     negate = bindValue.charAt(0) is '!'
@@ -226,7 +230,7 @@ class ViewModel
       return if negate then !value else value
 
     if bindValue is "this"
-      value = Template.instance().data
+      value = currentContext()
     else if quoted(bindValue)
       value = removeQuotes(bindValue)
     else
@@ -252,7 +256,7 @@ class ViewModel
             for arg in second.substr(1, second.length - 2).split(',') #remove parenthesis
               newArg = undefined
               if arg is "this"
-                newArg = Template.instance().data
+                newArg = currentContext()
               else if quoted(arg)
                 newArg = removeQuotes(arg)
               else
@@ -280,8 +284,10 @@ class ViewModel
 
     return if negate then !value else value
 
-  @getVmValueGetter = (viewmodel, bindValue) ->
-    return  (optBindValue = bindValue) -> getValue(viewmodel, optBindValue, viewmodel)
+  @getVmValueGetter = (viewmodel, bindValue, view) ->
+    return  (optBindValue = bindValue) ->
+      currentView = view
+      getValue(viewmodel, optBindValue.toString(), viewmodel)
 
   setValue = (value, container, bindValue, viewmodel) ->
     if dotRegex.test(bindValue)
@@ -294,12 +300,14 @@ class ViewModel
       if _.isFunction(container[bindValue]) then container[bindValue](value) else container[bindValue] = value
     return
 
-  @getVmValueSetter = (viewmodel, bindValue) ->
+  @getVmValueSetter = (viewmodel, bindValue, view) ->
     return (->) if not _.isString(bindValue)
     if ~bindValue.indexOf(')', bindValue.length - 1)
-      return -> getValue(viewmodel, bindValue, viewmodel)
+      return ViewModel.getVmValueGetter(viewmodel, bindValue, view)
     else
-      return (value) -> setValue(value, viewmodel, bindValue, viewmodel)
+      return (value) ->
+        currentView = view
+        setValue(value, viewmodel, bindValue, viewmodel)
 
 
   @parentTemplate = (templateInstance) ->

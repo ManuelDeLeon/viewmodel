@@ -78,6 +78,25 @@ addBinding
   events:
     'change': (event, bindArg) ->
       bindArg.setVmValue bindArg.element.is(':checked')
+      return
+
+  autorun: (c, bindArg) ->
+    vmValue = bindArg.getVmValue()
+    elementCheck = bindArg.element.is(':checked')
+    bindArg.element.prop 'checked', vmValue if elementCheck isnt vmValue
+
+addBinding
+  name: 'check'
+  selector: 'input[type=radio]'
+  events:
+    'change': (event, bindArg) ->
+      checked = bindArg.element.is(':checked')
+      bindArg.setVmValue checked
+      rawElement = bindArg.element[0]
+      if checked and name = rawElement.name
+        bindArg.templateInstance.$("input[type=radio][name=#{name}]").each ->
+          $(this).trigger('change') if rawElement isnt this
+      return
 
   autorun: (c, bindArg) ->
     vmValue = bindArg.getVmValue()
@@ -108,7 +127,14 @@ addBinding
   selector: 'input[type=radio]'
   events:
     'change': (event, bindArg) ->
-      bindArg.setVmValue bindArg.element.val()
+      checked = bindArg.element.is(':checked')
+      if checked
+        bindArg.setVmValue bindArg.element.val()
+        rawElement = bindArg.element[0]
+        if name = rawElement.name
+          bindArg.templateInstance.$("input[type=radio][name=#{name}]").each ->
+            $(this).trigger('change') if rawElement isnt this
+      return
 
   autorun: (c, bindArg) ->
     vmValue = bindArg.getVmValue()
@@ -158,4 +184,12 @@ addBinding
         bindArg.autorun ->
           bindArg.element.css style, bindArg.getVmValue(bindArg.bindValue[style])
           return
+    return
+
+addBinding
+  name: 'hover'
+  bind: (bindArg) ->
+    setBool = (val) ->
+      return -> bindArg.setVmValue(val)
+    bindArg.element.hover setBool(true), setBool(false)
     return

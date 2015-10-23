@@ -100,13 +100,18 @@ describe "ViewModel", ->
       viewmodel = new ViewModel()
       bindStub = sinon.stub viewmodel, 'bind'
       instanceStub = sinon.stub Template, 'instance'
+      parseBindStub = sinon.stub ViewModel, 'parseBind'
+      bindObject =
+        text: 'name'
+      parseBindStub.returns bindObject
       templateInstance =
         viewmodel: viewmodel
         '$': -> "X"
       instanceStub.returns templateInstance
       ViewModel.bindHelper("text: name")
-      @onViewReadyFunction()
-      assert.isTrue bindStub.calledWith { text: 'name' }, templateInstance, "X", ViewModel.bindings
+      bindObject.view = 'X'
+      @onViewReadyFunction.call 'X'
+      assert.isTrue bindStub.calledWith bindObject, templateInstance, "X", ViewModel.bindings
 
     it "adds a view model if the template doesn't have one", ->
       addEmptyViewModelStub = sinon.stub ViewModel, 'addEmptyViewModel'
@@ -1008,7 +1013,7 @@ describe "ViewModel", ->
         first: (v) -> val = v
       bindValue = 'first(true)'
       setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
-      setVmValue(2)
+      setVmValue()
       assert.isTrue val
       return
 
