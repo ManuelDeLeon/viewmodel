@@ -77,17 +77,43 @@ addBinding
   name: 'check'
   events:
     'change': (event, bindArg) ->
+      bindArg.setVmValue bindArg.element.is(':checked')
+
+  autorun: (c, bindArg) ->
+    vmValue = bindArg.getVmValue()
+    elementCheck = bindArg.element.is(':checked')
+    bindArg.element.prop 'checked', vmValue if elementCheck isnt vmValue
+
+addBinding
+  name: 'group'
+  selector: 'input[type=checkbox]'
+  events:
+    'change': (event, bindArg) ->
       vmValue = bindArg.getVmValue()
       elementValue = bindArg.element.val()
-      if vmValue instanceof Array
-        if bindArg.element.is(':checked')
-          vmValue.push elementValue if elementValue not in vmValue
-        else
-          vmValue.remove elementValue
+      if bindArg.element.is(':checked')
+        vmValue.push elementValue if elementValue not in vmValue
       else
-        newValue = if bindArg.element.attr('type') is 'checkbox' then bindArg.element.is(':checked') else elementValue
-        bindArg.setVmValue newValue
+        vmValue.remove elementValue
 
+  autorun: (c, bindArg) ->
+    vmValue = bindArg.getVmValue()
+    elementCheck = bindArg.element.is(':checked')
+    elementValue = bindArg.element.val()
+    newValue = elementValue in vmValue
+    bindArg.element.prop 'checked', newValue if elementCheck isnt newValue
+
+addBinding
+  name: 'group'
+  selector: 'input[type=radio]'
+  events:
+    'change': (event, bindArg) ->
+      bindArg.setVmValue bindArg.element.val()
+
+  autorun: (c, bindArg) ->
+    vmValue = bindArg.getVmValue()
+    elementValue = bindArg.element.val()
+    bindArg.element.prop 'checked', vmValue is elementValue
 
 addBinding
   name: 'class'
