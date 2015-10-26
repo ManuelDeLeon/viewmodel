@@ -14,15 +14,30 @@ addBinding
       value = bindArg.getVmValue()
       bindArg.setVmValue(!value)
 
-
-addBinding
-  name: 'if'
-  autorun: (c, bindArg) ->
-    if bindArg.getVmValue()
+showHide = (reverse) ->
+  (c, bindArg) ->
+    show = bindArg.getVmValue()
+    show = !show if reverse
+    if show
       bindArg.element.show()
     else
       bindArg.element.hide()
 
+addBinding
+  name: 'if'
+  autorun: showHide(false)
+
+addBinding
+  name: 'visible'
+  autorun: showHide(false)
+
+addBinding
+  name: 'unless'
+  autorun: showHide(true)
+
+addBinding
+  name: 'hide'
+  autorun: showHide(true)
 
 addBinding
   name: 'value'
@@ -212,3 +227,48 @@ addBinding
       else
         bindArg.element.blur()
     return
+
+enable = (elem) ->
+  if elem.is('button') or elem.is('input') or elem.is('textarea')
+    elem.removeAttr('disabled')
+  else
+    elem.removeClass('disabled')
+
+disable = (elem) ->
+  if elem.is('button') or elem.is('input') or elem.is('textarea')
+    elem.attr('disabled', 'disabled')
+  else
+    elem.addClass('disabled')
+
+enableDisable = (reverse) ->
+  (c, bindArg) ->
+    isEnable = bindArg.getVmValue()
+    isEnable = !isEnable if reverse
+    if isEnable
+      enable bindArg.element
+    else
+      disable bindArg.element
+
+addBinding
+  name: 'enable'
+  autorun: enableDisable(false)
+
+addBinding
+  name: 'disable'
+  autorun: enableDisable(true)
+
+addBinding
+  name: 'options'
+  selector: 'select'
+  bindIf: (bindArg) -> not bindArg.element.prop('multiple')
+  autorun: (c, bindArg) ->
+    source = bindArg.getVmValue()
+    optionsText = bindArg.elementBind.optionsText
+    optionsValue = bindArg.elementBind.optionsValue
+    selection = bindArg.getVmValue(bindArg.elementBind.value)
+    bindArg.element.find('option').remove()
+    for item in source
+      itemText = _.escape(if optionsText then item[optionsText] else item)
+      itemValue = _.escape(if optionsValue then item[optionsValue] else item)
+      selected = if selection is itemValue then "selected='selected'" else ""
+      bindArg.element.append("<option #{selected} value=\"#{itemValue}\">#{itemText}</option>")
