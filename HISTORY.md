@@ -1,4 +1,8 @@
-﻿## 1.9.13
+﻿## 1.9.14
+
+* returnKey binding now works with any element that can gain focus
+
+## 1.9.13
 
 * Update packages.js for Meteor 1.2
 

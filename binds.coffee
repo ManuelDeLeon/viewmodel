@@ -122,13 +122,13 @@ ViewModel.addBind 'value', (p) ->
     else
       f()
 
+ViewModel.addBind 'returnKey', (p) ->
+  p.element.bind "keyup", (ev) ->
+
     VmHelper.delay 1, ->
-      if p.elementBind.returnKey and 13 in [ev.which, ev.keyCode]
-        if isInput
-          newValue = p.element.val()
-          p.vm._vm_delayed[p.property] newValue if p.vm._vm_delayed[p.property]() isnt newValue
+      if ev.which is 13 or ev.keyCode is 13
         p.vm[p.elementBind.returnKey]()
-    if p.elementBind.returnKey and 13 in [ev.which, ev.keyCode]
+    if ev.which is 13 or ev.keyCode is 13
       ev.preventDefault()
 
 ViewModel.addBind 'options', (p) ->
