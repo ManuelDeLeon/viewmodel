@@ -574,13 +574,6 @@ describe "ViewModel", ->
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.isUndefined getVmValue()
 
-    it "returns value from name(first)", ->
-      viewmodel =
-        name: (v) -> v
-      bindValue = 'name(first)'
-      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
-      assert.equal "first", getVmValue()
-
     it "returns value from name(1, 2)", ->
       viewmodel =
         name: (a, b) -> a + b
@@ -1013,7 +1006,7 @@ describe "ViewModel", ->
         first: (v) -> val = v
       bindValue = 'first(true)'
       setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
-      setVmValue()
+      setVmValue(2)
       assert.isTrue val
       return
 

@@ -158,7 +158,8 @@ class ViewModel
 
     if binding.events
       for eventName, eventFunc of binding.events
-        element.bind eventName, (e) -> eventFunc(e, bindArg)
+        do (eventName, eventFunc) ->
+          element.bind eventName, (e) -> eventFunc(e, bindArg)
     return
 
   quoted = (str) -> str.charAt(0) is '"' or str.charAt(0) is "'"
@@ -264,23 +265,25 @@ class ViewModel
                 arg = arg.substring 1 if neg
 
                 arg = getValue(viewmodel, arg, viewmodel)
-                if `arg in viewmodel`
+                if viewmodel and `arg in viewmodel`
                   newArg = getValue(viewmodel, arg, viewmodel)
                 else
                   newArg = getPrimitive(arg)
                 newArg = !newArg if neg
               args.push newArg
 
-        if container instanceof ViewModel and not isPrimitive(name)
+        primitive = isPrimitive(name)
+        if container instanceof ViewModel and not primitive
           ViewModel.check 'vmProp', name, container
 
-        if `name in container`
+        if primitive or not (`name in container`)
+          value = getPrimitive(name)
+        else
           if _.isFunction(container[name])
             value = container[name].apply(container, args)
           else
             value = container[name]
-        else
-          value = getPrimitive(name)
+
 
     return if negate then !value else value
 
@@ -303,7 +306,9 @@ class ViewModel
   @getVmValueSetter = (viewmodel, bindValue, view) ->
     return (->) if not _.isString(bindValue)
     if ~bindValue.indexOf(')', bindValue.length - 1)
-      return ViewModel.getVmValueGetter(viewmodel, bindValue, view)
+      return ->
+        currentView = view
+        getValue(viewmodel, bindValue, view)
     else
       return (value) ->
         currentView = view

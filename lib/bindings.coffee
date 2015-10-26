@@ -5,6 +5,7 @@ addBinding
   bind: (bindArg) ->
     bindArg.element.on bindArg.bindName, (event) ->
       bindArg.setVmValue(event)
+      return
 
 addBinding
   name: 'toggle'
@@ -192,4 +193,22 @@ addBinding
     setBool = (val) ->
       return -> bindArg.setVmValue(val)
     bindArg.element.hover setBool(true), setBool(false)
+    return
+
+addBinding
+  name: 'focus'
+  events:
+    focus: (event, bindArg) ->
+      bindArg.setVmValue(true) if not bindArg.getVmValue()
+      return
+    blur: (event, bindArg) ->
+      bindArg.setVmValue(false) if bindArg.getVmValue()
+      return
+  autorun: (c, bindArg) ->
+    value = bindArg.getVmValue()
+    if bindArg.element.is(':focus') isnt value
+      if value
+        bindArg.element.focus()
+      else
+        bindArg.element.blur()
     return
