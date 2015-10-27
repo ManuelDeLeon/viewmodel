@@ -56,6 +56,7 @@ addBinding
   name: 'text'
   autorun: (c, bindArg) ->
     bindArg.element.text bindArg.getVmValue()
+    return
 
 addBinding
   name: 'html'
@@ -261,14 +262,19 @@ addBinding
 
 addBinding
   name: 'options'
-  selector: 'select'
-  bindIf: (bindArg) -> not bindArg.element.prop('multiple')
+  selector: 'select:not([multiple])'
   autorun: (c, bindArg) ->
     source = bindArg.getVmValue()
     optionsText = bindArg.elementBind.optionsText
     optionsValue = bindArg.elementBind.optionsValue
     selection = bindArg.getVmValue(bindArg.elementBind.value)
     bindArg.element.find('option').remove()
+    defaultText = bindArg.elementBind.defaultText
+    defaultValue = bindArg.elementBind.defaultValue
+    if defaultText? or defaultValue?
+      itemText = _.escape(bindArg.getVmValue(defaultText) or '')
+      itemValue = _.escape(bindArg.getVmValue(defaultValue) or '')
+      bindArg.element.append("<option selected='selected' value=\"#{itemValue}\">#{itemText}</option>")
     for item in source
       itemText = _.escape(if optionsText then item[optionsText] else item)
       itemValue = _.escape(if optionsValue then item[optionsValue] else item)
@@ -278,8 +284,7 @@ addBinding
 
 addBinding
   name: 'options'
-  selector: 'select'
-  bindIf: (bindArg) -> bindArg.element.prop('multiple')
+  selector: 'select[multiple]'
   autorun: (c, bindArg) ->
     source = bindArg.getVmValue()
     optionsText = bindArg.elementBind.optionsText
@@ -300,9 +305,12 @@ addBinding
     change: (event, bindArg) ->
       elementValues = bindArg.element.val()
       selected = bindArg.getVmValue()
-      if isArray(selected) and isArray(elementValues)
-        selected.pause()
-        selected.clear()
-        selected.push v for v in elementValues
-        selected.resume()
+      if isArray(selected)
+        if not isArray(elementValues)
+          selected.clear()
+        else
+          selected.pause()
+          selected.clear()
+          selected.push v for v in elementValues
+          selected.resume()
       return
