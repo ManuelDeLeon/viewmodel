@@ -176,20 +176,20 @@ class ViewModel
       else (if $.isNumeric(val) then parseFloat(val) else val)
 
   tokens =
-    ' + ': (a, b) -> a + b
-    ' - ': (a, b) -> a - b
-    ' * ': (a, b) -> a * b
-    ' / ': (a, b) -> a / b
-    ' && ': (a, b) -> a && b
-    ' || ': (a, b) -> a || b
-    ' == ': (a, b) -> `a == b`
-    ' === ': (a, b) -> a is b
-    ' !== ': (a, b) -> `a !== b`
-    ' !=== ': (a, b) -> a isnt b
-    ' > ': (a, b) -> a > b
-    ' >= ': (a, b) -> a >= b
-    ' < ': (a, b) -> a < b
-    ' <= ': (a, b) -> a <= b
+    '+ ': (a, b) -> a + b
+    '- ': (a, b) -> a - b
+    '* ': (a, b) -> a * b
+    '/ ': (a, b) -> a / b
+    '&& ': (a, b) -> a && b
+    '|| ': (a, b) -> a || b
+    '== ': (a, b) -> `a == b`
+    '=== ': (a, b) -> a is b
+    '!== ': (a, b) -> `a !== b`
+    '!=== ': (a, b) -> a isnt b
+    '> ': (a, b) -> a > b
+    '>= ': (a, b) -> a >= b
+    '< ': (a, b) -> a < b
+    '<= ': (a, b) -> a <= b
 
   tokenRegex = /[\+\-\*\/&\|=><]/
   dotRegex = /(\D\.)|(\.\D)/

@@ -1,3 +1,5 @@
+isArray = (obj) -> obj instanceof Array
+
 addBinding = ViewModel.addBinding
 
 addBinding
@@ -272,3 +274,35 @@ addBinding
       itemValue = _.escape(if optionsValue then item[optionsValue] else item)
       selected = if selection is itemValue then "selected='selected'" else ""
       bindArg.element.append("<option #{selected} value=\"#{itemValue}\">#{itemText}</option>")
+    return
+
+addBinding
+  name: 'options'
+  selector: 'select'
+  bindIf: (bindArg) -> bindArg.element.prop('multiple')
+  autorun: (c, bindArg) ->
+    source = bindArg.getVmValue()
+    optionsText = bindArg.elementBind.optionsText
+    optionsValue = bindArg.elementBind.optionsValue
+    selection = bindArg.getVmValue(bindArg.elementBind.value)
+    bindArg.element.find('option').remove()
+    for item in source
+      itemText = _.escape(if optionsText then item[optionsText] else item)
+      itemValue = _.escape(if optionsValue then item[optionsValue] else item)
+      selected = if itemValue in selection then "selected='selected'" else ""
+      bindArg.element.append("<option #{selected} value=\"#{itemValue}\">#{itemText}</option>")
+    return
+
+addBinding
+  name: 'value'
+  selector: 'select[multiple]'
+  events:
+    change: (event, bindArg) ->
+      elementValues = bindArg.element.val()
+      selected = bindArg.getVmValue()
+      if isArray(selected) and isArray(elementValues)
+        selected.pause()
+        selected.clear()
+        selected.push v for v in elementValues
+        selected.resume()
+      return
