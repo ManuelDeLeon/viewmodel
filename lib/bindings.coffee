@@ -4,7 +4,7 @@ addBinding = ViewModel.addBinding
 
 addBinding
   name: 'default'
-  bind: (bindArg) ->
+  bind: (bindArg, event) ->
     bindArg.element.on bindArg.bindName, (event) ->
       bindArg.setVmValue(event)
       return
@@ -12,12 +12,12 @@ addBinding
 addBinding
   name: 'toggle'
   events:
-    click: (event, bindArg) ->
+    click: (bindArg) ->
       value = bindArg.getVmValue()
       bindArg.setVmValue(!value)
 
 showHide = (reverse) ->
-  (c, bindArg) ->
+  (bindArg) ->
     show = bindArg.getVmValue()
     show = !show if reverse
     if show
@@ -44,23 +44,23 @@ addBinding
 addBinding
   name: 'value'
   events:
-    'input propertychange': (event, bindArg) ->
+    'input propertychange': (bindArg) ->
       newVal = bindArg.element.val()
       bindArg.setVmValue(newVal) if newVal isnt bindArg.getVmValue()
 
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     newVal = bindArg.getVmValue()
     bindArg.element.val(newVal) if newVal isnt bindArg.element.val()
 
 addBinding
   name: 'text'
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     bindArg.element.text bindArg.getVmValue()
     return
 
 addBinding
   name: 'html'
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     bindArg.element.html bindArg.getVmValue()
 
 changeBinding = (eb) ->
@@ -79,7 +79,7 @@ addBinding
 addBinding
   name: 'enter'
   events:
-    'keyup': (event, bindArg) ->
+    'keyup': (bindArg, event) ->
       if event.which is 13 or event.keyCode is 13
         bindArg.setVmValue(event)
 
@@ -95,11 +95,11 @@ addBinding
 addBinding
   name: 'check'
   events:
-    'change': (event, bindArg) ->
+    'change': (bindArg) ->
       bindArg.setVmValue bindArg.element.is(':checked')
       return
 
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     vmValue = bindArg.getVmValue()
     elementCheck = bindArg.element.is(':checked')
     bindArg.element.prop 'checked', vmValue if elementCheck isnt vmValue
@@ -108,7 +108,7 @@ addBinding
   name: 'check'
   selector: 'input[type=radio]'
   events:
-    'change': (event, bindArg) ->
+    'change': (bindArg) ->
       checked = bindArg.element.is(':checked')
       bindArg.setVmValue checked
       rawElement = bindArg.element[0]
@@ -117,7 +117,7 @@ addBinding
           $(this).trigger('change') if rawElement isnt this
       return
 
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     vmValue = bindArg.getVmValue()
     elementCheck = bindArg.element.is(':checked')
     bindArg.element.prop 'checked', vmValue if elementCheck isnt vmValue
@@ -126,7 +126,7 @@ addBinding
   name: 'group'
   selector: 'input[type=checkbox]'
   events:
-    'change': (event, bindArg) ->
+    'change': (bindArg) ->
       vmValue = bindArg.getVmValue()
       elementValue = bindArg.element.val()
       if bindArg.element.is(':checked')
@@ -134,7 +134,7 @@ addBinding
       else
         vmValue.remove elementValue
 
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     vmValue = bindArg.getVmValue()
     elementCheck = bindArg.element.is(':checked')
     elementValue = bindArg.element.val()
@@ -145,7 +145,7 @@ addBinding
   name: 'group'
   selector: 'input[type=radio]'
   events:
-    'change': (event, bindArg) ->
+    'change': (bindArg) ->
       checked = bindArg.element.is(':checked')
       if checked
         bindArg.setVmValue bindArg.element.val()
@@ -155,7 +155,7 @@ addBinding
             $(this).trigger('change') if rawElement isnt this
       return
 
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     vmValue = bindArg.getVmValue()
     elementValue = bindArg.element.val()
     bindArg.element.prop 'checked', vmValue is elementValue
@@ -165,7 +165,7 @@ addBinding
   bindIf: (bindArg) -> _.isString(bindArg.bindValue)
   bind: (bindArg) ->
     bindArg.prevValue = ''
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     newValue = bindArg.getVmValue()
     bindArg.element.removeClass bindArg.prevValue
     bindArg.element.addClass newValue
@@ -188,7 +188,7 @@ addBinding
 addBinding
   name: 'style'
   bindIf: (bindArg) -> _.isString(bindArg.bindValue)
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     newValue = bindArg.getVmValue()
     if _.isString(newValue)
       newValue = ViewModel.parseBind(newValue)
@@ -216,13 +216,13 @@ addBinding
 addBinding
   name: 'focus'
   events:
-    focus: (event, bindArg) ->
+    focus: (bindArg) ->
       bindArg.setVmValue(true) if not bindArg.getVmValue()
       return
-    blur: (event, bindArg) ->
+    blur: (bindArg) ->
       bindArg.setVmValue(false) if bindArg.getVmValue()
       return
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     value = bindArg.getVmValue()
     if bindArg.element.is(':focus') isnt value
       if value
@@ -244,7 +244,7 @@ disable = (elem) ->
     elem.addClass('disabled')
 
 enableDisable = (reverse) ->
-  (c, bindArg) ->
+  (bindArg) ->
     isEnable = bindArg.getVmValue()
     isEnable = !isEnable if reverse
     if isEnable
@@ -263,7 +263,7 @@ addBinding
 addBinding
   name: 'options'
   selector: 'select:not([multiple])'
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     source = bindArg.getVmValue()
     optionsText = bindArg.elementBind.optionsText
     optionsValue = bindArg.elementBind.optionsValue
@@ -285,7 +285,7 @@ addBinding
 addBinding
   name: 'options'
   selector: 'select[multiple]'
-  autorun: (c, bindArg) ->
+  autorun: (bindArg) ->
     source = bindArg.getVmValue()
     optionsText = bindArg.elementBind.optionsText
     optionsValue = bindArg.elementBind.optionsValue
@@ -302,17 +302,13 @@ addBinding
   name: 'value'
   selector: 'select[multiple]'
   events:
-    change: (event, bindArg) ->
+    change: (bindArg) ->
       elementValues = bindArg.element.val()
       selected = bindArg.getVmValue()
       if isArray(selected)
-        if not isArray(elementValues)
-          selected.clear()
-        else
-          selected.pause()
-          selected.clear()
+        selected.clear()
+        if isArray(elementValues)
           selected.push v for v in elementValues
-          selected.resume()
       return
 
 addBinding
@@ -320,3 +316,21 @@ addBinding
   bind: (bindArg) ->
     bindArg.viewmodel[bindArg.bindValue] = bindArg.element
     return
+
+addBinding
+  name: 'value'
+  selector: 'input[type=file]:not([multiple])'
+  events:
+    change: (bindArg, event) ->
+      file = if event.target.files?.length then event.target.files[0] else null
+      bindArg.setVmValue(file)
+      return
+
+addBinding
+  name: 'value'
+  selector: 'input[type=file][multiple]'
+  events:
+    change: (bindArg, event) ->
+      files = bindArg.getVmValue()
+      files.clear()
+      files.push(file) for file in event.target.files

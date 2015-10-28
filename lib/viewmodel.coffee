@@ -133,7 +133,7 @@ class ViewModel
     bindArg =
       templateInstance: templateInstance
       autorun: (f) ->
-        fun = (c) -> f(c, bindArg)
+        fun = (c) -> f(bindArg, c)
         templateInstance.autorun fun
         return
       element: element
@@ -159,7 +159,7 @@ class ViewModel
     if binding.events
       for eventName, eventFunc of binding.events
         do (eventName, eventFunc) ->
-          element.bind eventName, (e) -> eventFunc(e, bindArg)
+          element.bind eventName, (e) -> eventFunc(bindArg, e)
     return
 
   quoted = (str) -> str.charAt(0) is '"' or str.charAt(0) is "'"
