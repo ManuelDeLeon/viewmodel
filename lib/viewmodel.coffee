@@ -405,7 +405,7 @@ class ViewModel
       templateInstance = this
       if templateInstance.viewmodel.autorun
         fun = (c) -> templateInstance.viewmodel.autorun.apply(templateInstance.viewmodel, c)
-        templateInstance.autorun fun
+        Tracker.afterFlush -> templateInstance.autorun fun
 
   @onDestroyed = ->
     return ->

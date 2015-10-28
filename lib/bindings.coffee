@@ -314,3 +314,9 @@ addBinding
           selected.push v for v in elementValues
           selected.resume()
       return
+
+addBinding
+  name: 'ref'
+  bind: (bindArg) ->
+    bindArg.viewmodel[bindArg.bindValue] = bindArg.element
+    return
