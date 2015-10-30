@@ -64,7 +64,7 @@ addBinding
     bindArg.element.html bindArg.getVmValue()
 
 changeBinding = (eb) ->
-  eb.value or eb.check or eb.text or eb.focus or eb.hover or eb.if or eb.toggle
+  eb.value or eb.check or eb.text or eb.html or eb.focus or eb.hover or eb.toggle or eb.if or eb.visible or eb.unless or eb.hide or eb.enable or eb.disable
 
 addBinding
   name: 'change'
