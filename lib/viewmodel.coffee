@@ -151,9 +151,12 @@ class ViewModel
     return binding or ViewModel.getBinding('default', bindArg, bindings)
 
   getDelayedSetter = (bindArg, setter) ->
-    if bindArg.elementBind.delay
+    if bindArg.elementBind.throttle
       return (args...) ->
-        ViewModel.delay bindArg.getVmValue(bindArg.elementBind.delay), bindArg.elementBind.bindId, -> setter(args...)
+        ViewModel.delay bindArg.getVmValue(bindArg.elementBind.throttle), bindArg.elementBind.bindId, -> setter(args...)
+    else if bindArg.elementBind.delay
+      return (args...) ->
+        ViewModel.delay bindArg.getVmValue(bindArg.elementBind.delay), -> setter(args...)
     else
       return setter
 

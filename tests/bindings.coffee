@@ -41,18 +41,55 @@ describe "bindings", ->
         assert.equal "X", @viewmodel.name()
         done()
 
-  describe "input value delayed", ->
+  describe "input value delay", ->
     beforeEach ->
       @clock = sinon.useFakeTimers()
       bindObject =
         value: 'name'
         delay: '10'
+        bindId: 1
       @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
 
     afterEach ->
       @clock.restore()
 
-    it "sets value from element", ->
+    it "delays value from element", ->
+      @element.val 'X'
+      @element.trigger 'input'
+      @clock.tick 1
+      assert.equal '', @viewmodel.name()
+      @clock.tick 12
+      assert.equal 'X', @viewmodel.name()
+      return
+
+    it "doesn't throttle the value", ->
+      @element.val 'X'
+      @element.trigger 'input'
+      @clock.tick 8
+      assert.equal '', @viewmodel.name()
+      @element.val 'Y'
+      @element.trigger 'input'
+      @clock.tick 8
+      assert.equal 'X', @viewmodel.name()
+      @element.val 'Z'
+      @element.trigger 'input'
+      @clock.tick 12
+      assert.equal 'Z', @viewmodel.name()
+      return
+
+  describe "input value throttle", ->
+    beforeEach ->
+      @clock = sinon.useFakeTimers()
+      bindObject =
+        value: 'name'
+        throttle: '10'
+        bindId: 1
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+
+    afterEach ->
+      @clock.restore()
+
+    it "delays value from element", ->
       @element.val 'X'
       @element.trigger 'input'
       @clock.tick 1
@@ -75,7 +112,6 @@ describe "bindings", ->
       @clock.tick 12
       assert.equal 'Z', @viewmodel.name()
       return
-
 
   describe "default", ->
     beforeEach ->
