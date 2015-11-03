@@ -166,6 +166,22 @@ describe "ViewModel", ->
       assert.equal 1, actual().length
       assert.equal 1, actual()[0]
 
+    describe "delay", ->
+      beforeEach ->
+        @clock = sinon.useFakeTimers()
+      afterEach ->
+        @clock.restore()
+
+      it "delays values", ->
+        actual = ViewModel.makeReactiveProperty("X")
+        actual.delay = 10
+        actual("Y")
+        @clock.tick 8
+        assert.equal "X", actual()
+        @clock.tick 4
+        assert.equal "Y", actual()
+        return
+
   describe "@addBinding", ->
 
     last = 1

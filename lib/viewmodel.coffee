@@ -64,6 +64,7 @@ class ViewModel
       Blaze.currentView.onViewReady ->
         element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
         bindObject.view = this
+        bindObject.bindId = bindId
         templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings
         return
 
@@ -80,15 +81,31 @@ class ViewModel
     else
       return initial
 
+  delayed = { }
+  @delay = (time, nameOrFunc, fn) ->
+    func = fn || nameOrFunc
+    name = nameOrFunc if fn
+    d = delayed[name] if name
+    Meteor.clearTimeout d if d?
+    id = Meteor.setTimeout func, time
+    delayed[name] = id if name
+
   @makeReactiveProperty = (initial) ->
     dependency = new Tracker.Dependency()
     initialValue = if _.isArray(initial) then new ReactiveArray(initial, dependency) else initial
     _value = initialValue
+
     funProp = (value) ->
       if arguments.length
         if _value isnt value
-          _value = value
-          dependency.changed()
+          changeValue = ->
+            _value = value
+            dependency.changed()
+          if funProp.delay > 0
+            ViewModel.delay funProp.delay, funProp.id, changeValue
+          else
+            changeValue()
+
       else
         dependency.depend()
       return _value;
@@ -98,8 +115,12 @@ class ViewModel
       else
         _value = initialValue
       dependency.changed()
+
     funProp.depend = -> dependency.depend()
     funProp.changed = -> dependency.changed()
+    funProp.delay = 0
+    funProp.id = ViewModel.nextId()
+
 
     return funProp
 
@@ -129,6 +150,13 @@ class ViewModel
         )
     return binding or ViewModel.getBinding('default', bindArg, bindings)
 
+  getDelayedSetter = (bindArg, setter) ->
+    if bindArg.elementBind.delay
+      return (args...) ->
+        ViewModel.delay bindArg.getVmValue(bindArg.elementBind.delay), bindArg.elementBind.bindId, -> setter(args...)
+    else
+      return setter
+
   @getBindArgument = (templateInstance, element, bindName, bindValue, bindObject, viewmodel) ->
     bindArg =
       templateInstance: templateInstance
@@ -139,10 +167,11 @@ class ViewModel
       element: element
       elementBind: bindObject
       getVmValue: ViewModel.getVmValueGetter(viewmodel, bindValue, bindObject.view)
-      setVmValue: ViewModel.getVmValueSetter(viewmodel, bindValue, bindObject.view)
       bindName: bindName
       bindValue: bindValue
       viewmodel: viewmodel
+
+    bindArg.setVmValue = getDelayedSetter bindArg, ViewModel.getVmValueSetter(viewmodel, bindValue, bindObject.view)
     return bindArg
 
   @bindSingle = (templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings) ->

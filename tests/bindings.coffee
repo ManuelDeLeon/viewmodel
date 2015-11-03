@@ -14,11 +14,12 @@ describe "bindings", ->
     @templateInstance =
       autorun: Tracker.autorun
 
-  describe "input text value", ->
+  describe "input value", ->
     beforeEach ->
       bindObject =
         value: 'name'
       @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+
 
     it "sets value from vm", (done) ->
       @viewmodel.name 'X'
@@ -39,6 +40,42 @@ describe "bindings", ->
       delay =>
         assert.equal "X", @viewmodel.name()
         done()
+
+  describe "input value delayed", ->
+    beforeEach ->
+      @clock = sinon.useFakeTimers()
+      bindObject =
+        value: 'name'
+        delay: '10'
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+
+    afterEach ->
+      @clock.restore()
+
+    it "sets value from element", ->
+      @element.val 'X'
+      @element.trigger 'input'
+      @clock.tick 1
+      assert.equal '', @viewmodel.name()
+      @clock.tick 12
+      assert.equal 'X', @viewmodel.name()
+      return
+
+    it "throttles the value", ->
+      @element.val 'X'
+      @element.trigger 'input'
+      @clock.tick 8
+      assert.equal '', @viewmodel.name()
+      @element.val 'Y'
+      @element.trigger 'input'
+      @clock.tick 8
+      assert.equal '', @viewmodel.name()
+      @element.val 'Z'
+      @element.trigger 'input'
+      @clock.tick 12
+      assert.equal 'Z', @viewmodel.name()
+      return
+
 
   describe "default", ->
     beforeEach ->
