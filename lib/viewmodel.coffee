@@ -154,9 +154,6 @@ class ViewModel
     if bindArg.elementBind.throttle
       return (args...) ->
         ViewModel.delay bindArg.getVmValue(bindArg.elementBind.throttle), bindArg.elementBind.bindId, -> setter(args...)
-    else if bindArg.elementBind.delay
-      return (args...) ->
-        ViewModel.delay bindArg.getVmValue(bindArg.elementBind.delay), -> setter(args...)
     else
       return setter
 
