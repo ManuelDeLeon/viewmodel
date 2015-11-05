@@ -153,3 +153,33 @@ describe "ViewModel instance", ->
       @viewmodel.reset()
       assert.equal 1, @viewmodel.arr().length
       assert.equal 'A', @viewmodel.arr()[0]
+
+  describe "#toJS", ->
+
+    beforeEach ->
+      @viewmodel.extend
+        name: 'A'
+        arr: ['B']
+
+    it "creates js object", ->
+      obj = @viewmodel.toJS()
+      assert.equal 'A', obj.name
+      assert.equal 'B', obj.arr[0]
+      return
+
+  describe "#toJS", ->
+
+    beforeEach ->
+      @viewmodel.extend
+        name: 'A'
+        age: 2
+        f: -> 'X'
+
+    it "loads js object", ->
+      @viewmodel.loadJS
+        name: 'B'
+        f: -> 'Y'
+      assert.equal 'B', @viewmodel.name()
+      assert.equal 2, @viewmodel.age()
+      assert.equal 'Y', @viewmodel.f()
+      return

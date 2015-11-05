@@ -403,7 +403,23 @@ class ViewModel
     viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop].reset)
 
 
-  #############
+  toJS: ->
+    viewmodel = this
+    js = {}
+    for prop of viewmodel when viewmodel[prop].id
+      value = viewmodel[prop]()
+      if value instanceof ReactiveArray
+        js[prop] = value.array()
+      else
+        js[prop] = value
+    return js
+
+  loadJS: (obj) ->
+    viewmodel = this
+    viewmodel.extend obj
+
+
+#############
   # Constructor
 
   childrenProperty = ->

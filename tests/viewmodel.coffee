@@ -16,6 +16,40 @@ describe "ViewModel", ->
     it "has reserved words", ->
       assert.ok ViewModel.reserved.vmId
 
+  describe "@onRendered", ->
+
+    it "returns a function", ->
+      assert.isFunction ViewModel.onRendered()
+
+    describe "return function", ->
+      afterFlush = Tracker.afterFlush
+      beforeEach ->
+        @instance =
+          autorun: (f) -> f()
+          viewmodel: {}
+        afterFlush = Tracker.afterFlush
+        Tracker.afterFlush = (f) -> f()
+
+      afterEach ->
+        Tracker.afterFlush = afterFlush
+
+      it "sets autorun for single function", ->
+        ran = false
+        @instance.viewmodel.autorun = -> ran = true
+        ViewModel.onRendered().call @instance
+        assert.isTrue ran
+
+      it "sets autorun for array of functions", ->
+        ran1 = false
+        ran2 = false
+        @instance.viewmodel.autorun = [
+          (-> ran1 = true)
+          (-> ran2 = true)
+        ]
+        ViewModel.onRendered().call @instance
+        assert.isTrue ran1
+        assert.isTrue ran2
+
   describe "@onCreated", ->
 
     it "returns a function", ->

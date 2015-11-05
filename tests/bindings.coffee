@@ -340,3 +340,43 @@ describe "bindings", ->
         assert.equal 'A', @viewmodel.name()
         assert.isTrue triggeredChange
         done()
+
+  describe "style", ->
+    it "element has the style from object", (done) ->
+      bindObject =
+        style:
+          color: "'red'"
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element.inlineStyle("color")
+        done()
+      return
+
+    it "element has the style from string", (done) ->
+      bindObject =
+        style: "styles.label"
+      @viewmodel.extend
+        styles:
+          label:
+            color: 'red'
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element.inlineStyle("color")
+        done()
+      return
+
+    it "element has the style from array", (done) ->
+      bindObject =
+        style: "[styles.label, styles.button]"
+      @viewmodel.extend
+        styles:
+          label:
+            color: 'red'
+          button:
+            height: '10px'
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element.inlineStyle("color")
+        assert.equal "10px", @element.inlineStyle("height")
+        done()
+      return

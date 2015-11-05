@@ -187,6 +187,18 @@ addBinding
 
 addBinding
   name: 'style'
+  priority: 2
+  bindIf: (bindArg) -> _.isString(bindArg.bindValue) and bindArg.bindValue.charAt(0) is '['
+  autorun: (bindArg) ->
+    itemString = bindArg.bindValue.substr(1, bindArg.bindValue.length - 2)
+    items = itemString.split(',')
+    for item in items
+      value = bindArg.getVmValue($.trim(item))
+      bindArg.element.css value
+    return
+
+addBinding
+  name: 'style'
   bindIf: (bindArg) -> _.isString(bindArg.bindValue)
   autorun: (bindArg) ->
     newValue = bindArg.getVmValue()
