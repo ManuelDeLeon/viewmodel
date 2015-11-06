@@ -355,7 +355,7 @@ describe "bindings", ->
     it "element has the style from string", (done) ->
       bindObject =
         style: "styles.label"
-      @viewmodel.extend
+      @viewmodel.load
         styles:
           label:
             color: 'red'
@@ -368,7 +368,7 @@ describe "bindings", ->
     it "element has the style from array", (done) ->
       bindObject =
         style: "[styles.label, styles.button]"
-      @viewmodel.extend
+      @viewmodel.load
         styles:
           label:
             color: 'red'

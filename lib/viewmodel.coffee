@@ -24,7 +24,7 @@ class ViewModel
 
       Tracker.afterFlush ->
         templateInstance.autorun ->
-          viewmodel.extend Template.currentData()
+          viewmodel.load Template.currentData()
         ViewModel.assignChild(viewmodel)
 
 
@@ -369,6 +369,21 @@ class ViewModel
     parentTemplateInstance?.viewmodel.children().push(viewmodel)
     return
 
+  @onRendered = ->
+    return ->
+      templateInstance = this
+      viewmodelAutorun = templateInstance.viewmodel.autorun
+      ViewModel.check "@onRendered", viewmodelAutorun
+      if _.isFunction viewmodelAutorun
+        fun = (c) -> viewmodelAutorun.apply(templateInstance.viewmodel, c)
+        Tracker.afterFlush -> templateInstance.autorun fun
+      else if viewmodelAutorun instanceof Array
+        for autorun in viewmodelAutorun
+          do (autorun) ->
+            fun = (c) -> autorun.apply(templateInstance.viewmodel, c)
+            Tracker.afterFlush -> templateInstance.autorun fun
+      return
+
   ##################
   # Instance methods
 
@@ -378,7 +393,7 @@ class ViewModel
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings
     return
 
-  extend: (obj) ->
+  load: (obj) ->
     viewmodel = this
     for key, value of obj
       if _.isFunction(value)
@@ -416,7 +431,7 @@ class ViewModel
 
   loadJS: (obj) ->
     viewmodel = this
-    viewmodel.extend obj
+    viewmodel.load obj
 
 
 #############
@@ -438,19 +453,14 @@ class ViewModel
   constructor: (initial) ->
     viewmodel = this
     viewmodel.vmId = ViewModel.nextId()
-    viewmodel.extend(initial)
+    viewmodel.load initial
     @children = childrenProperty()
 
 
   ############
   # Not Tested
 
-  @onRendered = ->
-    return ->
-      templateInstance = this
-      if templateInstance.viewmodel.autorun
-        fun = (c) -> templateInstance.viewmodel.autorun.apply(templateInstance.viewmodel, c)
-        Tracker.afterFlush -> templateInstance.autorun fun
+
 
   @onDestroyed = ->
     return ->

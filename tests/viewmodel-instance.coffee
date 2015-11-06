@@ -47,24 +47,24 @@ describe "ViewModel instance", ->
   describe "#extend", ->
 
     it "adds a property to the view model", ->
-      @viewmodel.extend({ name: 'Alan' })
+      @viewmodel.load({ name: 'Alan' })
       assert.equal 'Alan', @viewmodel.name()
 
     it "adds function to the view model", ->
       f = ->
-      @viewmodel.extend({ fun: f })
+      @viewmodel.load({ fun: f })
       assert.equal f, @viewmodel.fun
 
     it "doesn't create a new property when extending the same name", ->
-      @viewmodel.extend({ name: 'Alan' })
+      @viewmodel.load({ name: 'Alan' })
       old = @viewmodel.name
-      @viewmodel.extend({ name: 'Brito' })
+      @viewmodel.load({ name: 'Brito' })
       assert.equal 'Brito', @viewmodel.name()
       assert.equal old, @viewmodel.name
 
     it "doesn't do anything with null and undefined", ->
-      @viewmodel.extend(undefined )
-      @viewmodel.extend(null)
+      @viewmodel.load(undefined )
+      @viewmodel.load(null)
 
   describe "#parent", ->
 
@@ -139,7 +139,7 @@ describe "ViewModel instance", ->
   describe "#reset", ->
 
     beforeEach ->
-      @viewmodel.extend
+      @viewmodel.load
         name: 'A'
         arr: ['A']
 
@@ -157,7 +157,7 @@ describe "ViewModel instance", ->
   describe "#toJS", ->
 
     beforeEach ->
-      @viewmodel.extend
+      @viewmodel.load
         name: 'A'
         arr: ['B']
 
@@ -170,7 +170,7 @@ describe "ViewModel instance", ->
   describe "#toJS", ->
 
     beforeEach ->
-      @viewmodel.extend
+      @viewmodel.load
         name: 'A'
         age: 2
         f: -> 'X'

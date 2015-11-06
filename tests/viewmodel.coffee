@@ -33,6 +33,11 @@ describe "ViewModel", ->
       afterEach ->
         Tracker.afterFlush = afterFlush
 
+      it "checks the arguments", ->
+        @instance.viewmodel.autorun = 'X'
+        ViewModel.onRendered().call @instance
+        assert.isTrue @checkStub.calledWithExactly('@onRendered', "X")
+
       it "sets autorun for single function", ->
         ran = false
         @instance.viewmodel.autorun = -> ran = true
