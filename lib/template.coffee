@@ -2,17 +2,17 @@ Template.registerHelper 'b', ViewModel.bindHelper
 Template.registerHelper 'on', ViewModel.eventHelper
 
 getPathTo = (element) ->
-  if element.tagName == 'HTML'
-    return '/HTML[1]'
-  if element == document.body
-    return '/HTML[1]/BODY[1]'
+  # use ~ and #
+  if element.tagName == 'HTML' or element == document.body
+    return '~'
+
   ix = 0
   siblings = element.parentNode.childNodes
   i = 0
   while i < siblings.length
     sibling = siblings[i]
     if sibling == element
-      return getPathTo(element.parentNode) + '/' + element.tagName + '[' + (ix + 1) + ']'
+      return getPathTo(element.parentNode) + '~' + element.tagName + '#' + (ix + 1) + '#'
     if sibling.nodeType == 1 and sibling.tagName == element.tagName
       ix++
     i++
