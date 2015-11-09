@@ -324,22 +324,17 @@ ViewModel.addBind 'style', (p) ->
       style = VmHelper.parseBind(style) if not VmHelper.isObject style
       p.element.css style
 
-setAttr = (attr, prop, vm, p) ->
+setAttr = (attr, p) ->
   p.autorun ->
-    if not _.has(vm, prop)
-      if Meteor.isDev
-        console.log "Property '#{prop}' not found on view model:"
-        console.log vm
-    else
-      p.element.attr attr, vm[prop]()
+    p.element.attr attr, getProperty(p.vm, p.property)
 
 ViewModel.addBind 'attr', (p) ->
   for attr of p.property
-    setAttr attr, p.property[attr], p.vm, p
+    setAttr attr, p
 
 for attr in ['src', 'href', 'readonly']
   do (attr) ->
-    ViewModel.addBind attr, (p) -> setAttr( attr, p.property, p.vm, p )
+    ViewModel.addBind attr, (p) -> setAttr( attr, p)
 
 ViewModel.addBind 'toggle', (p) ->
   p.element.bind 'click', ->

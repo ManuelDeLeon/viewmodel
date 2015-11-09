@@ -1,4 +1,8 @@
-﻿## 1.9.14
+﻿## 1.9.15
+
+* Use getProperty for attributes
+
+## 1.9.14
 
 * returnKey binding now works with any element that can gain focus
 
