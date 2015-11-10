@@ -15,6 +15,8 @@ Package.onUse(function(api) {
     'jquery@1.11.4',
     'underscore@1.0.4',
     'tracker@1.0.9',
+    'reactive-dict@1.1.3',
+    'sha@1.0.4',
     'manuel:reactivearray@1.0.5',
     'manuel:viewmodel-debug@2.0.0'
   ], CLIENT);
@@ -40,6 +42,8 @@ Package.onTest(function(api) {
     'jquery',
     'underscore',
     'tracker',
+    'reactive-dict',
+    'sha',
     'manuel:reactivearray',
     'practicalmeteor:mocha',
     'practicalmeteor:sinon'

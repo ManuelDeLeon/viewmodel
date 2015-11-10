@@ -16,6 +16,26 @@ describe "ViewModel", ->
     it "has reserved words", ->
       assert.ok ViewModel.reserved.vmId
 
+  describe "@onDestroyed", ->
+
+    it "returns a function", ->
+      assert.isFunction ViewModel.onDestroyed()
+
+    describe "return function", ->
+      beforeEach ->
+        @viewmodel =
+          vmId: 1
+          parent: -> undefined
+        @instance =
+          autorun: (f) -> f()
+          viewmodel: @viewmodel
+
+      it "removes the view model from ViewModel.byId", ->
+        ViewModel.byId = {}
+        ViewModel.add @viewmodel
+        ViewModel.onDestroyed().call @instance
+        assert.isUndefined ViewModel.byId[1]
+
   describe "@onRendered", ->
 
     it "returns a function", ->
@@ -67,7 +87,7 @@ describe "ViewModel", ->
         @template =
           createViewModel: ->
             vm = new ViewModel()
-            vm.vmId = ->
+            vm.vmId = 1
             vm.id = ->
             return vm
           helpers: (obj) => @helper = obj
@@ -84,6 +104,11 @@ describe "ViewModel", ->
       it "sets the viewmodel property on the template instance", ->
         @retFun.call @instance
         assert.isTrue @instance.viewmodel instanceof ViewModel
+
+      it "adds the viewmodel to ViewModel.all", ->
+        ViewModel.byId = {}
+        @retFun.call @instance
+        assert.equal @instance.viewmodel, ViewModel.byId[@instance.viewmodel.vmId]
 
       it "adds templateInstance to the view model", ->
         @retFun.call @instance

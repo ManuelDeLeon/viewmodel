@@ -9,6 +9,12 @@ class ViewModel
   @reserved =
     vmId: 1
 
+  @byId = {}
+  @add = (viewmodel) ->
+    ViewModel.byId[viewmodel.vmId] = viewmodel
+  @remove = (viewmodel) ->
+    delete ViewModel.byId[viewmodel.vmId]
+
   @check = (key, args...) ->
     if not ViewModel.ignoreErrors
       Package['manuel:viewmodel-debug']?.VmCheck key, args...
@@ -18,7 +24,7 @@ class ViewModel
     return ->
       templateInstance = this
       viewmodel = template.createViewModel(templateInstance.data)
-
+      ViewModel.add viewmodel
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
 
@@ -450,11 +456,40 @@ class ViewModel
 
     return funProp
 
+  getPathTo = (element) ->
+    # use ~ and #
+    if element.tagName == 'HTML' or element == document.body
+      return '~'
+
+    ix = 0
+    siblings = element.parentNode.childNodes
+    i = 0
+    while i < siblings.length
+      sibling = siblings[i]
+      if sibling == element
+        return getPathTo(element.parentNode) + '~' + element.tagName + '#' + (ix + 1) + '#'
+      if sibling.nodeType == 1 and sibling.tagName == element.tagName
+        ix++
+      i++
+    return
+
   constructor: (initial) ->
     viewmodel = this
     viewmodel.vmId = ViewModel.nextId()
+    viewmodel.vmHashId = null
     viewmodel.load initial
     @children = childrenProperty()
+    pathToParent = ''
+    viewmodel.vmPathToParent = ->
+      return pathToParent if pathToParent
+      viewmodelPath = getPathTo(viewmodel.templateInstance.firstNode)
+      return pathToParent = viewmodelPath if not viewmodel.parent()
+      parentPath = getPathTo(viewmodel.parent().templateInstance.firstNode)
+
+      regex = new RegExp("^" + parentPath + "(.*)")
+      match = regex.exec(viewmodelPath)
+      return viewmodelPath
+    return
 
 
   ############
@@ -475,8 +510,19 @@ class ViewModel
           if child.vmId is viewmodel.vmId
             children.splice(indexToRemove, 1)
             break
+      ViewModel.remove viewmodel
+      return
 
   @templateName = (templateInstance) ->
     name = templateInstance.view.name
     if name is 'body' then name else name.substr(name.indexOf('.') + 1)
 
+  vmHash: ->
+    viewmodel = this
+    return viewmodel.vmHashId if viewmodel.vmHashId
+    parentHash = viewmodel.parent()?.vmHash() or ''
+    if viewmodel._id
+      viewmodel.vmHashId = SHA256(parentHash + viewmodel._id)
+    else
+      viewmodel.vmHashId = SHA256(parentHash + viewmodel.vmPathToParent())
+    viewmodel.vmHashId
