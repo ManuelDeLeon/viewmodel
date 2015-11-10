@@ -28,7 +28,8 @@ class ViewModel
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
 
-      Tracker.afterFlush ->
+      #Tracker.afterFlush ->
+      f = ->
         templateInstance.autorun ->
           viewmodel.load Template.currentData()
         ViewModel.assignChild(viewmodel)
@@ -36,6 +37,8 @@ class ViewModel
         if migrationData = Migration.get(vmHash)
           viewmodel.load(migrationData)
           ViewModel.removeMigration viewmodel, vmHash
+
+      Meteor.setTimeout(f, 0)
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -430,7 +433,7 @@ class ViewModel
   data: ->
     viewmodel = this
     js = {}
-    for prop of viewmodel when viewmodel[prop].id
+    for prop of viewmodel when viewmodel[prop]?.id
       value = viewmodel[prop]()
       if value instanceof ReactiveArray
         js[prop] = value.array()
@@ -459,7 +462,7 @@ class ViewModel
 
     return funProp
 
-  getPathTo = (element) ->
+  @getPathTo = (element) ->
     # use ~ and #
     if !element or element.tagName == 'HTML' or element == document.body
       return '~'
@@ -470,7 +473,7 @@ class ViewModel
     while i < siblings.length
       sibling = siblings[i]
       if sibling == element
-        return getPathTo(element.parentNode) + '~' + element.tagName + '#' + (ix + 1) + '#'
+        return ViewModel.getPathTo(element.parentNode) + '~' + element.tagName + '#' + (ix + 1) + '#'
       if sibling.nodeType == 1 and sibling.tagName == element.tagName
         ix++
       i++
@@ -483,12 +486,11 @@ class ViewModel
     viewmodel.vmHashCache = null
     viewmodel.load initial
     @children = childrenProperty()
-    pathToParentCache = ''
     viewmodel.vmPathToParent = ->
-      return pathToParentCache if pathToParentCache
-      viewmodelPath = getPathTo(viewmodel.templateInstance.firstNode)
-      return pathToParentCache = viewmodelPath if not viewmodel.parent()
-      parentPath = getPathTo(viewmodel.parent().templateInstance.firstNode)
+      viewmodelPath = ViewModel.getPathTo(viewmodel.templateInstance.firstNode)
+      if not viewmodel.parent()
+        return viewmodelPath
+      parentPath = ViewModel.getPathTo(viewmodel.parent().templateInstance.firstNode)
       i = 0
       i++ while parentPath[i] is viewmodelPath[i]
       difference = viewmodelPath.substr(i)
@@ -524,13 +526,15 @@ class ViewModel
   vmHash: ->
     viewmodel = this
     return viewmodel.vmHashCache if viewmodel.vmHashCache
-    parentHash = viewmodel.parent()?.vmHash() or ''
+    key = ViewModel.templateName(viewmodel.templateInstance)
+    if viewmodel.parent()
+      key += viewmodel.parent().vmHash()
+    key += viewmodel.vmPathToParent()
     if viewmodel._id
-      viewmodel.vmHashCache = SHA256(parentHash + viewmodel._id()).toString()
-    else
-      viewmodel.vmHashCache = SHA256(parentHash + viewmodel.vmPathToParent()).toString()
+      key += viewmodel._id()
+    viewmodel.vmHashCache = SHA256(key).toString()
     viewmodel.vmHashCache
 
   @removeMigration = (viewmodel, vmHash) ->
-    Migration.set vmHash, undefined
+    Migration.delete vmHash
     viewmodel.vmHashCache = null
