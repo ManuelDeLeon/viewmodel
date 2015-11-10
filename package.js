@@ -16,13 +16,13 @@ Package.onUse(function(api) {
     'underscore@1.0.4',
     'tracker@1.0.9',
     'reload@1.1.4',
+    'sha@1.0.4',
     'reactive-dict@1.1.3',
     'manuel:reactivearray@1.0.5',
     'manuel:viewmodel-debug@2.0.0'
   ], CLIENT);
 
   api.addFiles([
-    'lib/cryptoJS.js',
     'lib/viewmodel.coffee',
     'lib/viewmodel-parseBind.coffee',
     'lib/bindings.coffee',
@@ -45,6 +45,7 @@ Package.onTest(function(api) {
     'underscore',
     'tracker',
     'reload',
+    'sha',
     'reactive-dict',
     'manuel:reactivearray',
     'practicalmeteor:mocha',
@@ -53,7 +54,6 @@ Package.onTest(function(api) {
   ], CLIENT);
 
   api.addFiles([
-    'lib/cryptoJS.js',
     'lib/viewmodel.coffee',
     'lib/viewmodel-parseBind.coffee',
     'lib/bindings.coffee',

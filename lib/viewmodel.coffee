@@ -35,6 +35,7 @@ class ViewModel
         vmHash = viewmodel.vmHash()
         if migrationData = Migration.get(vmHash)
           viewmodel.load(migrationData)
+          ViewModel.removeMigration viewmodel, vmHash
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -525,7 +526,11 @@ class ViewModel
     return viewmodel.vmHashCache if viewmodel.vmHashCache
     parentHash = viewmodel.parent()?.vmHash() or ''
     if viewmodel._id
-      viewmodel.vmHashCache = CryptoJS.SHA1(parentHash + viewmodel._id()).toString()
+      viewmodel.vmHashCache = SHA256(parentHash + viewmodel._id()).toString()
     else
-      viewmodel.vmHashCache = CryptoJS.SHA1(parentHash + viewmodel.vmPathToParent()).toString()
+      viewmodel.vmHashCache = SHA256(parentHash + viewmodel.vmPathToParent()).toString()
     viewmodel.vmHashCache
+
+  @removeMigration = (viewmodel, vmHash) ->
+    Migration.set vmHash, undefined
+    viewmodel.vmHashCache = null
