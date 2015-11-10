@@ -15,17 +15,19 @@ Package.onUse(function(api) {
     'jquery@1.11.4',
     'underscore@1.0.4',
     'tracker@1.0.9',
+    'reload@1.1.4',
     'reactive-dict@1.1.3',
-    'sha@1.0.4',
     'manuel:reactivearray@1.0.5',
     'manuel:viewmodel-debug@2.0.0'
   ], CLIENT);
 
   api.addFiles([
+    'lib/cryptoJS.js',
     'lib/viewmodel.coffee',
     'lib/viewmodel-parseBind.coffee',
     'lib/bindings.coffee',
-    'lib/template.coffee'
+    'lib/template.coffee',
+    'lib/migration.coffee'
   ], CLIENT);
 
   api.export([
@@ -42,8 +44,8 @@ Package.onTest(function(api) {
     'jquery',
     'underscore',
     'tracker',
+    'reload',
     'reactive-dict',
-    'sha',
     'manuel:reactivearray',
     'practicalmeteor:mocha',
     'practicalmeteor:sinon'
@@ -51,10 +53,12 @@ Package.onTest(function(api) {
   ], CLIENT);
 
   api.addFiles([
+    'lib/cryptoJS.js',
     'lib/viewmodel.coffee',
     'lib/viewmodel-parseBind.coffee',
     'lib/bindings.coffee',
     'lib/template.coffee',
+    'lib/migration.coffee',
     'tests/jquery-patch.js',
     'tests/sinon-restore.js',
     'tests/bindings.coffee',

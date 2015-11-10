@@ -32,7 +32,9 @@ class ViewModel
         templateInstance.autorun ->
           viewmodel.load Template.currentData()
         ViewModel.assignChild(viewmodel)
-
+        vmHash = viewmodel.vmHash()
+        if migrationData = Migration.get(vmHash)
+          viewmodel.load(migrationData)
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -424,7 +426,7 @@ class ViewModel
     viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop].reset)
 
 
-  toJS: ->
+  data: ->
     viewmodel = this
     js = {}
     for prop of viewmodel when viewmodel[prop].id
@@ -458,7 +460,7 @@ class ViewModel
 
   getPathTo = (element) ->
     # use ~ and #
-    if element.tagName == 'HTML' or element == document.body
+    if !element or element.tagName == 'HTML' or element == document.body
       return '~'
 
     ix = 0
@@ -473,22 +475,23 @@ class ViewModel
       i++
     return
 
+
   constructor: (initial) ->
     viewmodel = this
     viewmodel.vmId = ViewModel.nextId()
-    viewmodel.vmHashId = null
+    viewmodel.vmHashCache = null
     viewmodel.load initial
     @children = childrenProperty()
-    pathToParent = ''
+    pathToParentCache = ''
     viewmodel.vmPathToParent = ->
-      return pathToParent if pathToParent
+      return pathToParentCache if pathToParentCache
       viewmodelPath = getPathTo(viewmodel.templateInstance.firstNode)
-      return pathToParent = viewmodelPath if not viewmodel.parent()
+      return pathToParentCache = viewmodelPath if not viewmodel.parent()
       parentPath = getPathTo(viewmodel.parent().templateInstance.firstNode)
-
-      regex = new RegExp("^" + parentPath + "(.*)")
-      match = regex.exec(viewmodelPath)
-      return viewmodelPath
+      i = 0
+      i++ while parentPath[i] is viewmodelPath[i]
+      difference = viewmodelPath.substr(i)
+      return difference
     return
 
 
@@ -519,10 +522,10 @@ class ViewModel
 
   vmHash: ->
     viewmodel = this
-    return viewmodel.vmHashId if viewmodel.vmHashId
+    return viewmodel.vmHashCache if viewmodel.vmHashCache
     parentHash = viewmodel.parent()?.vmHash() or ''
     if viewmodel._id
-      viewmodel.vmHashId = SHA256(parentHash + viewmodel._id)
+      viewmodel.vmHashCache = CryptoJS.SHA1(parentHash + viewmodel._id()).toString()
     else
-      viewmodel.vmHashId = SHA256(parentHash + viewmodel.vmPathToParent())
-    viewmodel.vmHashId
+      viewmodel.vmHashCache = CryptoJS.SHA1(parentHash + viewmodel.vmPathToParent()).toString()
+    viewmodel.vmHashCache
