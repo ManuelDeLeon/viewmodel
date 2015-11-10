@@ -8,6 +8,7 @@ class ViewModel
 
   @reserved =
     vmId: 1
+    vmTag: 1
 
   @byId = {}
   @add = (viewmodel) ->
@@ -28,17 +29,18 @@ class ViewModel
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
 
-      #Tracker.afterFlush ->
-      f = ->
+      Tracker.afterFlush ->
+#      f = ->
         templateInstance.autorun ->
           viewmodel.load Template.currentData()
         ViewModel.assignChild(viewmodel)
-        vmHash = viewmodel.vmHash()
-        if migrationData = Migration.get(vmHash)
-          viewmodel.load(migrationData)
-          ViewModel.removeMigration viewmodel, vmHash
+        ViewModel.delay 0, ->
+          vmHash = viewmodel.vmHash()
+          if migrationData = Migration.get(vmHash)
+            viewmodel.load(migrationData)
+            ViewModel.removeMigration viewmodel, vmHash
 
-      Meteor.setTimeout(f, 0)
+#      Meteor.setTimeout(f, 0)
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -465,7 +467,7 @@ class ViewModel
   @getPathTo = (element) ->
     # use ~ and #
     if !element or element.tagName == 'HTML' or element == document.body
-      return '~'
+      return '/'
 
     ix = 0
     siblings = element.parentNode.childNodes
@@ -473,7 +475,7 @@ class ViewModel
     while i < siblings.length
       sibling = siblings[i]
       if sibling == element
-        return ViewModel.getPathTo(element.parentNode) + '~' + element.tagName + '#' + (ix + 1) + '#'
+        return ViewModel.getPathTo(element.parentNode) + '/' + element.tagName + '[' + (ix + 1) + ']'
       if sibling.nodeType == 1 and sibling.tagName == element.tagName
         ix++
       i++
@@ -529,9 +531,15 @@ class ViewModel
     key = ViewModel.templateName(viewmodel.templateInstance)
     if viewmodel.parent()
       key += viewmodel.parent().vmHash()
-    key += viewmodel.vmPathToParent()
+
+    if viewmodel.vmTag
+      key += viewmodel.vmTag()
+
     if viewmodel._id
       key += viewmodel._id()
+    else
+      key += viewmodel.vmPathToParent()
+
     viewmodel.vmHashCache = SHA256(key).toString()
     viewmodel.vmHashCache
 
