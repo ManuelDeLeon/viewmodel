@@ -154,7 +154,7 @@ describe "ViewModel instance", ->
       assert.equal 1, @viewmodel.arr().length
       assert.equal 'A', @viewmodel.arr()[0]
 
-  describe "#toJS", ->
+  describe "#data", ->
 
     beforeEach ->
       @viewmodel.load
@@ -162,12 +162,18 @@ describe "ViewModel instance", ->
         arr: ['B']
 
     it "creates js object", ->
-      obj = @viewmodel.toJS()
+      obj = @viewmodel.data()
       assert.equal 'A', obj.name
       assert.equal 'B', obj.arr[0]
       return
 
-  describe "#toJS", ->
+    it "only loads fields specified", ->
+      obj = @viewmodel.data(['name'])
+      assert.equal 'A', obj.name
+      assert.isUndefined obj.arr
+      return
+
+  describe "#load", ->
 
     beforeEach ->
       @viewmodel.load
@@ -176,7 +182,7 @@ describe "ViewModel instance", ->
         f: -> 'X'
 
     it "loads js object", ->
-      @viewmodel.loadJS
+      @viewmodel.load
         name: 'B'
         f: -> 'Y'
       assert.equal 'B', @viewmodel.name()

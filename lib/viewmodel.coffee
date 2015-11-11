@@ -5,7 +5,7 @@ class ViewModel
 
   _nextId = 1
   @nextId = -> _nextId++
-
+  @persist = true
   @reserved =
     vmId: 1
     vmTag: 1
@@ -30,7 +30,6 @@ class ViewModel
       viewmodel.templateInstance = templateInstance
 
       Tracker.afterFlush ->
-#      f = ->
         templateInstance.autorun ->
           viewmodel.load Template.currentData()
         ViewModel.assignChild(viewmodel)
@@ -39,8 +38,9 @@ class ViewModel
           if migrationData = Migration.get(vmHash)
             viewmodel.load(migrationData)
             ViewModel.removeMigration viewmodel, vmHash
-
-#      Meteor.setTimeout(f, 0)
+          if viewmodel.onUrl
+            ViewModel.loadUrl viewmodel
+            ViewModel.saveUrl viewmodel
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -432,10 +432,10 @@ class ViewModel
     viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop].reset)
 
 
-  data: ->
+  data: (fields = []) ->
     viewmodel = this
     js = {}
-    for prop of viewmodel when viewmodel[prop]?.id
+    for prop of viewmodel when viewmodel[prop]?.id and (fields.length is 0 or prop in fields)
       value = viewmodel[prop]()
       if value instanceof ReactiveArray
         js[prop] = value.array()
@@ -527,7 +527,6 @@ class ViewModel
 
   vmHash: ->
     viewmodel = this
-    return viewmodel.vmHashCache if viewmodel.vmHashCache
     key = ViewModel.templateName(viewmodel.templateInstance)
     if viewmodel.parent()
       key += viewmodel.parent().vmHash()
@@ -545,4 +544,3 @@ class ViewModel
 
   @removeMigration = (viewmodel, vmHash) ->
     Migration.delete vmHash
-    viewmodel.vmHashCache = null

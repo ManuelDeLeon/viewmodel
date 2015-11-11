@@ -27,7 +27,9 @@ Package.onUse(function(api) {
     'lib/viewmodel-parseBind.coffee',
     'lib/bindings.coffee',
     'lib/template.coffee',
-    'lib/migration.coffee'
+    'lib/migration.coffee',
+    'lib/viewmodel-onUrl.coffee',
+    'lib/lzstring.js'
   ], CLIENT);
 
   api.export([

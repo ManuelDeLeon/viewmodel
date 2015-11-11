@@ -1,6 +1,6 @@
 @Migration = new ReactiveDict("ViewModel_Migration")
 Reload._onMigrate ->
-#  try
+  return [true] if not ViewModel.persist
   for vmId, viewmodel of ViewModel.byId
     vmHash = viewmodel.vmHash()
     if Migration.get(vmHash)
