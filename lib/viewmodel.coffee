@@ -113,7 +113,10 @@ class ViewModel
       if arguments.length
         if _value isnt value
           changeValue = ->
-            _value = value
+            if value instanceof Array
+              _value = new ReactiveArray(value, dependency)
+            else
+              _value = value
             dependency.changed()
           if funProp.delay > 0
             ViewModel.delay funProp.delay, funProp.id, changeValue
