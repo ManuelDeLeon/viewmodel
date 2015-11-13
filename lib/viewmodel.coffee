@@ -412,7 +412,7 @@ class ViewModel
 
   load: (obj) ->
     viewmodel = this
-    for key, value of obj when key isnt 'share'
+    for key, value of obj when key isnt 'share' and key isnt 'mixin'
       if _.isFunction(value)
         # we don't care, just take the new function
         viewmodel[key] = value
@@ -481,6 +481,12 @@ class ViewModel
       i++
     return
 
+  loadObj = (obj, collection, viewmodel) ->
+    if obj
+      array = if obj instanceof Array then obj else [obj]
+      for element in array
+        viewmodel.load collection[element]
+    return
 
   constructor: (initial) ->
     viewmodel = this
@@ -497,10 +503,9 @@ class ViewModel
       i++ while parentPath[i] is viewmodelPath[i]
       difference = viewmodelPath.substr(i)
       return difference
-    if initial.share
-      shared = if initial.share instanceof Array then initial.share else [initial.share]
-      for share in shared
-        viewmodel.load ViewModel.shared[share]
+    loadObj initial.share, ViewModel.shared, viewmodel
+    loadObj initial.mixin, ViewModel.mixins, viewmodel
+
     return
 
 
@@ -559,4 +564,10 @@ class ViewModel
         else
           ViewModel.shared[key][prop] = ViewModel.makeReactiveProperty(content)
 
+    return
+
+  @mixins = {}
+  @mixin = (obj) ->
+    for key, value of obj
+      ViewModel.mixins[key] = value
     return
