@@ -412,7 +412,7 @@ class ViewModel
 
   load: (obj) ->
     viewmodel = this
-    for key, value of obj
+    for key, value of obj when key isnt 'share'
       if _.isFunction(value)
         # we don't care, just take the new function
         viewmodel[key] = value
@@ -446,9 +446,6 @@ class ViewModel
         js[prop] = value
     return js
 
-  loadJS: (obj) ->
-    viewmodel = this
-    viewmodel.load obj
 
 
 #############
@@ -500,6 +497,10 @@ class ViewModel
       i++ while parentPath[i] is viewmodelPath[i]
       difference = viewmodelPath.substr(i)
       return difference
+    if initial.share
+      shared = if initial.share instanceof Array then initial.share else [initial.share]
+      for share in shared
+        viewmodel.load ViewModel.shared[share]
     return
 
 
@@ -547,3 +548,15 @@ class ViewModel
 
   @removeMigration = (viewmodel, vmHash) ->
     Migration.delete vmHash
+
+  @shared = {}
+  @share = (obj) ->
+    for key, value of obj
+      ViewModel.shared[key] = {}
+      for prop, content of value
+        if _.isFunction(content)
+          ViewModel.shared[key][prop] = content
+        else
+          ViewModel.shared[key][prop] = ViewModel.makeReactiveProperty(content)
+
+    return
