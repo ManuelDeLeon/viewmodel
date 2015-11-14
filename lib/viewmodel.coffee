@@ -28,7 +28,8 @@ class ViewModel
       ViewModel.add viewmodel
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
-
+      if templateInstance.data?.ref and viewmodel.parent()
+        viewmodel.parent()[templateInstance.data.ref] = viewmodel
       Tracker.afterFlush ->
         templateInstance.autorun ->
           viewmodel.load Template.currentData()
@@ -412,7 +413,7 @@ class ViewModel
 
   load: (obj) ->
     viewmodel = this
-    for key, value of obj when key isnt 'share' and key isnt 'mixin'
+    for key, value of obj when key isnt 'share' and key isnt 'mixin' and key isnt 'ref'
       if _.isFunction(value)
         # we don't care, just take the new function
         viewmodel[key] = value
@@ -428,7 +429,7 @@ class ViewModel
     ViewModel.check "#parent", args...
     viewmodel = this
     parentTemplate = ViewModel.parentTemplate(viewmodel.templateInstance)
-    return parentTemplate.viewmodel
+    return parentTemplate?.viewmodel
 
   reset: ->
     viewmodel = this
