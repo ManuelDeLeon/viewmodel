@@ -1,4 +1,8 @@
-﻿## 1.9.15
+﻿## 1.9.16
+
+* Fix attr binding (broke on 1.9.15)
+
+## 1.9.15
 
 * Use getProperty for attributes
 

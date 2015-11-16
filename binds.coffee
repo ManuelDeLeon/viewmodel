@@ -325,8 +325,10 @@ ViewModel.addBind 'style', (p) ->
       p.element.css style
 
 setAttr = (attr, p) ->
+  prop = if _.isString(p.property) then p.property else p.property[attr]
   p.autorun ->
-    p.element.attr attr, getProperty(p.vm, p.property)
+    p.element.attr attr, getProperty(p.vm, prop)
+    return
 
 ViewModel.addBind 'attr', (p) ->
   for attr of p.property
