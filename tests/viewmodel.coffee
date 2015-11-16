@@ -535,7 +535,7 @@ describe "ViewModel", ->
 
     it "returns value from 1 + 'A'", ->
     viewmodel = {}
-    bindValue = "1+ 'A'"
+    bindValue = ViewModel.parseBind("x: 1 + 'A'").x
     getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
     assert.equal "1A", getVmValue()
 
@@ -766,38 +766,38 @@ describe "ViewModel", ->
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "A", getVmValue()
 
-    it "returns value from first+ second", ->
+    it "returns value from first + second", ->
       viewmodel =
         first: 1
         second: 2
-      bindValue = 'first+ second'
+      bindValue = ViewModel.parseBind("x: first + second").x
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal 3, getVmValue()
       return
 
-    it "returns value from first +' - '+ second", ->
+    it "returns value from first + ' - ' + second", ->
       viewmodel =
         first: 1
         second: 2
-      bindValue = "first +' - '+ second"
+      bindValue = ViewModel.parseBind("x: first + ' - ' + second").x
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "1 - 2", getVmValue()
       return
 
-    it "returns value from first +second", ->
+    it "returns value from first + second", ->
       viewmodel =
         first: 1
         second: 2
-      bindValue = 'first +second'
+      bindValue = ViewModel.parseBind("x: first + second").x
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal 3, getVmValue()
       return
 
-    it "returns value from first- second", ->
+    it "returns value from first - second", ->
       viewmodel =
         first: 3
         second: 2
-      bindValue = 'first- second'
+      bindValue = ViewModel.parseBind("x: first - second").x
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal 1, getVmValue()
       return

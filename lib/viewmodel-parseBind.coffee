@@ -1,9 +1,18 @@
-_bindingToken = RegExp("\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*'|/(?:[^/\\\\]|\\\\.)*/w*|[^\\s:,/][^,\"'{}()/:[\\]]*[^\\s,\"'{}()/:[\\]]|[^\\s]","g")
+stringDouble = '"(?:[^"\\\\]|\\\\.)*"'
+stringSingle = '\'(?:[^\'\\\\]|\\\\.)*\''
+stringRegexp = '/(?:[^/\\\\]|\\\\.)*/w*'
+specials = ',"\'{}()/:[\\]'
+everyThingElse = '[^\\s:,/][^' + specials + ']*[^\\s' + specials + ']'
+oneNotSpace = '[^\\s]'
+_bindingToken = RegExp(stringDouble + '|' + stringSingle + '|' + stringRegexp + '|' + everyThingElse + '|' + oneNotSpace, 'g')
+
 _divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/
 _keywordRegexLookBehind =
   in: 1
   return: 1
   typeof: 1
+
+_operators = "+-*/&|=><"
 
 ViewModel.parseBind = (objectLiteralString) ->
   str = $.trim(objectLiteralString)
@@ -41,13 +50,19 @@ ViewModel.parseBind = (objectLiteralString) ->
           toks.push(',')
           i = -1
           tok = '/'
-      else if c in [40, 123, 91]
+      else if c is 40 or c is 123 or c is 91
         ++depth
-      else if c in [41, 125, 93]
+      else if c is 41 or c is 125 or c is 93
         --depth
       else if not key and not values
         key = (if (c is 34 or c is 39) then tok.slice(1, -1) else tok)
         continue
+
+      if ~_operators.indexOf(tok[0])
+        tok = ' ' + tok
+
+      if ~_operators.indexOf(tok[tok.length - 1])
+        tok += ' '
 
       if values
         values.push tok

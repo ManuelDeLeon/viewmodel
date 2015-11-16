@@ -28,8 +28,12 @@ class ViewModel
       ViewModel.add viewmodel
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
-      if templateInstance.data?.ref and viewmodel.parent()
-        viewmodel.parent()[templateInstance.data.ref] = viewmodel
+      if templateInstance.data?.ref
+        parentTemplate = ViewModel.parentTemplate(templateInstance)
+        if parentTemplate
+          if not parentTemplate.viewmodel
+            ViewModel.addEmptyViewModel(parentTemplate)
+          viewmodel.parent()[templateInstance.data.ref] = viewmodel
       Tracker.afterFlush ->
         templateInstance.autorun ->
           viewmodel.load Template.currentData()
@@ -242,7 +246,8 @@ class ViewModel
   dotRegex = /(\D\.)|(\.\D)/
   spaceRegex = (token) ->
     t = token.split('').join('\\')
-    new RegExp("(\\S\\#{t}\\s)|(\\s\\#{t}\\S)")
+    new RegExp("(\\s\\#{t}\\s)")
+#    new RegExp("(\\S\\#{t}\\s)|(\\s\\#{t}\\S)")
 
   spaceRegexMem = _.memoize spaceRegex
 
@@ -250,9 +255,9 @@ class ViewModel
     for token of tokens
       regex = spaceRegexMem(token)
       index = str.search(regex)
-      index += 1 if ~index and str.charAt(index) isnt ' '
+#      index += 1 if ~index and str.charAt(index) isnt ' '
       if ~index
-        return str.substr(index, token.length + 1)
+        return str.substr(index, token.length + 2)
     return null
 
   getMatchingParenIndex = (bindValue, parenIndexStart) ->
@@ -501,11 +506,12 @@ class ViewModel
         return viewmodelPath
       parentPath = ViewModel.getPathTo(viewmodel.parent().templateInstance.firstNode)
       i = 0
-      i++ while parentPath[i] is viewmodelPath[i]
+      i++ while parentPath[i] is viewmodelPath[i] and parentPath[i]?
       difference = viewmodelPath.substr(i)
       return difference
-    loadObj initial.share, ViewModel.shared, viewmodel
-    loadObj initial.mixin, ViewModel.mixins, viewmodel
+    if initial
+      loadObj initial.share, ViewModel.shared, viewmodel
+      loadObj initial.mixin, ViewModel.mixins, viewmodel
 
     return
 

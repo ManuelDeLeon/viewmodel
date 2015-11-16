@@ -9,7 +9,3 @@ Reload._onMigrate ->
       return [false]
     Migration.set vmHash, viewmodel.data()
   return [true]
-#  catch error
-#    console.log error
-#  finally
-#    return [true]
