@@ -213,7 +213,8 @@ class ViewModel
           element.bind eventName, (e) -> eventFunc(bindArg, e)
     return
 
-  quoted = (str) -> str.charAt(0) is '"' or str.charAt(0) is "'"
+  stringRegex = /^(?:"(?:[^"]|\\")*[^\\]"|'(?:[^']|\\')*[^\\]')$/
+  quoted = (str) -> stringRegex.test(str)
   removeQuotes = (str) -> str.substr(1, str.length - 2)
   isPrimitive = (val) ->
     val is "true" or val is "false" or val is "null" or val is "undefined" or $.isNumeric(val)
@@ -283,18 +284,16 @@ class ViewModel
   getValue = (container, bindValue, viewmodel) ->
     negate = bindValue.charAt(0) is '!'
     bindValue = bindValue.substring 1 if negate
-    token = tokenRegex.test(bindValue) and getToken(bindValue)
-    if token
-      i = bindValue.indexOf(token)
-      left = getValue(container, bindValue.substring(0, i), viewmodel)
-      right = getValue(container, bindValue.substring(i + token.length), viewmodel)
-      value = tokens[token.trim()]( left, right )
-      return if negate then !value else value
 
     if bindValue is "this"
       value = currentContext()
     else if quoted(bindValue)
       value = removeQuotes(bindValue)
+    else if (token = tokenRegex.test(bindValue) and getToken(bindValue))
+      i = bindValue.indexOf(token)
+      left = getValue(container, bindValue.substring(0, i), viewmodel)
+      right = getValue(container, bindValue.substring(i + token.length), viewmodel)
+      value = tokens[token.trim()]( left, right )
     else
       dotIndex = bindValue.search(dotRegex)
       dotIndex += 1 if ~dotIndex and bindValue.charAt(dotIndex) isnt '.'
@@ -438,7 +437,7 @@ class ViewModel
 
   reset: ->
     viewmodel = this
-    viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop].reset)
+    viewmodel[prop].reset() for prop of viewmodel when _.isFunction(viewmodel[prop]?.reset)
 
 
   data: (fields = []) ->

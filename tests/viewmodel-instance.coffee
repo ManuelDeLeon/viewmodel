@@ -139,6 +139,9 @@ describe "ViewModel instance", ->
   describe "#reset", ->
 
     beforeEach ->
+      @viewmodel.templateInstance =
+        view:
+          name: 'body'
       @viewmodel.load
         name: 'A'
         arr: ['A']

@@ -10,5 +10,5 @@ describe "ViewModel", ->
 
     it "parses object", ->
       obj = ViewModel.parseBind "text: name, full: first + ' ' + last"
-      assert.isTrue _.isEqual({ text: "name", full: "first +' '+ last" }, obj)
+      assert.isTrue _.isEqual({ text: "name", full: "first + ' ' + last" }, obj)
 
