@@ -47,12 +47,18 @@ class ViewModel
             ViewModel.loadUrl viewmodel
             ViewModel.saveUrl viewmodel
 
+          viewmodelOnCreated = viewmodel.onCreated
+          if _.isFunction viewmodelOnCreated
+            viewmodelOnCreated.call viewmodel, templateInstance
+
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
         do (prop) ->
           helpers[prop] = -> viewmodel[prop]()
 
       template.helpers helpers
+
+
       return
 
   @bindIdAttribute = 'b-id'
@@ -394,16 +400,21 @@ class ViewModel
   @onRendered = ->
     return ->
       templateInstance = this
-      viewmodelAutorun = templateInstance.viewmodel.autorun
+      viewmodel = templateInstance.viewmodel
+      viewmodelAutorun = viewmodel.autorun
       ViewModel.check "@onRendered", viewmodelAutorun
       if _.isFunction viewmodelAutorun
-        fun = (c) -> viewmodelAutorun.apply(templateInstance.viewmodel, c)
+        fun = (c) -> viewmodelAutorun.apply(viewmodel, c)
         Tracker.afterFlush -> templateInstance.autorun fun
       else if viewmodelAutorun instanceof Array
         for autorun in viewmodelAutorun
           do (autorun) ->
-            fun = (c) -> autorun.apply(templateInstance.viewmodel, c)
+            fun = (c) -> autorun.apply(viewmodel, c)
             Tracker.afterFlush -> templateInstance.autorun fun
+      viewmodelOnRendered = viewmodel.onRendered
+      if _.isFunction viewmodelOnRendered
+        Tracker.afterFlush ->
+          viewmodelOnRendered.call viewmodel, templateInstance
       return
 
   ##################
@@ -524,6 +535,9 @@ class ViewModel
     return ->
       templateInstance = this
       viewmodel = templateInstance.viewmodel
+      viewmodelOnDestroyed = viewmodel.onDestroyed
+      if _.isFunction viewmodelOnDestroyed
+        viewmodelOnDestroyed.call viewmodel, templateInstance
       parent = viewmodel.parent()
       if parent
         children = parent.children()
