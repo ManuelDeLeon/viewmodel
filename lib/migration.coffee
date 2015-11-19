@@ -1,7 +1,7 @@
 @Migration = new ReactiveDict("ViewModel_Migration")
 Reload._onMigrate ->
   return [true] if not ViewModel.persist
-  for vmId, viewmodel of ViewModel.byId
+  for vmId, viewmodel of ViewModel.byId when !viewmodel.persist or viewmodel.persist()
     vmHash = viewmodel.vmHash()
     if Migration.get(vmHash)
       templateName = ViewModel.templateName(viewmodel.templateInstance)

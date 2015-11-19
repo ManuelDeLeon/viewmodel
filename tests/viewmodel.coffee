@@ -100,6 +100,8 @@ describe "ViewModel", ->
         @instance =
           data: "A"
           autorun: (f) -> f()
+          view:
+            name: 'body'
 
       it "sets the viewmodel property on the template instance", ->
         @retFun.call @instance

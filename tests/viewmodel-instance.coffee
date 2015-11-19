@@ -8,6 +8,11 @@ describe "ViewModel instance", ->
     sinon.restoreAll()
 
   describe "constructor", ->
+    it "checks the arguments", ->
+      obj = { name: 'A'}
+      vm = new ViewModel obj
+      assert.isTrue @checkStub.calledWith '#constructor', obj
+
     it "adds property as function", ->
       vm = new ViewModel({ name: 'A'})
       assert.isFunction vm.name
@@ -130,7 +135,7 @@ describe "ViewModel instance", ->
 
     it "doesn't check without arguments", ->
       @viewmodel.children()
-      assert.isFalse @checkStub.called
+      assert.isFalse @checkStub.calledWith '#children'
 
     it "checks with arguments", ->
       @viewmodel.children('X')

@@ -505,6 +505,7 @@ class ViewModel
     return
 
   constructor: (initial) ->
+    ViewModel.check "#constructor", initial
     viewmodel = this
     viewmodel.vmId = ViewModel.nextId()
     viewmodel.vmHashCache = null
