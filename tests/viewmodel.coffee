@@ -145,6 +145,23 @@ describe "ViewModel", ->
     it "has has default value", ->
       assert.equal "b-id", ViewModel.bindIdAttribute
 
+  describe "@eventHelper", ->
+    beforeEach ->
+      @nextIdStub = sinon.stub ViewModel, 'nextId'
+      @nextIdStub.returns 99
+      @onViewReadyFunction = null
+      Blaze.currentView =
+        onViewReady: (f) => @onViewReadyFunction = f
+
+    it "returns object with the next bind id", ->
+      instanceStub = sinon.stub Template, 'instance'
+      templateInstance =
+        viewmodel: {}
+        '$': -> "X"
+      instanceStub.returns templateInstance
+      ret = ViewModel.eventHelper()
+      assert.equal ret[ViewModel.bindIdAttribute + '-e'], 99
+
   describe "@bindHelper", ->
     beforeEach ->
       @nextIdStub = sinon.stub ViewModel, 'nextId'

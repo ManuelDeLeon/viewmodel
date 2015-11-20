@@ -1,4 +1,8 @@
-﻿## 2.1.0
+﻿## 2.1.1
+
+* Fix issue when using {{b and {{on at the same time
+
+## 2.1.0
 
 * Add persist option for individual view models
 

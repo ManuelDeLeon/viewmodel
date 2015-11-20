@@ -76,6 +76,8 @@ class ViewModel
     return
 
   getBindHelper = (useBindings) ->
+    bindIdAttribute = ViewModel.bindIdAttribute
+    bindIdAttribute += "-e" if not useBindings
     return (bindString) ->
       bindId = ViewModel.nextId()
       bindObject = ViewModel.parseBind bindString
@@ -87,14 +89,14 @@ class ViewModel
 
       bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
       Blaze.currentView.onViewReady ->
-        element = templateInstance.$("[#{ViewModel.bindIdAttribute}='#{bindId}']")
+        element = templateInstance.$("[#{bindIdAttribute}='#{bindId}']")
         bindObject.view = this
         bindObject.bindId = bindId
         templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings
         return
 
       bindIdObj = {}
-      bindIdObj[ViewModel.bindIdAttribute] = bindId
+      bindIdObj[bindIdAttribute] = bindId
       return bindIdObj
 
   @bindHelper = getBindHelper(true)
