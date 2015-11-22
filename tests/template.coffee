@@ -48,6 +48,17 @@ describe "Template", ->
     it "returns undefined", ->
       assert.isUndefined Template.prototype.viewmodel.call(@context, "X")
 
+    it "adds the events", ->
+      called = []
+      initial =
+        events:
+          a: null
+          b: null
+      @context.events = (eventObj) -> called.push eventObj
+      Template.prototype.viewmodel.call @context, initial
+      assert.isFunction called[0].a
+      assert.isFunction called[1].b
+      assert.equal called.length, 2
 
   describe "#createViewModel", ->
     beforeEach ->

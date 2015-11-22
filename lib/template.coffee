@@ -25,6 +25,15 @@ Blaze.Template.prototype.viewmodel = (initial) ->
   template.onCreated ViewModel.onCreated(template)
   template.onRendered ViewModel.onRendered(template)
   template.onDestroyed ViewModel.onDestroyed(template)
+  if initial.events
+    for event, eventFunction of initial.events
+      do (event, eventFunction) ->
+        eventObj = {}
+        eventObj[event] = (e, t) ->
+          templateInstance = Template.instance()
+          viewmodel = templateInstance.viewmodel
+          eventFunction.call viewmodel, e, t
+        template.events eventObj
 
   return
 
