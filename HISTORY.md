@@ -1,4 +1,8 @@
-﻿## 2.2.2
+﻿## 2.3.0
+
+* Add ViewModel.elementBind for testing
+
+## 2.2.2
 
 * Fix setVmValue when the value to set is taken from the view model
 

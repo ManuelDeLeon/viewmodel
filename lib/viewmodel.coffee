@@ -10,6 +10,7 @@ class ViewModel
     vmId: 1
     vmTag: 1
 
+  @bindObjects = {}
   @byId = {}
   @add = (viewmodel) ->
     ViewModel.byId[viewmodel.vmId] = viewmodel
@@ -81,13 +82,14 @@ class ViewModel
     return (bindString) ->
       bindId = ViewModel.nextId()
       bindObject = ViewModel.parseBind bindString
-
+      ViewModel.bindObjects[bindId] = bindObject
       templateInstance = Template.instance()
 
       if not templateInstance.viewmodel
         ViewModel.addEmptyViewModel(templateInstance)
 
       bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
+
       Blaze.currentView.onViewReady ->
         element = templateInstance.$("[#{bindIdAttribute}='#{bindId}']")
         bindObject.view = this

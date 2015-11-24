@@ -44,3 +44,18 @@ Blaze.Template.prototype.createViewModel = (context) ->
   viewmodel = new ViewModel(initial)
   viewmodel
 
+htmls = { }
+Blaze.Template.prototype.elementBind = (selector, data) ->
+  name = this.viewName
+  html = null
+  if data
+    html = $("<div></div>").append($(Blaze.toHTMLWithData(this, data)))
+  else if htmls[name]
+    html = htmls[name]
+  else
+    html = $("<div></div>").append($(Blaze.toHTML(this)))
+    htmls[name] = html
+
+  bindId = html.find(selector).attr("b-id")
+  bindOject = ViewModel.bindObjects[bindId]
+  return bindOject
