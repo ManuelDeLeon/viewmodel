@@ -1133,6 +1133,17 @@ describe "ViewModel", ->
       assert.isTrue val
       return
 
+    it "sets first(second)", ->
+      val = null
+      viewmodel =
+        first: (v) -> val = v
+        second: 2
+      bindValue = 'first(second)'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue()
+      assert.equal val , 2
+      return
+
     it "doesn't do anything if bindValue isn't a string", ->
       val = null
       viewmodel =

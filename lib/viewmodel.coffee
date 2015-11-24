@@ -376,7 +376,7 @@ class ViewModel
     if ~bindValue.indexOf(')', bindValue.length - 1)
       return ->
         currentView = view
-        getValue(viewmodel, bindValue, view)
+        getValue(viewmodel, bindValue, viewmodel)
     else
       return (value) ->
         currentView = view

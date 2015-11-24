@@ -1,4 +1,8 @@
-﻿## 2.2.1
+﻿## 2.2.2
+
+* Fix setVmValue when the value to set is taken from the view model
+
+## 2.2.1
 
 * Add events
 
