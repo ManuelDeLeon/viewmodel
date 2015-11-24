@@ -179,6 +179,20 @@ describe "ViewModel", ->
       ret = ViewModel.bindHelper()
       assert.equal ret[ViewModel.bindIdAttribute], 99
 
+    it "adds the binding to ViewModel.bindObjects", ->
+      viewmodel = new ViewModel()
+      instanceStub = sinon.stub Template, 'instance'
+      parseBindStub = sinon.stub ViewModel, 'parseBind'
+      bindObject =
+        text: 'name'
+      parseBindStub.returns bindObject
+      templateInstance =
+        viewmodel: viewmodel
+        '$': -> "X"
+      instanceStub.returns templateInstance
+      ViewModel.bindHelper("text: name")
+      assert.equal ViewModel.bindObjects[99], bindObject
+
     it "binds the view model when the view is ready", ->
       viewmodel = new ViewModel()
       bindStub = sinon.stub viewmodel, 'bind'
