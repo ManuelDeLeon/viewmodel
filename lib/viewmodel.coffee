@@ -6,9 +6,21 @@ class ViewModel
   _nextId = 1
   @nextId = -> _nextId++
   @persist = true
+  @properties =
+    autorun: 1
+    events: 1
+    share: 1
+    mixin: 1
+    ref: 1
+
   @reserved =
     vmId: 1
     vmTag: 1
+    parent: 1
+    children: 1
+    reset: 1
+    data: 1
+    load: 1
 
   @bindObjects = {}
   @byId = {}
@@ -121,7 +133,8 @@ class ViewModel
 
   @makeReactiveProperty = (initial) ->
     dependency = new Tracker.Dependency()
-    initialValue = if _.isArray(initial) then new ReactiveArray(initial, dependency) else initial
+    isArray = _.isArray(initial)
+    initialValue = if isArray then new ReactiveArray(initial, dependency) else initial
     _value = initialValue
 
     funProp = (value) ->
@@ -401,20 +414,22 @@ class ViewModel
     parentTemplateInstance?.viewmodel.children().push(viewmodel)
     return
 
-  @onRendered = ->
+  @onRendered = (initial) ->
     return ->
       templateInstance = this
       viewmodel = templateInstance.viewmodel
-      viewmodelAutorun = viewmodel.autorun
-      ViewModel.check "@onRendered", viewmodelAutorun
-      if _.isFunction viewmodelAutorun
-        fun = (c) -> viewmodelAutorun.apply(viewmodel, c)
+      initialAutorun = initial.autorun
+      ViewModel.check "@onRendered", initialAutorun, templateInstance
+      if _.isFunction initialAutorun
+        fun = (c) -> initialAutorun.apply(viewmodel, c)
         Tracker.afterFlush -> templateInstance.autorun fun
-      else if viewmodelAutorun instanceof Array
-        for autorun in viewmodelAutorun
+      else if initialAutorun instanceof Array
+        for autorun in initialAutorun
           do (autorun) ->
             fun = (c) -> autorun.apply(viewmodel, c)
-            Tracker.afterFlush -> templateInstance.autorun fun
+            do (fun) ->
+              Tracker.afterFlush -> templateInstance.autorun fun
+
       viewmodelOnRendered = viewmodel.onRendered
       if _.isFunction viewmodelOnRendered
         Tracker.afterFlush ->
@@ -432,7 +447,7 @@ class ViewModel
 
   load: (obj) ->
     viewmodel = this
-    for key, value of obj when key isnt 'share' and key isnt 'mixin' and key isnt 'ref'
+    for key, value of obj when not ViewModel.properties[key]
       if _.isFunction(value)
         # we don't care, just take the new function
         viewmodel[key] = value

@@ -54,26 +54,28 @@ describe "ViewModel", ->
         Tracker.afterFlush = afterFlush
 
       it "checks the arguments", ->
-        @instance.viewmodel.autorun = 'X'
-        ViewModel.onRendered().call @instance
-        assert.isTrue @checkStub.calledWithExactly('@onRendered', "X")
+        ViewModel.onRendered({ autorun: 'X' }).call @instance
+        assert.isTrue @checkStub.calledWithExactly('@onRendered', "X", @instance)
 
       it "sets autorun for single function", ->
         ran = false
-        @instance.viewmodel.autorun = -> ran = true
-        ViewModel.onRendered().call @instance
+        initial =
+          autorun: -> ran = true
+        ViewModel.onRendered(initial).call @instance
         assert.isTrue ran
 
       it "sets autorun for array of functions", ->
         ran1 = false
         ran2 = false
-        @instance.viewmodel.autorun = [
-          (-> ran1 = true)
-          (-> ran2 = true)
-        ]
-        ViewModel.onRendered().call @instance
+        initial =
+          autorun: [
+            (-> ran1 = true)
+            (-> ran2 = true)
+          ]
+        ViewModel.onRendered(initial).call @instance
         assert.isTrue ran1
         assert.isTrue ran2
+
 
   describe "@onCreated", ->
 

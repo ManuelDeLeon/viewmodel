@@ -36,13 +36,13 @@ describe "Template", ->
     it "adds onRendered", ->
       @vmOnRenderedStub.returns "Y"
       Template.prototype.viewmodel.call @context, "X"
-      assert.isTrue @vmOnRenderedStub.calledWithExactly(@context)
+      assert.isTrue @vmOnRenderedStub.calledWithExactly("X")
       assert.isTrue @templateOnRenderedStub.calledWithExactly("Y")
 
     it "adds onDestroyed", ->
       @vmOnDestroyedStub.returns "Y"
       Template.prototype.viewmodel.call @context, "X"
-      assert.isTrue @vmOnDestroyedStub.calledWithExactly(@context)
+      assert.isTrue @vmOnDestroyedStub.called
       assert.isTrue @templateOnDestroyedStub.calledWithExactly("Y")
       
     it "returns undefined", ->

@@ -23,8 +23,8 @@ Blaze.Template.prototype.viewmodel = (initial) ->
   ViewModel.check 'T#viewmodel', initial, template
   template.viewmodelInitial = initial
   template.onCreated ViewModel.onCreated(template)
-  template.onRendered ViewModel.onRendered(template)
-  template.onDestroyed ViewModel.onDestroyed(template)
+  template.onRendered ViewModel.onRendered(initial)
+  template.onDestroyed ViewModel.onDestroyed()
   if initial.events
     for event, eventFunction of initial.events
       do (event, eventFunction) ->

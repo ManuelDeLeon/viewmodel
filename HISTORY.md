@@ -1,4 +1,8 @@
-﻿## 2.3.0
+﻿## 2.3.1
+
+* Fix autorun when given an array of functions
+
+## 2.3.0
 
 * Add ViewModel.elementBind for testing
 
