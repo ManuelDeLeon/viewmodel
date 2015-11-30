@@ -36,6 +36,7 @@ class ViewModel
 
   @onCreated = (template) ->
     return ->
+      currentDataAutorunSet = false
       templateInstance = this
       viewmodel = template.createViewModel(templateInstance.data)
       ViewModel.add viewmodel
@@ -48,8 +49,10 @@ class ViewModel
             ViewModel.addEmptyViewModel(parentTemplate)
           viewmodel.parent()[templateInstance.data.ref] = viewmodel
       Tracker.afterFlush ->
-        templateInstance.autorun ->
-          viewmodel.load Template.currentData()
+        if not currentDataAutorunSet
+          currentDataAutorunSet = true
+          templateInstance.autorun ->
+            viewmodel.load Template.currentData()
         ViewModel.assignChild(viewmodel)
         ViewModel.delay 0, ->
           vmHash = viewmodel.vmHash()
@@ -63,6 +66,11 @@ class ViewModel
           viewmodelOnCreated = viewmodel.onCreated
           if _.isFunction viewmodelOnCreated
             viewmodelOnCreated.call viewmodel, templateInstance
+
+      if not Tracker.currentComputation
+        currentDataAutorunSet = true
+        templateInstance.autorun ->
+          viewmodel.load Template.currentData()
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
