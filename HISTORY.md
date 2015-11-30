@@ -1,4 +1,8 @@
-﻿## 2.3.1
+﻿## 2.3.2
+
+* Fix inherited contexts
+
+## 2.3.1
 
 * Fix autorun when given an array of functions
 
