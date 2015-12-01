@@ -1,4 +1,10 @@
-﻿## 2.3.2
+﻿## 2.4.0
+
+* Add error messages when the bind/event doesn't exist.
+* Add href, src, readonly bindings.
+* Check .viewmodel args
+
+## 2.3.2
 
 * Fix inherited contexts
 
