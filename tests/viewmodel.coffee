@@ -365,8 +365,9 @@ describe "ViewModel", ->
       assert.isUndefined ret
 
     it "uses getBindArgument", ->
-      ViewModel.bindSingle 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel', 'bindingArray'
-      assert.isTrue @getBindArgumentStub.calledWithExactly 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel'
+
+      ViewModel.bindSingle 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel', 'bindingArray', 'bindId', 'view'
+      assert.isTrue @getBindArgumentStub.calledWithExactly 'templateInstance', 'element', 'bindName', 'bindValue', 'bindObject', 'viewmodel', 'bindId', 'view'
 
     it "uses getBinding", ->
       bindArg = {}

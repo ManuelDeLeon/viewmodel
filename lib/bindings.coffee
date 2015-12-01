@@ -2,12 +2,15 @@ isArray = (obj) -> obj instanceof Array
 
 addBinding = ViewModel.addBinding
 
+
 addBinding
   name: 'default'
   bind: (bindArg, event) ->
+    ViewModel.check '$default', bindArg
     bindArg.element.on bindArg.bindName, (event) ->
       bindArg.setVmValue(event)
       return
+    return
 
 addBinding
   name: 'toggle'
@@ -91,6 +94,16 @@ addBinding
         bindArg.autorun ->
           bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])
     return
+
+attrPremade = ['src','href','readonly']
+for attr in attrPremade
+  do (attr) ->
+    addBinding
+      name: attr
+      bind: (bindArg) ->
+        bindArg.autorun ->
+          bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])
+        return
 
 addBinding
   name: 'check'

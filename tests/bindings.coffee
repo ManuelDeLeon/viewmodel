@@ -48,7 +48,7 @@ describe "bindings", ->
         value: 'name'
         throttle: '10'
         bindId: 1
-      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings, 99, {}
 
     afterEach ->
       @clock.restore()
@@ -257,6 +257,42 @@ describe "bindings", ->
       delay =>
         assert.equal 'X', @element.attr('title')
         assert.equal 'Y', @element.attr('href')
+        done()
+
+  describe "href", ->
+    beforeEach ->
+      bindObject =
+        href: 'on'
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+
+    it "sets from vm", (done) ->
+      @viewmodel.on 'Y'
+      delay =>
+        assert.equal 'Y', @element.attr('href')
+        done()
+
+  describe "src", ->
+    beforeEach ->
+      bindObject =
+        src: 'on'
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+
+    it "sets from vm", (done) ->
+      @viewmodel.on 'Y'
+      delay =>
+        assert.equal 'Y', @element.attr('src')
+        done()
+
+  describe "readonly", ->
+    beforeEach ->
+      bindObject =
+        readonly: 'on'
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+
+    it "sets from vm", (done) ->
+      @viewmodel.on true
+      delay =>
+        assert.equal 'readonly', @element.attr('readonly')
         done()
 
   describe "check", ->

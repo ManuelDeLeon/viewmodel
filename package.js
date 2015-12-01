@@ -19,7 +19,8 @@ Package.onUse(function(api) {
     'sha@1.0.4',
     'reactive-dict@1.1.3',
     'manuel:reactivearray@1.0.5',
-    'manuel:viewmodel-debug@2.3.0'
+    'manuel:viewmodel-debug@2.3.0',
+    'manuel:isdev@1.0.0'
   ], CLIENT);
 
   api.addFiles([
@@ -51,7 +52,8 @@ Package.onTest(function(api) {
     'reactive-dict',
     'manuel:reactivearray',
     'practicalmeteor:mocha',
-    'practicalmeteor:sinon'
+    'practicalmeteor:sinon',
+    'manuel:isdev'
 
   ], CLIENT);
 

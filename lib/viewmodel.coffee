@@ -6,6 +6,9 @@ class ViewModel
   _nextId = 1
   @nextId = -> _nextId++
   @persist = true
+
+  # These are view model properties the user can use
+  # but they have special meaning to ViewModel
   @properties =
     autorun: 1
     events: 1
@@ -13,14 +16,24 @@ class ViewModel
     mixin: 1
     ref: 1
 
+  # The user can't use these properties
+  # when defining a view model
   @reserved =
     vmId: 1
-    vmTag: 1
     parent: 1
     children: 1
     reset: 1
     data: 1
     load: 1
+
+  # These are objects used as bindings but do not have
+  # an implementation
+  @nonBindings =
+    throttle: 1
+    optionsText: 1
+    optionsValue: 1
+    defaultText: 1
+    defaultValue: 1
 
   @bindObjects = {}
   @byId = {}
@@ -30,7 +43,7 @@ class ViewModel
     delete ViewModel.byId[viewmodel.vmId]
 
   @check = (key, args...) ->
-    if not ViewModel.ignoreErrors
+    if Meteor.isDev and not ViewModel.ignoreErrors
       Package['manuel:viewmodel-debug']?.VmCheck key, args...
     return
 
@@ -112,9 +125,7 @@ class ViewModel
 
       Blaze.currentView.onViewReady ->
         element = templateInstance.$("[#{bindIdAttribute}='#{bindId}']")
-        bindObject.view = this
-        bindObject.bindId = bindId
-        templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings
+        templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, this
         return
 
       bindIdObj = {}
@@ -203,14 +214,14 @@ class ViewModel
         )
     return binding or ViewModel.getBinding('default', bindArg, bindings)
 
-  getDelayedSetter = (bindArg, setter) ->
+  getDelayedSetter = (bindArg, setter, bindId) ->
     if bindArg.elementBind.throttle
       return (args...) ->
-        ViewModel.delay bindArg.getVmValue(bindArg.elementBind.throttle), bindArg.elementBind.bindId, -> setter(args...)
+        ViewModel.delay bindArg.getVmValue(bindArg.elementBind.throttle), bindId, -> setter(args...)
     else
       return setter
 
-  @getBindArgument = (templateInstance, element, bindName, bindValue, bindObject, viewmodel) ->
+  @getBindArgument = (templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindId, view) ->
     bindArg =
       templateInstance: templateInstance
       autorun: (f) ->
@@ -219,16 +230,16 @@ class ViewModel
         return
       element: element
       elementBind: bindObject
-      getVmValue: ViewModel.getVmValueGetter(viewmodel, bindValue, bindObject.view)
+      getVmValue: ViewModel.getVmValueGetter(viewmodel, bindValue, view)
       bindName: bindName
       bindValue: bindValue
       viewmodel: viewmodel
 
-    bindArg.setVmValue = getDelayedSetter bindArg, ViewModel.getVmValueSetter(viewmodel, bindValue, bindObject.view)
+    bindArg.setVmValue = getDelayedSetter bindArg, ViewModel.getVmValueSetter(viewmodel, bindValue, view), bindId
     return bindArg
 
-  @bindSingle = (templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings) ->
-    bindArg = ViewModel.getBindArgument templateInstance, element, bindName, bindValue, bindObject, viewmodel
+  @bindSingle = (templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view) ->
+    bindArg = ViewModel.getBindArgument templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindId, view
     binding = ViewModel.getBinding(bindName, bindArg, bindings)
     return if not binding
 
@@ -447,10 +458,10 @@ class ViewModel
   ##################
   # Instance methods
 
-  bind: (bindObject, templateInstance, element, bindings) ->
+  bind: (bindObject, templateInstance, element, bindings, bindId, view) ->
     viewmodel = this
-    for bindName, bindValue of bindObject
-      ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings
+    for bindName, bindValue of bindObject when not ViewModel.nonBindings[bindName]
+      ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
     return
 
   load: (obj) ->
