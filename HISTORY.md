@@ -1,4 +1,8 @@
-﻿## 1.9.16
+﻿## 1.9.17
+
+* Use getProperty for options text, value, and caption
+
+## 1.9.16
 
 * Fix attr binding (broke on 1.9.15)
 

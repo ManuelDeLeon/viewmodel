@@ -143,6 +143,15 @@ ViewModel.addBind 'options', (p) ->
       if p.element.prop('multiple')
         throw new Error "Must use an array value for multiple selection options."
 
+  getOption = (container, prop) ->
+    if prop
+      if container instanceof ViewModel
+        container[prop]()
+      else
+        container[prop]
+    else
+      container
+
   p.autorun ->
     arr = getProperty(p.vm, p.property)
     arr = arr.fetch() if arr instanceof Mongo.Cursor
@@ -161,8 +170,8 @@ ViewModel.addBind 'options', (p) ->
 
     isMultiple = p.element.prop('multiple')
     for o in arr
-      text = _.escape(if optionsText then o[optionsText] else o)
-      oValue = _.escape(if optionsValue then o[optionsValue] else o)
+      text = _.escape(getOption(o, optionsText))
+      oValue = _.escape(getOption(o, optionsValue))
       if isMultiple
         if value
           selected = if oValue in value then "selected='selected'" else ""
