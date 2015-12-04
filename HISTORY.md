@@ -1,4 +1,8 @@
-﻿## 2.4.0
+﻿## 2.4.1
+
+* Make `this` reactive when used in a binding inside an `#each` block
+
+## 2.4.0
 
 * Add error messages when the bind/event doesn't exist.
 * Add href, src, readonly bindings.

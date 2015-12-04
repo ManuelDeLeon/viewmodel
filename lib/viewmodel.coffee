@@ -321,7 +321,10 @@ class ViewModel
 
   currentView = null
   currentContext = ->
-    Template.instance()?.data or currentView?.dataVar?.curValue
+    if currentView
+      Blaze.getData(currentView)
+    else
+      Template.instance()? data
 
   getValue = (container, bindValue, viewmodel) ->
     negate = bindValue.charAt(0) is '!'
