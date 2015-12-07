@@ -1,4 +1,8 @@
-﻿## 2.4.1
+﻿## 2.4.2
+
+* Update readme
+
+## 2.4.1
 
 * Make `this` reactive when used in a binding inside an `#each` block
 
