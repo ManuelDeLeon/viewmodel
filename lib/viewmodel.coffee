@@ -324,7 +324,7 @@ class ViewModel
     if currentView
       Blaze.getData(currentView)
     else
-      Template.instance()? data
+      Template.instance()?.data
 
   getValue = (container, bindValue, viewmodel) ->
     negate = bindValue.charAt(0) is '!'
@@ -378,8 +378,8 @@ class ViewModel
               args.push newArg
 
         primitive = isPrimitive(name)
-        if container instanceof ViewModel and not primitive
-          ViewModel.check 'vmProp', name, container
+        if container instanceof ViewModel and not primitive and not container[name]
+          container[name] = ViewModel.makeReactiveProperty(undefined)
 
         if primitive or not (`name in container`)
           value = getPrimitive(name)

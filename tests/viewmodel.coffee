@@ -1081,15 +1081,12 @@ describe "ViewModel", ->
       assert.equal 'A', getVmValue()
       return
 
-    it "checks vmProp when parent is a view model", ->
-      parentVm = new ViewModel( { first: 'A' } )
-      viewmodel = new ViewModel( {  } )
-      viewmodel.parent = -> parentVm
-      bindValue = 'parent.first'
+    it "creates property on view model", ->
+      viewmodel = new ViewModel()
+      bindValue = 'name'
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
-      getVmValue()
-      assert.isTrue @checkStub.calledWith 'vmProp', 'parent', viewmodel
-      assert.isTrue @checkStub.calledWith 'vmProp', 'first', parentVm
+      assert.isUndefined getVmValue()
+      assert.ok viewmodel.name
       return
 
     it "returns quoted string", ->
