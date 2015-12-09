@@ -360,6 +360,7 @@ class ViewModel
           second = parsed[name]
           if second.length > 2
             for arg in second.substr(1, second.length - 2).split(',') #remove parenthesis
+              arg = $.trim(arg)
               newArg = undefined
               if arg is "this"
                 newArg = currentContext()

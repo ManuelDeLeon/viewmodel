@@ -1,4 +1,8 @@
-﻿## 2.5.0
+﻿## 2.5.1
+
+* Trim parameters used when using functions declared in bindings
+
+## 2.5.0
 
 * Properties are automatically added to the view models when used in the markup. This alleviates the problem of inheriting from Mongo documents where one might be missing a field.
 

@@ -1125,6 +1125,27 @@ describe "ViewModel", ->
       assert.isTrue getVmValue()
       return
 
+    it "returns value from first( second )", ->
+      viewmodel = new ViewModel()
+      viewmodel.load
+        first: (v) -> v
+        second: 'A'
+      bindValue = 'first( second )'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 'A', getVmValue()
+      return
+
+    it "returns value from first( second , third )", ->
+      viewmodel = new ViewModel()
+      viewmodel.load
+        first: (a, b) -> a + b
+        second: 'A'
+        third: 'B'
+      bindValue = 'first( second , third )'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal 'AB', getVmValue()
+      return
+
   describe "@getVmValueSetter", ->
 
     it "sets first func", ->
