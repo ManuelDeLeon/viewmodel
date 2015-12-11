@@ -444,12 +444,12 @@ class ViewModel
       initialAutorun = initial.autorun
       ViewModel.check "@onRendered", initialAutorun, templateInstance
       if _.isFunction initialAutorun
-        fun = (c) -> initialAutorun.apply(viewmodel, c)
+        fun = (c) -> initialAutorun.call(viewmodel, c)
         Tracker.afterFlush -> templateInstance.autorun fun
       else if initialAutorun instanceof Array
         for autorun in initialAutorun
           do (autorun) ->
-            fun = (c) -> autorun.apply(viewmodel, c)
+            fun = (c) -> autorun.call(viewmodel, c)
             do (fun) ->
               Tracker.afterFlush -> templateInstance.autorun fun
 

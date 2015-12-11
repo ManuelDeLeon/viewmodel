@@ -1,4 +1,8 @@
-﻿## 2.5.1
+﻿## 2.5.2
+
+* autoruns now receive a computation parameter (as they should).
+
+## 2.5.1
 
 * Trim parameters used when using functions declared in bindings
 
