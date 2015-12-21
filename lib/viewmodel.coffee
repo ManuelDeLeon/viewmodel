@@ -66,6 +66,7 @@ class ViewModel
           currentDataAutorunSet = true
           templateInstance.autorun ->
             viewmodel.load Template.currentData()
+            return
         ViewModel.assignChild(viewmodel)
         ViewModel.delay 0, ->
           vmHash = viewmodel.vmHash()
@@ -88,7 +89,7 @@ class ViewModel
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
         do (prop) ->
-          helpers[prop] = -> viewmodel[prop]()
+          helpers[prop] = -> Template.instance().viewmodel[prop]()
 
       template.helpers helpers
 

@@ -1,5 +1,9 @@
 ﻿## 2.5.2
 
+* Fix issue with blaze helpers not being wired up correctly when using nested #each blocks.
+
+## 2.5.2
+
 * autoruns now receive a computation parameter (as they should).
 
 ## 2.5.1
