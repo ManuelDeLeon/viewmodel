@@ -129,7 +129,7 @@ class ViewModel
       # it's because it IS confusing. The only case I know of is with
       # Iron Router's contentFor blocks.
       # See https://github.com/ManuelDeLeon/viewmodel/issues/142
-      currentViewInstance = Blaze.currentView._templateInstance
+      currentViewInstance = Blaze.currentView._templateInstance or templateInstance
       Blaze.currentView.onViewReady ->
         element = currentViewInstance.$("[#{bindIdAttribute}='#{bindId}']")
         templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, this

@@ -214,6 +214,26 @@ describe "ViewModel", ->
       @onViewReadyFunction.call 'X'
       assert.isTrue bindStub.calledWith bindObject, templateInstance, "X", ViewModel.bindings
 
+    it "binds the view model when the view is ready 2", ->
+      viewmodel = new ViewModel()
+      bindStub = sinon.stub viewmodel, 'bind'
+      instanceStub = sinon.stub Template, 'instance'
+      parseBindStub = sinon.stub ViewModel, 'parseBind'
+      bindObject =
+        text: 'name'
+      parseBindStub.returns bindObject
+      Blaze.currentView =
+        onViewReady: (f) => @onViewReadyFunction = f
+        _templateInstance: undefined
+      templateInstance =
+        viewmodel: viewmodel
+        '$': -> "Y"
+      instanceStub.returns templateInstance
+      ViewModel.bindHelper("text: name")
+      bindObject.view = 'X'
+      @onViewReadyFunction.call 'X'
+      assert.isTrue bindStub.calledWith bindObject, templateInstance, "Y", ViewModel.bindings
+
     it "adds a view model if the template doesn't have one", ->
       addEmptyViewModelStub = sinon.stub ViewModel, 'addEmptyViewModel'
       instanceStub = sinon.stub Template, 'instance'

@@ -1,4 +1,8 @@
-﻿## 2.5.4
+﻿## 2.5.5
+
+* Fix to the fix
+
+## 2.5.4
 
 * Fix issue when using Iron Router's contentFor blocks
 
