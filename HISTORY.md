@@ -1,4 +1,4 @@
-﻿## 2.5.2
+﻿## 2.5.3
 
 * Fix issue with blaze helpers not being wired up correctly when using nested #each blocks.
 
