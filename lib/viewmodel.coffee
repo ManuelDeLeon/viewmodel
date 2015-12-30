@@ -124,8 +124,14 @@ class ViewModel
 
       bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
 
+      # The template on which the element is rendered might not be
+      # the one where the user puts it on the html. If it sounds confusing
+      # it's because it IS confusing. The only case I know of is with
+      # Iron Router's contentFor blocks.
+      # See https://github.com/ManuelDeLeon/viewmodel/issues/142
+      currentViewInstance = Blaze.currentView._templateInstance
       Blaze.currentView.onViewReady ->
-        element = templateInstance.$("[#{bindIdAttribute}='#{bindId}']")
+        element = currentViewInstance.$("[#{bindIdAttribute}='#{bindId}']")
         templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, this
         return
 

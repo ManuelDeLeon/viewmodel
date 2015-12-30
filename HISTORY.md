@@ -1,4 +1,8 @@
-﻿## 2.5.3
+﻿## 2.5.4
+
+* Fix issue when using Iron Router's contentFor blocks
+
+## 2.5.3
 
 * Fix issue with blaze helpers not being wired up correctly when using nested #each blocks.
 

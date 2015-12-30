@@ -171,6 +171,8 @@ describe "ViewModel", ->
       @onViewReadyFunction = null
       Blaze.currentView =
         onViewReady: (f) => @onViewReadyFunction = f
+        _templateInstance:
+          '$': -> 'X'
 
     it "returns object with the next bind id", ->
       instanceStub = sinon.stub Template, 'instance'
