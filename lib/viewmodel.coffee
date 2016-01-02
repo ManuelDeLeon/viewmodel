@@ -497,6 +497,25 @@ class ViewModel
           
       return
 
+  @loadProperties = (toLoad, container) ->
+    loadObj = (obj) ->
+      for key, value of obj when not ViewModel.properties[key]
+        if _.isFunction(value)
+# we don't care, just take the new function
+          container[key] = value
+        else if container[key]
+# keep the reference to the old property we already have
+          container[key] value
+        else
+# Create a new property
+          container[key] = ViewModel.makeReactiveProperty(value);
+      return
+    if toLoad instanceof Array
+      loadObj obj for obj in toLoad
+    else
+      loadObj toLoad
+    return
+
   ##################
   # Instance methods
 
@@ -508,23 +527,7 @@ class ViewModel
 
   load: (toLoad) ->
     viewmodel = this
-    loadObj = (obj) ->
-      for key, value of obj when not ViewModel.properties[key]
-        if _.isFunction(value)
-          # we don't care, just take the new function
-          viewmodel[key] = value
-        else if viewmodel[key]
-          # keep the reference to the old property we already have
-          viewmodel[key] value
-        else
-          # Create a new property
-          viewmodel[key] = ViewModel.makeReactiveProperty(value);
-      return
-    if toLoad instanceof Array
-      loadObj obj for obj in toLoad
-    else
-      loadObj toLoad
-    return
+    ViewModel.loadProperties toLoad, viewmodel
 
   parent: (args...) ->
     ViewModel.check "#parent", args...
@@ -588,8 +591,18 @@ class ViewModel
       if toLoad instanceof Array
         for element in toLoad
           viewmodel.load collection[element]
-      else
+      else if _.isString toLoad
         viewmodel.load collection[toLoad]
+      else
+        for ref of toLoad
+          container = {}
+          mixshare = toLoad[ref]
+          if mixshare instanceof Array
+            for item in mixshare
+              ViewModel.loadProperties collection[item], container
+          else
+            ViewModel.loadProperties collection[mixshare], container
+          viewmodel[ref] = container
     return
 
   constructor: (initial) ->

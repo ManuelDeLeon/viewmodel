@@ -215,3 +215,86 @@ describe "ViewModel instance", ->
       assert.equal 2, @viewmodel.age()
       assert.equal 'Y', @viewmodel.f()
       return
+
+  describe "mixin", ->
+
+    beforeEach ->
+      ViewModel.mixin
+        house:
+          address: 'A'
+        person:
+          name: 'X'
+
+    it "adds property to vm", ->
+      vm = new ViewModel
+        mixin: 'house'
+      assert.equal 'A', vm.address()
+
+    it "adds property to vm from array", ->
+      vm = new ViewModel
+        mixin: ['house']
+      assert.equal 'A', vm.address()
+
+    it "doesn't share the property", ->
+      vm1 = new ViewModel
+        mixin: 'house'
+      vm2 = new ViewModel
+        mixin: 'house'
+      vm2.address 'B'
+      assert.equal 'A', vm1.address()
+      assert.equal 'B', vm2.address()
+
+    it "adds object to vm", ->
+      vm = new ViewModel
+        mixin:
+          location: 'house'
+      assert.equal 'A', vm.location.address()
+
+    it "adds array to vm", ->
+      vm = new ViewModel
+        mixin:
+          location: ['house', 'person']
+      assert.equal 'A', vm.location.address()
+      assert.equal 'X', vm.location.name()
+
+  describe "share", ->
+
+    beforeEach ->
+      ViewModel.share
+        house:
+          address: 'A'
+        person:
+          name: 'X'
+
+    it "adds property to vm", ->
+      vm = new ViewModel
+        share: 'house'
+      assert.equal 'A', vm.address()
+
+    it "adds property to vm from array", ->
+      vm = new ViewModel
+        share: ['house']
+      assert.equal 'A', vm.address()
+
+    it "adds object to vm", ->
+      vm = new ViewModel
+        share:
+          location: 'house'
+      assert.equal 'A', vm.location.address()
+
+    it "shares the property", ->
+      vm1 = new ViewModel
+        share: 'house'
+      vm2 = new ViewModel
+        share: 'house'
+      vm2.address 'B'
+      assert.equal 'B', vm1.address()
+      assert.equal 'B', vm2.address()
+      assert.equal vm1.address, vm1.address
+
+    it "adds array to vm", ->
+      vm = new ViewModel
+        share:
+          location: ['house', 'person']
+      assert.equal 'A', vm.location.address()
+      assert.equal 'X', vm.location.name()

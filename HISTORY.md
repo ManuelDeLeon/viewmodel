@@ -1,4 +1,8 @@
-﻿## 2.6.0
+﻿## 2.7.0
+
+* mixins and shares can be scoped to a view model property. So instead of adding all share/mixin properties to the view model, you can specify under which property they should fall. See: https://viewmodel.meteor.com/docs/viewmodels#sharemixinscope
+
+## 2.6.0
 
 * .load now accepts an array of objects
 * You can now load multiple objects when you define a view model( .viewmodel({ load: objOrArray }) )
