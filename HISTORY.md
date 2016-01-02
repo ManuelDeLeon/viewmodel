@@ -1,4 +1,10 @@
-﻿## 2.5.5
+﻿## 2.6.0
+
+* .load now accepts an array of objects
+* You can now load multiple objects when you define a view model( .viewmodel({ load: objOrArray }) )
+* Loaded objects can have their own autorun/onCreated/onRendered/onDestroyed properties.
+
+## 2.5.5
 
 * Fix to the fix
 

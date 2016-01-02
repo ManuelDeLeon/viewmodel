@@ -15,6 +15,10 @@ class ViewModel
     share: 1
     mixin: 1
     ref: 1
+    load: 1
+    onRendered: 1
+    onCreated: 1
+    onDestroyed: 1
 
   # The user can't use these properties
   # when defining a view model
@@ -24,7 +28,7 @@ class ViewModel
     children: 1
     reset: 1
     data: 1
-    load: 1
+
 
   # These are objects used as bindings but do not have
   # an implementation
@@ -47,7 +51,7 @@ class ViewModel
       Package['manuel:viewmodel-debug']?.VmCheck key, args...
     return
 
-  @onCreated = (template) ->
+  @onCreated = (template, initial) ->
     return ->
       currentDataAutorunSet = false
       templateInstance = this
@@ -77,9 +81,15 @@ class ViewModel
             ViewModel.loadUrl viewmodel
             ViewModel.saveUrl viewmodel
 
-          viewmodelOnCreated = viewmodel.onCreated
-          if _.isFunction viewmodelOnCreated
-            viewmodelOnCreated.call viewmodel, templateInstance
+          if _.isFunction initial?.onCreated
+            initial.onCreated.call viewmodel, templateInstance
+    
+          if initial?.load
+            if initial.load instanceof Array
+              for obj in initial.load when _.isFunction obj.onCreated
+                obj.onCreated.call viewmodel, templateInstance
+            else if _.isFunction initial.load.onCreated
+              initial.load.onCreated.call viewmodel, templateInstance
 
       if not Tracker.currentComputation
         currentDataAutorunSet = true
@@ -101,11 +111,11 @@ class ViewModel
   @addEmptyViewModel = (templateInstance) ->
     template = templateInstance.view.template
     template.viewmodelInitial = {}
-    onCreated = ViewModel.onCreated(template)
+    onCreated = ViewModel.onCreated(template, template.viewmodelInitial)
     onCreated.call templateInstance
-    onRendered = ViewModel.onRendered(template)
+    onRendered = ViewModel.onRendered(template.viewmodelInitial)
     onRendered.call templateInstance
-    onDestroyed = ViewModel.onDestroyed(template)
+    onDestroyed = ViewModel.onDestroyed(template.viewmodelInitial)
     templateInstance.view.onViewDestroyed ->
       onDestroyed.call templateInstance
     return
@@ -448,22 +458,43 @@ class ViewModel
     return ->
       templateInstance = this
       viewmodel = templateInstance.viewmodel
-      initialAutorun = initial.autorun
-      ViewModel.check "@onRendered", initialAutorun, templateInstance
-      if _.isFunction initialAutorun
-        fun = (c) -> initialAutorun.call(viewmodel, c)
-        Tracker.afterFlush -> templateInstance.autorun fun
-      else if initialAutorun instanceof Array
-        for autorun in initialAutorun
-          do (autorun) ->
-            fun = (c) -> autorun.call(viewmodel, c)
-            do (fun) ->
-              Tracker.afterFlush -> templateInstance.autorun fun
 
-      viewmodelOnRendered = viewmodel.onRendered
-      if _.isFunction viewmodelOnRendered
+      ViewModel.check "@onRendered", initial.autorun, templateInstance
+
+      loadAutorun = (initialAutorun) ->
+        if _.isFunction initialAutorun
+          fun = (c) -> initialAutorun.call(viewmodel, c)
+          Tracker.afterFlush -> templateInstance.autorun fun
+        else if initialAutorun instanceof Array
+          for autorun in initialAutorun
+            do (autorun) ->
+              fun = (c) -> autorun.call(viewmodel, c)
+              do (fun) ->
+                Tracker.afterFlush -> templateInstance.autorun fun
+        return
+
+      loadAutorun initial.autorun
+      if initial.load
+        if initial.load instanceof Array
+          for obj in initial.load
+            ViewModel.check "@onRendered", obj.autorun, templateInstance
+            loadAutorun obj.autorun
+        else
+          loadAutorun initial.load.autorun
+
+      if _.isFunction initial?.onRendered
         Tracker.afterFlush ->
-          viewmodelOnRendered.call viewmodel, templateInstance
+          initial.onRendered.call viewmodel, templateInstance
+
+      if initial?.load
+        Tracker.afterFlush ->
+          if initial.load instanceof Array
+            for obj in initial.load when _.isFunction obj.onRendered
+              do (obj) ->
+                obj.onRendered.call viewmodel, templateInstance
+          else if _.isFunction initial.load.onRendered
+            initial.load.onRendered.call viewmodel, templateInstance
+          
       return
 
   ##################
@@ -475,18 +506,24 @@ class ViewModel
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
     return
 
-  load: (obj) ->
+  load: (toLoad) ->
     viewmodel = this
-    for key, value of obj when not ViewModel.properties[key]
-      if _.isFunction(value)
-        # we don't care, just take the new function
-        viewmodel[key] = value
-      else if viewmodel[key]
-        # keep the reference to the old property we already have
-        viewmodel[key] value
-      else
-        # Create a new property
-        viewmodel[key] = ViewModel.makeReactiveProperty(value);
+    loadObj = (obj) ->
+      for key, value of obj when not ViewModel.properties[key]
+        if _.isFunction(value)
+          # we don't care, just take the new function
+          viewmodel[key] = value
+        else if viewmodel[key]
+          # keep the reference to the old property we already have
+          viewmodel[key] value
+        else
+          # Create a new property
+          viewmodel[key] = ViewModel.makeReactiveProperty(value);
+      return
+    if toLoad instanceof Array
+      loadObj obj for obj in toLoad
+    else
+      loadObj toLoad
     return
 
   parent: (args...) ->
@@ -546,11 +583,13 @@ class ViewModel
       i++
     return
 
-  loadObj = (obj, collection, viewmodel) ->
-    if obj
-      array = if obj instanceof Array then obj else [obj]
-      for element in array
-        viewmodel.load collection[element]
+  loadObj = (toLoad, collection, viewmodel) ->
+    if toLoad
+      if toLoad instanceof Array
+        for element in toLoad
+          viewmodel.load collection[element]
+      else
+        viewmodel.load collection[toLoad]
     return
 
   constructor: (initial) ->
@@ -558,7 +597,9 @@ class ViewModel
     viewmodel = this
     viewmodel.vmId = ViewModel.nextId()
     viewmodel.vmHashCache = null
-    viewmodel.load initial
+    if initial
+      viewmodel.load initial
+      viewmodel.load initial.load
     @children = childrenProperty()
     viewmodel.vmPathToParent = ->
       viewmodelPath = ViewModel.getPathTo(viewmodel.templateInstance.firstNode)
@@ -581,13 +622,21 @@ class ViewModel
 
 
 
-  @onDestroyed = ->
+  @onDestroyed = (initial) ->
     return ->
       templateInstance = this
       viewmodel = templateInstance.viewmodel
-      viewmodelOnDestroyed = viewmodel.onDestroyed
-      if _.isFunction viewmodelOnDestroyed
-        viewmodelOnDestroyed.call viewmodel, templateInstance
+      
+      if _.isFunction initial?.onDestroyed
+        initial.onDestroyed.call viewmodel, templateInstance
+
+      if initial?.load
+        if initial.load instanceof Array
+          for obj in initial.load when _.isFunction obj.onDestroyed
+            obj.onDestroyed.call viewmodel, templateInstance
+        else if _.isFunction initial.load.onDestroyed
+          initial.load.onDestroyed.call viewmodel, templateInstance
+
       parent = viewmodel.parent()
       if parent
         children = parent.children()

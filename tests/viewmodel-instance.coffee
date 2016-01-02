@@ -20,6 +20,19 @@ describe "ViewModel instance", ->
       vm.name('B')
       assert.equal 'B', vm.name()
 
+    it "adds properties in load object", ->
+      obj = { name: "A" }
+      vm = new ViewModel
+        load: obj
+      assert.equal 'A', vm.name()
+
+    it "adds properties in load array", ->
+      arr = [ { name: "A" }, { age: 1 } ]
+      vm = new ViewModel
+        load: arr
+      assert.equal 'A', vm.name()
+      assert.equal 1, vm.age()
+
     it "doesn't convert functions", ->
       f = ->
       vm = new ViewModel
@@ -49,11 +62,16 @@ describe "ViewModel instance", ->
       ret = @viewmodel.bind bindObject, 'templateInstance', 'element', 'bindings'
       assert.isUndefined ret
 
-  describe "#extend", ->
+  describe "#load", ->
 
     it "adds a property to the view model", ->
       @viewmodel.load({ name: 'Alan' })
       assert.equal 'Alan', @viewmodel.name()
+
+    it "adds a properties from an array", ->
+      @viewmodel.load([{ name: 'Alan' },{ two: 'Brito' }])
+      assert.equal 'Alan', @viewmodel.name()
+      assert.equal 'Brito', @viewmodel.two()
 
     it "adds function to the view model", ->
       f = ->

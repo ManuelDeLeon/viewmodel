@@ -36,6 +36,34 @@ describe "ViewModel", ->
         ViewModel.onDestroyed().call @instance
         assert.isUndefined ViewModel.byId[1]
 
+      it "calls viewmodel.onDestroyed", ->
+        ran = false
+        initial =
+          onDestroyed: -> ran = true
+        ViewModel.onDestroyed(initial).call @instance
+        assert.isTrue ran
+
+      it "calls viewmodel.load { onDestroyed }", ->
+        ran = false
+        initial =
+          load:
+            onDestroyed: -> ran = true
+        ViewModel.onDestroyed(initial).call @instance
+        assert.isTrue ran
+
+      it "calls viewmodel.load [{ onDestroyed }]", ->
+        ran1 = false
+        ran2 = false
+        initial =
+          load: [
+            { onDestroyed: -> ran1 = true },
+            { onDestroyed: -> ran2 = true }
+          ]
+          
+        ViewModel.onDestroyed(initial).call @instance
+        assert.isTrue ran1
+        assert.isTrue ran2
+
   describe "@onRendered", ->
 
     it "returns a function", ->
@@ -64,6 +92,14 @@ describe "ViewModel", ->
         ViewModel.onRendered(initial).call @instance
         assert.isTrue ran
 
+      it "sets autorun for load object", ->
+        ran = false
+        initial =
+          load:
+            autorun: -> ran = true
+        ViewModel.onRendered(initial).call @instance
+        assert.isTrue ran
+
       it "sets autorun for array of functions", ->
         ran1 = false
         ran2 = false
@@ -72,6 +108,46 @@ describe "ViewModel", ->
             (-> ran1 = true)
             (-> ran2 = true)
           ]
+        ViewModel.onRendered(initial).call @instance
+        assert.isTrue ran1
+        assert.isTrue ran2
+
+      it "sets autorun for load array", ->
+        ran1 = false
+        ran2 = false
+        initial =
+          load: [
+            { autorun: -> ran1 = true },
+            { autorun: -> ran2 = true }
+          ]
+        ViewModel.onRendered(initial).call @instance
+        assert.isTrue ran1
+        assert.isTrue ran2
+
+      it "calls viewmodel.onRendered", ->
+        ran = false
+        initial =
+          onRendered: -> ran = true
+        ViewModel.onRendered(initial).call @instance
+        assert.isTrue ran
+
+      it "calls viewmodel.load { onRendered }", ->
+        ran = false
+        initial =
+          load:
+            onRendered: -> ran = true
+        ViewModel.onRendered(initial).call @instance
+        assert.isTrue ran
+
+      it "calls viewmodel.load [{ onRendered }]", ->
+        ran1 = false
+        ran2 = false
+        initial =
+          load: [
+            { onRendered: -> ran1 = true },
+            { onRendered: -> ran2 = true }
+          ]
+
         ViewModel.onRendered(initial).call @instance
         assert.isTrue ran1
         assert.isTrue ran2
@@ -85,6 +161,7 @@ describe "ViewModel", ->
     describe "return function", ->
 
       beforeEach ->
+
         @helper = null
         @template =
           createViewModel: ->
@@ -142,6 +219,8 @@ describe "ViewModel", ->
         @retFun.call @instance
         Tracker.afterFlush = cache
         assert.isTrue @assignChildStub.calledWithExactly @instance.viewmodel
+
+
 
   describe "@bindIdAttribute", ->
     it "has has default value", ->

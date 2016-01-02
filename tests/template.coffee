@@ -30,7 +30,7 @@ describe "Template", ->
     it "adds onCreated", ->
       @vmOnCreatedStub.returns "Y"
       Template.prototype.viewmodel.call @context, "X"
-      assert.isTrue @vmOnCreatedStub.calledWithExactly(@context)
+      assert.isTrue @vmOnCreatedStub.calledWithExactly(@context, "X")
       assert.isTrue @templateOnCreatedStub.calledWithExactly("Y")
 
     it "adds onRendered", ->
