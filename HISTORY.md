@@ -1,4 +1,8 @@
-﻿## 2.7.0
+﻿## 2.7.1
+
+* View model methods used as template helpers now receive the parameters from the template.
+
+## 2.7.0
 
 * mixins and shares can be scoped to a view model property. So instead of adding all share/mixin properties to the view model, you can specify under which property they should fall. See: https://viewmodel.meteor.com/docs/viewmodels#sharemixinscope
 

@@ -99,7 +99,7 @@ class ViewModel
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
         do (prop) ->
-          helpers[prop] = -> Template.instance().viewmodel[prop]()
+          helpers[prop] = (args...) -> Template.instance().viewmodel[prop](args...)
 
       template.helpers helpers
 
