@@ -461,16 +461,29 @@ class ViewModel
 
       ViewModel.check "@onRendered", initial.autorun, templateInstance
 
+      if _.isFunction initial?.onRendered
+        ViewModel.delay 0, ->
+          initial.onRendered.call viewmodel, templateInstance
+
+      if initial?.load
+        ViewModel.delay 0, ->
+          if initial.load instanceof Array
+            for obj in initial.load when _.isFunction obj.onRendered
+              do (obj) ->
+                obj.onRendered.call viewmodel, templateInstance
+          else if _.isFunction initial.load.onRendered
+            initial.load.onRendered.call viewmodel, templateInstance
+
       loadAutorun = (initialAutorun) ->
         if _.isFunction initialAutorun
           fun = (c) -> initialAutorun.call(viewmodel, c)
-          Tracker.afterFlush -> templateInstance.autorun fun
+          ViewModel.delay 0, -> templateInstance.autorun fun
         else if initialAutorun instanceof Array
           for autorun in initialAutorun
             do (autorun) ->
               fun = (c) -> autorun.call(viewmodel, c)
               do (fun) ->
-                Tracker.afterFlush -> templateInstance.autorun fun
+                ViewModel.delay 0, -> templateInstance.autorun fun
         return
 
       loadAutorun initial.autorun
@@ -482,18 +495,7 @@ class ViewModel
         else
           loadAutorun initial.load.autorun
 
-      if _.isFunction initial?.onRendered
-        Tracker.afterFlush ->
-          initial.onRendered.call viewmodel, templateInstance
 
-      if initial?.load
-        Tracker.afterFlush ->
-          if initial.load instanceof Array
-            for obj in initial.load when _.isFunction obj.onRendered
-              do (obj) ->
-                obj.onRendered.call viewmodel, templateInstance
-          else if _.isFunction initial.load.onRendered
-            initial.load.onRendered.call viewmodel, templateInstance
           
       return
 

@@ -1,4 +1,8 @@
-﻿## 2.7.1
+﻿## 2.7.2
+
+* Order of events are now correct: onCreated -> onRendered -> autorun
+
+## 2.7.1
 
 * View model methods used as template helpers now receive the parameters from the template.
 

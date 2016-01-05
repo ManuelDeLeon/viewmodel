@@ -2,9 +2,12 @@ describe "ViewModel", ->
 
   beforeEach ->
     @checkStub = sinon.stub ViewModel, "check"
+    @delay = ViewModel.delay
+    ViewModel.delay = (t, f) -> f()
 
   afterEach ->
     sinon.restoreAll()
+    ViewModel.delay = @delay
 
   describe "@nextId", ->
     it "increments the numbers", ->
@@ -369,8 +372,10 @@ describe "ViewModel", ->
     describe "delay", ->
       beforeEach ->
         @clock = sinon.useFakeTimers()
+        ViewModel.delay = @delay
       afterEach ->
         @clock.restore()
+        @delay = ViewModel.delay
 
       it "delays values", ->
         actual = ViewModel.makeReactiveProperty("X")
