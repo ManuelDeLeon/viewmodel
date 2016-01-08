@@ -24,6 +24,9 @@ class ViewModel
   # when defining a view model
   @reserved =
     vmId: 1
+    vmHashCache: 1
+    vmPathToParent: 1
+    templateInstance: 1
     parent: 1
     children: 1
     reset: 1
@@ -501,7 +504,7 @@ class ViewModel
 
   @loadProperties = (toLoad, container) ->
     loadObj = (obj) ->
-      for key, value of obj when not ViewModel.properties[key]
+      for key, value of obj when not (ViewModel.properties[key] or ViewModel.reserved[key])
         if _.isFunction(value)
 # we don't care, just take the new function
           container[key] = value

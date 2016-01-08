@@ -289,7 +289,6 @@ addBinding
   name: 'options'
   selector: 'select:not([multiple])'
   autorun: (bindArg) ->
-    source = bindArg.getVmValue()
     optionsText = bindArg.elementBind.optionsText
     optionsValue = bindArg.elementBind.optionsValue
     selection = bindArg.getVmValue(bindArg.elementBind.value)
@@ -297,10 +296,12 @@ addBinding
     defaultText = bindArg.elementBind.defaultText
     defaultValue = bindArg.elementBind.defaultValue
     if defaultText? or defaultValue?
-      itemText = _.escape(bindArg.getVmValue(defaultText) or '')
-      itemValue = _.escape(bindArg.getVmValue(defaultValue) or '')
+      itemText = _.escape(defaultText? and bindArg.getVmValue(defaultText) or '')
+      itemValue = _.escape(defaultValue? and bindArg.getVmValue(defaultValue) or '')
       bindArg.element.append("<option selected='selected' value=\"#{itemValue}\">#{itemText}</option>")
-    for item in source
+    source = bindArg.getVmValue()
+    collection = if source instanceof Mongo.Cursor then source.fetch() else source
+    for item in collection
       itemText = _.escape(if optionsText then item[optionsText] else item)
       itemValue = _.escape(if optionsValue then item[optionsValue] else item)
       selected = if selection is itemValue then "selected='selected'" else ""
@@ -311,12 +312,13 @@ addBinding
   name: 'options'
   selector: 'select[multiple]'
   autorun: (bindArg) ->
-    source = bindArg.getVmValue()
     optionsText = bindArg.elementBind.optionsText
     optionsValue = bindArg.elementBind.optionsValue
     selection = bindArg.getVmValue(bindArg.elementBind.value)
     bindArg.element.find('option').remove()
-    for item in source
+    source = bindArg.getVmValue()
+    collection = if source instanceof Mongo.Cursor then source.fetch() else source
+    for item in collection
       itemText = _.escape(if optionsText then item[optionsText] else item)
       itemValue = _.escape(if optionsValue then item[optionsValue] else item)
       selected = if itemValue in selection then "selected='selected'" else ""

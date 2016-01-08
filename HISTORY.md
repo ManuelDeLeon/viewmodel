@@ -1,4 +1,8 @@
-﻿## 2.7.2
+﻿## 2.7.3
+
+* options binding now works with mongo collections 
+
+## 2.7.2
 
 * Order of events are now correct: onCreated -> onRendered -> autorun
 
