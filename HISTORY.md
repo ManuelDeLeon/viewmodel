@@ -1,4 +1,8 @@
-﻿## 2.7.5
+﻿## 2.7.6
+
+* Using viewmodel-debug@2.5.1
+
+## 2.7.5
 
 * Missed underscore 1.0.3 
 
