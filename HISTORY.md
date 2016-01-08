@@ -1,4 +1,12 @@
-﻿## 2.7.3
+﻿## 2.7.5
+
+* Missed underscore 1.0.3 
+
+## 2.7.4
+
+* Reduce version requirements so it works with Meteor 1.1 
+
+## 2.7.3
 
 * options binding now works with mongo collections 
 
