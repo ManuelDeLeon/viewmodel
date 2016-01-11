@@ -1,4 +1,8 @@
-﻿## 2.7.6
+﻿## 2.7.7
+
+* .parent() now searches for the first view model up the chain. Not just the parent template.
+
+## 2.7.6
 
 * Using viewmodel-debug@2.5.1
 

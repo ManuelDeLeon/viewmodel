@@ -103,6 +103,20 @@ describe "ViewModel instance", ->
       parent = @viewmodel.parent()
       assert.equal "X", parent
 
+    it "returns the first view model up the chain", ->
+      @viewmodel.templateInstance =
+        view:
+          parentView:
+            name: 'Template.something'
+            templateInstance: ->
+              view:
+                parentView:
+                  name: 'Template.A'
+                  templateInstance: ->
+                    viewmodel: "Y"
+      parent = @viewmodel.parent()
+      assert.equal "Y", parent
+
     it "checks the arguments", ->
       @viewmodel.parent('X')
       assert.isTrue @checkStub.calledWith '#parent', 'X'

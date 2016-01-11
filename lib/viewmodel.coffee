@@ -537,8 +537,13 @@ class ViewModel
   parent: (args...) ->
     ViewModel.check "#parent", args...
     viewmodel = this
-    parentTemplate = ViewModel.parentTemplate(viewmodel.templateInstance)
-    return parentTemplate?.viewmodel
+    instance = viewmodel.templateInstance
+    while parentTemplate = ViewModel.parentTemplate(instance)
+      if parentTemplate.viewmodel
+        return parentTemplate.viewmodel
+      else
+        instance = parentTemplate
+    return
 
   reset: ->
     viewmodel = this
