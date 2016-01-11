@@ -1,4 +1,8 @@
-﻿## 2.7.7
+﻿## 2.7.8
+
+* onCreated/onRendered/onDestroyed/autorun now work when defining the view model with a function.
+
+## 2.7.7
 
 * .parent() now searches for the first view model up the chain. Not just the parent template.
 

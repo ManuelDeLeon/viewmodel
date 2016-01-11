@@ -56,8 +56,9 @@ class ViewModel
 
   @onCreated = (template, initial) ->
     return ->
-      currentDataAutorunSet = false
       templateInstance = this
+      initial = initial(templateInstance.data) if _.isFunction(initial)
+      currentDataAutorunSet = false
       viewmodel = template.createViewModel(templateInstance.data)
       ViewModel.add viewmodel
       templateInstance.viewmodel = viewmodel
@@ -460,6 +461,7 @@ class ViewModel
   @onRendered = (initial) ->
     return ->
       templateInstance = this
+      initial = initial(templateInstance.data) if _.isFunction(initial)
       viewmodel = templateInstance.viewmodel
 
       ViewModel.check "@onRendered", initial.autorun, templateInstance
@@ -648,6 +650,7 @@ class ViewModel
   @onDestroyed = (initial) ->
     return ->
       templateInstance = this
+      initial = initial(templateInstance.data) if _.isFunction(initial)
       viewmodel = templateInstance.viewmodel
       
       if _.isFunction initial?.onDestroyed
