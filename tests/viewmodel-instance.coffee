@@ -271,6 +271,15 @@ describe "ViewModel instance", ->
       assert.equal 'A', vm.location.address()
       assert.equal 'X', vm.location.name()
 
+    it "adds mix to vm", ->
+      vm = new ViewModel
+        mixin: [
+          { location: 'house' },
+          'person'
+        ]
+      assert.equal 'A', vm.location.address()
+      assert.equal 'X', vm.name()
+
   describe "share", ->
 
     beforeEach ->
@@ -312,3 +321,12 @@ describe "ViewModel instance", ->
           location: ['house', 'person']
       assert.equal 'A', vm.location.address()
       assert.equal 'X', vm.location.name()
+
+    it "adds mix to vm", ->
+      vm = new ViewModel
+        share: [
+          { location: 'house' },
+          'person'
+        ]
+      assert.equal 'A', vm.location.address()
+      assert.equal 'X', vm.name()

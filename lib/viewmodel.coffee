@@ -602,7 +602,10 @@ class ViewModel
     if toLoad
       if toLoad instanceof Array
         for element in toLoad
-          viewmodel.load collection[element]
+          if _.isString element
+            viewmodel.load collection[element]
+          else
+            loadObj element, collection, viewmodel
       else if _.isString toLoad
         viewmodel.load collection[toLoad]
       else

@@ -1,4 +1,8 @@
-﻿## 2.7.8
+﻿## 2.8.0
+
+* You can now add an array of strings and objects to mixin and share properties. 
+
+## 2.7.8
 
 * onCreated/onRendered/onDestroyed/autorun now work when defining the view model with a function.
 
