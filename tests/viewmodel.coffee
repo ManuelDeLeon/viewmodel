@@ -1389,21 +1389,20 @@ describe "ViewModel", ->
       assert.equal "X", parent
 
   describe "@assignChild", ->
-    beforeEach ->
-      @parentTemplateStub = sinon.stub ViewModel, 'parentTemplate'
 
     it "adds viewmodel to children", ->
       arr = []
-      @parentTemplateStub.returns
-        viewmodel:
+      vm =
+        parent: ->
           children: -> arr
-      ViewModel.assignChild "X"
+      ViewModel.assignChild vm
       assert.equal 1, arr.length
-      assert.equal "X", arr[0]
+      assert.equal vm, arr[0]
 
     it "doesn't do anything without a parent template", ->
-      @parentTemplateStub.returns null
-      ViewModel.assignChild "X"
+      vm =
+        parent: ->
+      ViewModel.assignChild vm
 
   describe "@templateName", ->
     it "returns body if the template is the body", ->

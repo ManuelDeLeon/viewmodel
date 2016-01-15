@@ -1,4 +1,8 @@
-﻿## 2.8.0
+﻿## 2.8.1
+
+* .children() uses the .parent instead of its own logic.
+
+## 2.8.0
 
 * You can now add an array of strings and objects to mixin and share properties. 
 

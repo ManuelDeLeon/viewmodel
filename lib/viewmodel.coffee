@@ -451,11 +451,7 @@ class ViewModel
     return
 
   @assignChild = (viewmodel) ->
-    parentTemplateInstance = ViewModel.parentTemplate(viewmodel.templateInstance)
-    while parentTemplateInstance and not parentTemplateInstance.viewmodel
-      parentTemplateInstance = ViewModel.parentTemplate(parentTemplateInstance)
-
-    parentTemplateInstance?.viewmodel.children().push(viewmodel)
+    viewmodel.parent()?.children().push(viewmodel)
     return
 
   @onRendered = (initial) ->
