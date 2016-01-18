@@ -1,4 +1,8 @@
-﻿## 2.9.0
+﻿## 2.9.1
+
+* Fix ViewModel.find
+
+## 2.9.0
 
 * Add ViewModel.find and ViewModel.findOne - They both take an optional string with the name of the template and an optional function to find a template.
 

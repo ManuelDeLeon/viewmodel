@@ -85,9 +85,9 @@ class ViewModel
       initial = initial(templateInstance.data) if _.isFunction(initial)
       currentDataAutorunSet = false
       viewmodel = template.createViewModel(templateInstance.data)
-      ViewModel.add viewmodel
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
+      ViewModel.add viewmodel
       if templateInstance.data?.ref
         parentTemplate = ViewModel.parentTemplate(templateInstance)
         if parentTemplate
