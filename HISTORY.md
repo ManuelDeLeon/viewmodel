@@ -1,4 +1,8 @@
-﻿## 2.8.1
+﻿## 2.9.0
+
+* Add ViewModel.find and ViewModel.findOne - They both take an optional string with the name of the template and an optional function to find a template.
+
+## 2.8.1
 
 * .children() uses the .parent instead of its own logic.
 

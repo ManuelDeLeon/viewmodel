@@ -43,11 +43,36 @@ class ViewModel
     defaultValue: 1
 
   @bindObjects = {}
+
   @byId = {}
+  @byTemplate = {}
   @add = (viewmodel) ->
     ViewModel.byId[viewmodel.vmId] = viewmodel
+    templateName = ViewModel.templateName(viewmodel.templateInstance)
+    if templateName
+      if not ViewModel.byTemplate[templateName]
+        ViewModel.byTemplate[templateName] = {}
+      ViewModel.byTemplate[templateName][viewmodel.vmId] = viewmodel
+
   @remove = (viewmodel) ->
     delete ViewModel.byId[viewmodel.vmId]
+    templateName = ViewModel.templateName(viewmodel.templateInstance)
+    if templateName
+      delete ViewModel.byTemplate[templateName][viewmodel.byId]
+
+  @find = (templateNameOrPredicate, predicateOrNothing) ->
+    templateName = _.isString(templateNameOrPredicate) and templateNameOrPredicate
+    predicate = if templateName then predicateOrNothing else _.isFunction(templateNameOrPredicate) and templateNameOrPredicate
+
+    vmCollection = if templateName then ViewModel.byTemplate[templateName] else ViewModel.byId
+    vmCollectionValues = _.values(vmCollection)
+    if predicate
+      return _.filter(vmCollection, predicate)
+    else
+      return vmCollectionValues
+
+  @findOne = (templateNameOrPredicate, predicateOrNothing) ->
+    return _.first ViewModel.find( templateNameOrPredicate, predicateOrNothing )
 
   @check = (key, args...) ->
     if Meteor.isDev and not ViewModel.ignoreErrors
@@ -675,7 +700,8 @@ class ViewModel
       return
 
   @templateName = (templateInstance) ->
-    name = templateInstance.view.name
+    name = templateInstance?.view?.name
+    return '' if not name
     if name is 'body' then name else name.substr(name.indexOf('.') + 1)
 
   vmHash: ->

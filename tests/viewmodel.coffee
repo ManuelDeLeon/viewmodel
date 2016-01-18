@@ -28,6 +28,9 @@ describe "ViewModel", ->
       beforeEach ->
         @viewmodel =
           vmId: 1
+          templateInstance:
+            view:
+              name: 'Template.A'
           parent: -> undefined
         @instance =
           autorun: (f) -> f()
@@ -38,6 +41,12 @@ describe "ViewModel", ->
         ViewModel.add @viewmodel
         ViewModel.onDestroyed().call @instance
         assert.isUndefined ViewModel.byId[1]
+
+      xit "removes the view model from ViewModel.byTemplate", ->
+        ViewModel.byTemplate = {}
+        ViewModel.add @viewmodel
+        ViewModel.onDestroyed().call @instance
+        assert.isUndefined ViewModel.byTemplate['A'][1]
 
       it "calls viewmodel.onDestroyed", ->
         ran = false
@@ -189,10 +198,15 @@ describe "ViewModel", ->
         @retFun.call @instance
         assert.isTrue @instance.viewmodel instanceof ViewModel
 
-      it "adds the viewmodel to ViewModel.all", ->
+      it "adds the viewmodel to ViewModel.byId", ->
         ViewModel.byId = {}
         @retFun.call @instance
         assert.equal @instance.viewmodel, ViewModel.byId[@instance.viewmodel.vmId]
+
+      xit "adds the viewmodel to ViewModel.byTemplate", ->
+        ViewModel.byTemplate = {}
+        @retFun.call @instance
+        assert.equal @instance.viewmodel, ViewModel.byTemplate['body'][@instance.viewmodel.vmId]
 
       it "adds templateInstance to the view model", ->
         @retFun.call @instance
@@ -1416,3 +1430,79 @@ describe "ViewModel", ->
         view:
           name: 'Template.mine'
       assert.equal 'mine', name
+
+  describe "@find", ->
+    before ->
+      ViewModel.byId = {}
+      ViewModel.byTemplate = {}
+      @vm1 = new ViewModel
+        vmId: 1
+        name: 'A'
+        age: 2
+      @vm1.templateInstance =
+        view:
+          name: 'Template.X'
+      ViewModel.add @vm1
+      @vm2 = new ViewModel
+        vmId: 2
+        name: 'B'
+        age: 1
+      @vm2.templateInstance =
+        view:
+          name: 'Template.X'
+      ViewModel.add @vm2
+      @vm3 = new ViewModel
+        vmId: 3
+        name: 'C'
+        age: 1
+      @vm3.templateInstance =
+        view:
+          name: 'Template.Y'
+      ViewModel.add @vm3
+
+
+    it "returns all without parameters", ->
+      vms = ViewModel.find()
+      assert.isTrue vms instanceof Array
+      assert.equal 3, vms.length
+      assert.equal @vm1, vms[0]
+      assert.equal @vm2, vms[1]
+      assert.equal @vm3, vms[2]
+
+    it "returns all for template X", ->
+      vms = ViewModel.find('X')
+      assert.isTrue vms instanceof Array
+      assert.equal 2, vms.length
+      assert.equal @vm1, vms[0]
+      assert.equal @vm2, vms[1]
+
+    it "returns all for template X with a predicate", ->
+      vms = ViewModel.find('X', (vm) -> vm.name() is 'B')
+      assert.isTrue vms instanceof Array
+      assert.equal 1, vms.length
+      assert.equal @vm2, vms[0]
+
+    it "returns all for a predicate", ->
+      vms = ViewModel.find((vm) -> vm.age() is 1)
+      assert.isTrue vms instanceof Array
+      assert.equal 2, vms.length
+      assert.equal @vm2, vms[0]
+      assert.equal @vm3, vms[1]
+
+    describe "@findOne", ->
+
+      it "returns first one without params", ->
+        vm = ViewModel.findOne()
+        assert.equal @vm1, vm
+
+      it "returns first for template X", ->
+        vm = ViewModel.findOne('X')
+        assert.equal @vm1, vm
+
+      it "returns first for template X with predicate", ->
+        vm = ViewModel.findOne('X', (vm) -> vm.name() is 'B')
+        assert.equal @vm2, vm
+
+      it "returns first with predicate", ->
+        vm = ViewModel.findOne((vm) -> vm.age() is 1)
+        assert.equal @vm2, vm
