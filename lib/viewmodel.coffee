@@ -712,8 +712,7 @@ class ViewModel
 
     if viewmodel.vmTag
       key += viewmodel.vmTag()
-
-    if viewmodel._id
+    else if viewmodel._id
       key += viewmodel._id()
     else
       key += viewmodel.vmPathToParent()

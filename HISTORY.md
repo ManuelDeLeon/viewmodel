@@ -1,4 +1,8 @@
-﻿## 2.9.1
+﻿## 2.9.2
+
+* Warn if you try to put _id on the url without specifying a vmTag property.
+
+## 2.9.1
 
 * Fix ViewModel.find
 

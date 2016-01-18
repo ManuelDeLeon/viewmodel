@@ -91,6 +91,7 @@ getSavedData = (url = document.URL) ->
 
 ViewModel.saveUrl = (viewmodel) ->
   viewmodel.templateInstance.autorun (c) ->
+    ViewModel.check '@saveUrl', viewmodel
     vmHash = viewmodel.vmHash()
     url = window.location.href
     savedData = getSavedData() or {}
