@@ -58,7 +58,7 @@ class ViewModel
     delete ViewModel.byId[viewmodel.vmId]
     templateName = ViewModel.templateName(viewmodel.templateInstance)
     if templateName
-      delete ViewModel.byTemplate[templateName][viewmodel.byId]
+      delete ViewModel.byTemplate[templateName][viewmodel.vmId]
 
   @find = (templateNameOrPredicate, predicateOrNothing) ->
     templateName = _.isString(templateNameOrPredicate) and templateNameOrPredicate
