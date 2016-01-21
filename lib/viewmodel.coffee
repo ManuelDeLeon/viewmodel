@@ -428,7 +428,13 @@ class ViewModel
         if container instanceof ViewModel and not primitive and not container[name]
           container[name] = ViewModel.makeReactiveProperty(undefined)
 
-        if primitive or not (`name in container`)
+        if !primitive and !container?
+          errorMsg = "Can't access '#{name}' of #{container}."
+          if viewmodel
+            templateName = ViewModel.templateName(viewmodel.templateInstance)
+            errorMsg += " This is for template '#{templateName}'."
+          console.error errorMsg
+        else if primitive or not (`name in container`)
           value = getPrimitive(name)
         else
           if _.isFunction(container[name])

@@ -42,9 +42,10 @@ describe "ViewModel", ->
         ViewModel.onDestroyed().call @instance
         assert.isUndefined ViewModel.byId[1]
 
-      xit "removes the view model from ViewModel.byTemplate", ->
+      it "removes the view model from ViewModel.byTemplate", ->
         ViewModel.byTemplate = {}
         ViewModel.add @viewmodel
+        assert.ok ViewModel.byTemplate['A'][1]
         ViewModel.onDestroyed().call @instance
         assert.isUndefined ViewModel.byTemplate['A'][1]
 
@@ -203,7 +204,7 @@ describe "ViewModel", ->
         @retFun.call @instance
         assert.equal @instance.viewmodel, ViewModel.byId[@instance.viewmodel.vmId]
 
-      xit "adds the viewmodel to ViewModel.byTemplate", ->
+      it "adds the viewmodel to ViewModel.byTemplate", ->
         ViewModel.byTemplate = {}
         @retFun.call @instance
         assert.equal @instance.viewmodel, ViewModel.byTemplate['body'][@instance.viewmodel.vmId]

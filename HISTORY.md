@@ -1,4 +1,9 @@
-﻿## 2.9.2
+﻿## 2.9.3
+
+* Fix cleanup when a template is destroyed. It was leaving a reference to the view model on ViewModel.byTemplate
+* Give a better error when trying to access a property of undefined/null in the template.
+
+## 2.9.2
 
 * Warn if you try to put _id on the url without specifying a vmTag property.
 
