@@ -39,6 +39,124 @@ describe "ViewModel instance", ->
         fun: f
       assert.equal f, vm.fun
 
+    describe "loading hooks direct", ->
+      beforeEach ->
+        ViewModel.mixins = {}
+        ViewModel.mixin
+          hooksMixin:
+            onCreated: -> 'onCreatedMixin'
+            onRendered: -> 'onRenderedMixin'
+            onDestroyed: -> 'onDestroyedMixin'
+            autorun: -> 'autorunMixin'
+        ViewModel.shared = {}
+        ViewModel.share
+          hooksShare:
+            onCreated: -> 'onCreatedShare'
+            onRendered: -> 'onRenderedShare'
+            onDestroyed: -> 'onDestroyedShare'
+            autorun: -> 'autorunShare'
+              
+        @viewmodel = new ViewModel
+          share: 'hooksShare'
+          mixin: 'hooksMixin'
+          load:
+            onCreated: -> 'onCreatedLoad'
+            onRendered: -> 'onRenderedLoad'
+            onDestroyed: -> 'onDestroyedLoad'
+            autorun: -> 'autorunLoad'
+          onCreated: -> 'onCreatedBase'
+          onRendered: -> 'onRenderedBase'
+          onDestroyed: -> 'onDestroyedBase'
+          autorun: -> 'autorunBase'
+        return
+
+      it "adds hooks to onCreated", ->
+        assert.equal @viewmodel.vmOnCreated.length, 4
+        assert.equal @viewmodel.vmOnCreated[0](), 'onCreatedShare'
+        assert.equal @viewmodel.vmOnCreated[1](), 'onCreatedMixin'
+        assert.equal @viewmodel.vmOnCreated[2](), 'onCreatedLoad'
+        assert.equal @viewmodel.vmOnCreated[3](), 'onCreatedBase'
+      it "adds hooks to onRendered", ->
+        assert.equal @viewmodel.vmOnRendered.length, 4
+        assert.equal @viewmodel.vmOnRendered[0](), 'onRenderedShare'
+        assert.equal @viewmodel.vmOnRendered[1](), 'onRenderedMixin'
+        assert.equal @viewmodel.vmOnRendered[2](), 'onRenderedLoad'
+        assert.equal @viewmodel.vmOnRendered[3](), 'onRenderedBase'
+      it "adds hooks to onDestroyed", ->
+        assert.equal @viewmodel.vmOnDestroyed.length, 4
+        assert.equal @viewmodel.vmOnDestroyed[0](), 'onDestroyedShare'
+        assert.equal @viewmodel.vmOnDestroyed[1](), 'onDestroyedMixin'
+        assert.equal @viewmodel.vmOnDestroyed[2](), 'onDestroyedLoad'
+        assert.equal @viewmodel.vmOnDestroyed[3](), 'onDestroyedBase'
+      it "adds hooks to autorun", ->
+        assert.equal @viewmodel.vmAutorun.length, 4
+        assert.equal @viewmodel.vmAutorun[0](), 'autorunShare'
+        assert.equal @viewmodel.vmAutorun[1](), 'autorunMixin'
+        assert.equal @viewmodel.vmAutorun[2](), 'autorunLoad'
+        assert.equal @viewmodel.vmAutorun[3](), 'autorunBase'
+
+  describe "load order", ->
+    beforeEach ->
+      ViewModel.mixins = {}
+      ViewModel.mixin
+        name:
+          name: 'mixin'
+      ViewModel.shared = {}
+      ViewModel.share
+        name:
+          name: 'share'
+
+      ViewModel.signals = {}
+      ViewModel.signal
+        name:
+          name:
+            target: document
+            event: 'keydown'
+
+    it "loads base name last", ->
+      vm = new ViewModel({
+        name: 'base',
+        load: {
+          name: 'load'
+        },
+        mixin: 'name',
+        share: 'name',
+        signal: 'name'
+      })
+      assert.equal vm.name(), "base"
+
+    it "loads from load 2nd to last", ->
+      vm = new ViewModel({
+        load: {
+          name: 'load'
+        },
+        mixin: 'name',
+        share: 'name',
+        signal: 'name'
+      })
+      assert.equal vm.name(), "load"
+
+    it "loads from mixin 3rd to last", ->
+      vm = new ViewModel({
+        mixin: 'name',
+        share: 'name',
+        signal: 'name'
+      })
+      assert.equal vm.name(), "mixin"
+
+    it "loads from share 4th to last", ->
+      vm = new ViewModel({
+        share: 'name',
+        signal: 'name'
+      })
+      assert.equal vm.name(), "share"
+
+    it "loads from signal first", ->
+      vm = new ViewModel({
+        signal: 'name'
+      })
+      assert.equal _.keys(vm.name()).length, 0
+
   describe "#bind", ->
 
     beforeEach ->

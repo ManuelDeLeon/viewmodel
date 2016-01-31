@@ -28,6 +28,7 @@ describe "ViewModel", ->
       beforeEach ->
         @viewmodel =
           vmId: 1
+          vmOnDestroyed: []
           templateInstance:
             view:
               name: 'Template.A'
@@ -51,31 +52,15 @@ describe "ViewModel", ->
 
       it "calls viewmodel.onDestroyed", ->
         ran = false
-        initial =
+        @instance.viewmodel = new ViewModel
           onDestroyed: -> ran = true
-        ViewModel.onDestroyed(initial).call @instance
-        assert.isTrue ran
 
-      it "calls viewmodel.load { onDestroyed }", ->
-        ran = false
-        initial =
-          load:
-            onDestroyed: -> ran = true
-        ViewModel.onDestroyed(initial).call @instance
-        assert.isTrue ran
+        @instance.viewmodel.templateInstance =
+          view:
+            name: 'Template.A'
 
-      it "calls viewmodel.load [{ onDestroyed }]", ->
-        ran1 = false
-        ran2 = false
-        initial =
-          load: [
-            { onDestroyed: -> ran1 = true },
-            { onDestroyed: -> ran2 = true }
-          ]
-          
-        ViewModel.onDestroyed(initial).call @instance
-        assert.isTrue ran1
-        assert.isTrue ran2
+        ViewModel.onDestroyed({}).call @instance
+        assert.isTrue ran
 
   describe "@onRendered", ->
 
@@ -85,9 +70,10 @@ describe "ViewModel", ->
     describe "return function", ->
       afterFlush = Tracker.afterFlush
       beforeEach ->
+        @viewmodel = new ViewModel()
         @instance =
           autorun: (f) -> f()
-          viewmodel: {}
+          viewmodel: @viewmodel
         afterFlush = Tracker.afterFlush
         Tracker.afterFlush = (f) -> f()
 
@@ -100,70 +86,16 @@ describe "ViewModel", ->
 
       it "sets autorun for single function", ->
         ran = false
-        initial =
-          autorun: -> ran = true
-        ViewModel.onRendered(initial).call @instance
+        @viewmodel.vmAutorun.push -> ran = true
+        ViewModel.onRendered({}).call @instance
         assert.isTrue ran
-
-      it "sets autorun for load object", ->
-        ran = false
-        initial =
-          load:
-            autorun: -> ran = true
-        ViewModel.onRendered(initial).call @instance
-        assert.isTrue ran
-
-      it "sets autorun for array of functions", ->
-        ran1 = false
-        ran2 = false
-        initial =
-          autorun: [
-            (-> ran1 = true)
-            (-> ran2 = true)
-          ]
-        ViewModel.onRendered(initial).call @instance
-        assert.isTrue ran1
-        assert.isTrue ran2
-
-      it "sets autorun for load array", ->
-        ran1 = false
-        ran2 = false
-        initial =
-          load: [
-            { autorun: -> ran1 = true },
-            { autorun: -> ran2 = true }
-          ]
-        ViewModel.onRendered(initial).call @instance
-        assert.isTrue ran1
-        assert.isTrue ran2
 
       it "calls viewmodel.onRendered", ->
         ran = false
-        initial =
-          onRendered: -> ran = true
-        ViewModel.onRendered(initial).call @instance
+        @viewmodel.vmOnRendered.push -> ran = true
+        ViewModel.onRendered({}).call @instance
         assert.isTrue ran
 
-      it "calls viewmodel.load { onRendered }", ->
-        ran = false
-        initial =
-          load:
-            onRendered: -> ran = true
-        ViewModel.onRendered(initial).call @instance
-        assert.isTrue ran
-
-      it "calls viewmodel.load [{ onRendered }]", ->
-        ran1 = false
-        ran2 = false
-        initial =
-          load: [
-            { onRendered: -> ran1 = true },
-            { onRendered: -> ran2 = true }
-          ]
-
-        ViewModel.onRendered(initial).call @instance
-        assert.isTrue ran1
-        assert.isTrue ran2
 
 
   describe "@onCreated", ->
@@ -1360,11 +1292,10 @@ describe "ViewModel", ->
       onCreatedStub = sinon.stub ViewModel, 'onCreated'
       onCreatedStub.returns f
       templateInstance =
-        viewmodel: {}
+        viewmodel: new ViewModel()
         view:
           onViewDestroyed: -> onViewDestroyedCalled = true
-          template:
-            viewmodel: ->
+          template: {}
       ViewModel.addEmptyViewModel(templateInstance)
       assert.equal context, templateInstance
       assert.isTrue onViewDestroyedCalled

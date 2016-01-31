@@ -47,7 +47,7 @@ addBinding
 addBinding
   name: 'value'
   events:
-    'input propertychange': (bindArg) ->
+    'change input propertychange': (bindArg) ->
       newVal = bindArg.element.val()
       bindArg.setVmValue(newVal) if newVal isnt bindArg.getVmValue()
 

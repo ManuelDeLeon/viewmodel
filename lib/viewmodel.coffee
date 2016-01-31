@@ -14,6 +14,7 @@ class ViewModel
     events: 1
     share: 1
     mixin: 1
+    signal: 1
     ref: 1
     load: 1
     onRendered: 1
@@ -24,8 +25,11 @@ class ViewModel
   # when defining a view model
   @reserved =
     vmId: 1
-    vmHashCache: 1
     vmPathToParent: 1
+    vmOnCreated: 1
+    vmOnRendered: 1
+    vmOnDestroyed: 1
+    vmAutorun: 1
     templateInstance: 1
     parent: 1
     children: 1
@@ -83,47 +87,40 @@ class ViewModel
     return ->
       templateInstance = this
       initial = initial(templateInstance.data) if _.isFunction(initial)
-      currentDataAutorunSet = false
       viewmodel = template.createViewModel(templateInstance.data)
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
       ViewModel.add viewmodel
+
+      autoLoadData = ->
+        templateInstance.autorun ->
+          viewmodel.load Template.currentData()
+      if Tracker.currentComputation
+        Tracker.afterFlush autoLoadData
+      else
+        autoLoadData()
+
+      for fun in viewmodel.vmOnCreated
+        fun.call viewmodel, templateInstance
+
       if templateInstance.data?.ref
         parentTemplate = ViewModel.parentTemplate(templateInstance)
         if parentTemplate
           if not parentTemplate.viewmodel
             ViewModel.addEmptyViewModel(parentTemplate)
           viewmodel.parent()[templateInstance.data.ref] = viewmodel
-      Tracker.afterFlush ->
-        if not currentDataAutorunSet
-          currentDataAutorunSet = true
-          templateInstance.autorun ->
-            viewmodel.load Template.currentData()
-            return
-        ViewModel.assignChild(viewmodel)
-        ViewModel.delay 0, ->
-          vmHash = viewmodel.vmHash()
-          if migrationData = Migration.get(vmHash)
-            viewmodel.load(migrationData)
-            ViewModel.removeMigration viewmodel, vmHash
-          if viewmodel.onUrl
-            ViewModel.loadUrl viewmodel
-            ViewModel.saveUrl viewmodel
 
-          if _.isFunction initial?.onCreated
-            initial.onCreated.call viewmodel, templateInstance
-    
-          if initial?.load
-            if initial.load instanceof Array
-              for obj in initial.load when _.isFunction obj.onCreated
-                obj.onCreated.call viewmodel, templateInstance
-            else if _.isFunction initial.load.onCreated
-              initial.load.onCreated.call viewmodel, templateInstance
 
-      if not Tracker.currentComputation
-        currentDataAutorunSet = true
-        templateInstance.autorun ->
-          viewmodel.load Template.currentData()
+      ViewModel.delay 0, ->
+        vmHash = viewmodel.vmHash()
+        if migrationData = Migration.get(vmHash)
+          viewmodel.load(migrationData)
+          ViewModel.removeMigration viewmodel, vmHash
+        if viewmodel.onUrl
+          ViewModel.loadUrl viewmodel
+          ViewModel.saveUrl viewmodel
+
+      ViewModel.assignChild(viewmodel)
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -131,7 +128,6 @@ class ViewModel
           helpers[prop] = (args...) -> Template.instance().viewmodel[prop](args...)
 
       template.helpers helpers
-
 
       return
 
@@ -231,6 +227,8 @@ class ViewModel
     funProp.delay = 0
     funProp.id = ViewModel.nextId()
 
+    # to give the feel of non reactivity
+    Object.defineProperty funProp, 'value', { get: -> _value}
 
     return funProp
 
@@ -493,42 +491,14 @@ class ViewModel
 
       ViewModel.check "@onRendered", initial.autorun, templateInstance
 
-      if _.isFunction initial?.onRendered
-        ViewModel.delay 0, ->
-          initial.onRendered.call viewmodel, templateInstance
+      for fun in viewmodel.vmOnRendered
+        fun.call viewmodel, templateInstance
 
-      if initial?.load
-        ViewModel.delay 0, ->
-          if initial.load instanceof Array
-            for obj in initial.load when _.isFunction obj.onRendered
-              do (obj) ->
-                obj.onRendered.call viewmodel, templateInstance
-          else if _.isFunction initial.load.onRendered
-            initial.load.onRendered.call viewmodel, templateInstance
+      for autorun in viewmodel.vmAutorun
+        do (autorun) ->
+          fun = (c) -> autorun.call(viewmodel, c)
+          templateInstance.autorun fun
 
-      loadAutorun = (initialAutorun) ->
-        if _.isFunction initialAutorun
-          fun = (c) -> initialAutorun.call(viewmodel, c)
-          ViewModel.delay 0, -> templateInstance.autorun fun
-        else if initialAutorun instanceof Array
-          for autorun in initialAutorun
-            do (autorun) ->
-              fun = (c) -> autorun.call(viewmodel, c)
-              do (fun) ->
-                ViewModel.delay 0, -> templateInstance.autorun fun
-        return
-
-      loadAutorun initial.autorun
-      if initial.load
-        if initial.load instanceof Array
-          for obj in initial.load
-            ViewModel.check "@onRendered", obj.autorun, templateInstance
-            loadAutorun obj.autorun
-        else
-          loadAutorun initial.load.autorun
-
-
-          
       return
 
   @loadProperties = (toLoad, container) ->
@@ -559,9 +529,59 @@ class ViewModel
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
     return
 
+  loadMixinShare = (toLoad, collection, viewmodel) ->
+    if toLoad
+      if toLoad instanceof Array
+        for element in toLoad
+          if _.isString element
+            viewmodel.load collection[element]
+          else
+            loadMixinShare element, collection, viewmodel
+      else if _.isString toLoad
+        viewmodel.load collection[toLoad]
+      else
+        for ref of toLoad
+          container = {}
+          mixshare = toLoad[ref]
+          if mixshare instanceof Array
+            for item in mixshare
+              ViewModel.loadProperties collection[item], container
+          else
+            ViewModel.loadProperties collection[mixshare], container
+          viewmodel[ref] = container
+    return
+
   load: (toLoad) ->
+    return if not toLoad
     viewmodel = this
+
+    # Signals are loaded 1st
+    signals = ViewModel.signalToLoad(toLoad.signal)
+    for signal in signals
+      viewmodel.load signal
+      viewmodel.vmOnCreated.push signal.onCreated
+      viewmodel.vmOnDestroyed.push signal.onDestroyed
+
+    # Shared are loaded 2nd
+    loadMixinShare toLoad.share, ViewModel.shared, viewmodel
+
+    # Mixins are loaded 3rd
+    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel
+
+    # Whatever is in 'load' is loaded before direct properties
+    viewmodel.load toLoad.load
+
+    # Direct properties are loaded last.
     ViewModel.loadProperties toLoad, viewmodel
+
+    hooks =
+      onCreated: 'vmOnCreated'
+      onRendered: 'vmOnRendered'
+      onDestroyed: 'vmOnDestroyed'
+      autorun: 'vmAutorun'
+    for hook, vmProp of hooks when toLoad[hook]
+      viewmodel[vmProp].push toLoad[hook]
+    #Load onCreated/onRendered/onDestroyed/autorun
 
   parent: (args...) ->
     ViewModel.check "#parent", args...
@@ -625,37 +645,21 @@ class ViewModel
       i++
     return
 
-  loadObj = (toLoad, collection, viewmodel) ->
-    if toLoad
-      if toLoad instanceof Array
-        for element in toLoad
-          if _.isString element
-            viewmodel.load collection[element]
-          else
-            loadObj element, collection, viewmodel
-      else if _.isString toLoad
-        viewmodel.load collection[toLoad]
-      else
-        for ref of toLoad
-          container = {}
-          mixshare = toLoad[ref]
-          if mixshare instanceof Array
-            for item in mixshare
-              ViewModel.loadProperties collection[item], container
-          else
-            ViewModel.loadProperties collection[mixshare], container
-          viewmodel[ref] = container
-    return
-
   constructor: (initial) ->
     ViewModel.check "#constructor", initial
     viewmodel = this
     viewmodel.vmId = ViewModel.nextId()
-    viewmodel.vmHashCache = null
-    if initial
-      viewmodel.load initial
-      viewmodel.load initial.load
+
+    # These will be filled from load/mixin/share/initial
+    @vmOnCreated = []
+    @vmOnRendered = []
+    @vmOnDestroyed = []
+    @vmAutorun = []
+
+    viewmodel.load initial
+
     @children = childrenProperty()
+
     viewmodel.vmPathToParent = ->
       viewmodelPath = ViewModel.getPathTo(viewmodel.templateInstance.firstNode)
       if not viewmodel.parent()
@@ -665,9 +669,7 @@ class ViewModel
       i++ while parentPath[i] is viewmodelPath[i] and parentPath[i]?
       difference = viewmodelPath.substr(i)
       return difference
-    if initial
-      loadObj initial.share, ViewModel.shared, viewmodel
-      loadObj initial.mixin, ViewModel.mixins, viewmodel
+
 
     return
 
@@ -682,16 +684,9 @@ class ViewModel
       templateInstance = this
       initial = initial(templateInstance.data) if _.isFunction(initial)
       viewmodel = templateInstance.viewmodel
-      
-      if _.isFunction initial?.onDestroyed
-        initial.onDestroyed.call viewmodel, templateInstance
 
-      if initial?.load
-        if initial.load instanceof Array
-          for obj in initial.load when _.isFunction obj.onDestroyed
-            obj.onDestroyed.call viewmodel, templateInstance
-        else if _.isFunction initial.load.onDestroyed
-          initial.load.onDestroyed.call viewmodel, templateInstance
+      for fun in viewmodel.vmOnDestroyed
+        fun.call viewmodel, templateInstance
 
       parent = viewmodel.parent()
       if parent
@@ -723,8 +718,7 @@ class ViewModel
     else
       key += viewmodel.vmPathToParent()
 
-    viewmodel.vmHashCache = SHA256(key).toString()
-    viewmodel.vmHashCache
+    return SHA256(key).toString()
 
   @removeMigration = (viewmodel, vmHash) ->
     Migration.delete vmHash
@@ -746,3 +740,32 @@ class ViewModel
     for key, value of obj
       ViewModel.mixins[key] = value
     return
+
+  @signals = {}
+  @signal = (obj) ->
+    for key, value of obj
+      ViewModel.signals[key] = value
+    return
+
+  signalContainer = (containerName) ->
+    all = []
+    return all if not containerName
+    signalObject = ViewModel.signals[containerName]
+    for key, value of signalObject
+      do (key, value) ->
+        single = {}
+        single[key] = {}
+        boundProp = "_#{key}_Bound"
+        single.onCreated = ->
+          this[boundProp] = this[key].bind(this)
+          value.target.addEventListener value.event, this[boundProp]
+        single.onDestroyed = ->
+          value.target.removeEventListener this[boundProp]
+        all.push single
+    return all
+
+  @signalToLoad = (container) ->
+    if container instanceof Array
+      _.flatten( (signalContainer(name) for name in container), true )
+    else
+      signalContainer container

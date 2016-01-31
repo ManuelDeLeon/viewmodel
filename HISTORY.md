@@ -1,4 +1,14 @@
-﻿## 2.9.3
+﻿## 3.0.0
+
+* Add signals to capture stream of events that happen outside the view models.
+* Fix options binding on Firefox
+* Set order of load priority: direct props, from load, mixin, share, signal
+
+### BREAKING CHANGES
+
+* onCreated now runs when the template is created. This means, by the time onCreated is called, the view model will not have properties automatically added from the markup. I don't expect this to affect many people, if at all. You should be able to upgrade without a problem.
+
+## 2.9.3
 
 * Fix cleanup when a template is destroyed. It was leaving a reference to the view model on ViewModel.byTemplate
 * Give a better error when trying to access a property of undefined/null in the template.
