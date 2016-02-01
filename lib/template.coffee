@@ -40,7 +40,6 @@ Blaze.Template.prototype.viewmodel = (initial) ->
 
 Blaze.Template.prototype.createViewModel = (context) ->
   template = this
-  ViewModel.check 'T#createViewModel', context, template
   initial = ViewModel.getInitialObject template.viewmodelInitial, context
   viewmodel = new ViewModel(initial)
   viewmodel
