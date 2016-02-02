@@ -69,6 +69,7 @@ class ViewModel
     predicate = if templateName then predicateOrNothing else _.isFunction(templateNameOrPredicate) and templateNameOrPredicate
 
     vmCollection = if templateName then ViewModel.byTemplate[templateName] else ViewModel.byId
+    return undefined if not vmCollection
     vmCollectionValues = _.values(vmCollection)
     if predicate
       return _.filter(vmCollection, predicate)
@@ -92,14 +93,6 @@ class ViewModel
       viewmodel.templateInstance = templateInstance
       ViewModel.add viewmodel
 
-      autoLoadData = ->
-        templateInstance.autorun ->
-          viewmodel.load Template.currentData()
-      if Tracker.currentComputation
-        Tracker.afterFlush autoLoadData
-      else
-        autoLoadData()
-
       for fun in viewmodel.vmOnCreated
         fun.call viewmodel, templateInstance
 
@@ -110,8 +103,8 @@ class ViewModel
             ViewModel.addEmptyViewModel(parentTemplate)
           viewmodel.parent()[templateInstance.data.ref] = viewmodel
 
-
       ViewModel.delay 0, ->
+        ViewModel.assignChild(viewmodel)
         vmHash = viewmodel.vmHash()
         if migrationData = Migration.get(vmHash)
           viewmodel.load(migrationData)
@@ -120,7 +113,13 @@ class ViewModel
           ViewModel.loadUrl viewmodel
           ViewModel.saveUrl viewmodel
 
-      ViewModel.assignChild(viewmodel)
+      autoLoadData = ->
+        templateInstance.autorun ->
+          viewmodel.load Template.currentData()
+      if Tracker.currentComputation
+        ViewModel.delay 0, autoLoadData
+      else
+        autoLoadData()
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -494,10 +493,11 @@ class ViewModel
       for fun in viewmodel.vmOnRendered
         fun.call viewmodel, templateInstance
 
-      for autorun in viewmodel.vmAutorun
-        do (autorun) ->
-          fun = (c) -> autorun.call(viewmodel, c)
-          templateInstance.autorun fun
+      Tracker.afterFlush ->
+        for autorun in viewmodel.vmAutorun
+          do (autorun) ->
+            fun = (c) -> autorun.call(viewmodel, c)
+            templateInstance.autorun fun
 
       return
 

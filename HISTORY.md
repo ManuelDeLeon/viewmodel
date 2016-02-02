@@ -2,7 +2,8 @@
 
 * Add signals to capture stream of events that happen outside the view models.
 * Fix options binding on Firefox
-* Set order of load priority: direct props, from load, mixin, share, signal
+* Set order of load priority: context props, direct props, from load, mixin, share, signal
+* Return undefined when ViewModel.find and .findOne can't find the given template
 
 ### BREAKING CHANGES
 
