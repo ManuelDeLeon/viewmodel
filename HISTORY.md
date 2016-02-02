@@ -4,10 +4,12 @@
 * Fix options binding on Firefox
 * Set order of load priority: context props, direct props, from load, mixin, share, signal
 * Return undefined when ViewModel.find and .findOne can't find the given template
+* onCreated now runs when the template is created.
 
 ### BREAKING CHANGES
 
-* onCreated now runs when the template is created. This means, by the time onCreated is called, the view model will not have properties automatically added from the markup. I don't expect this to affect many people, if at all. You should be able to upgrade without a problem.
+* onCreated now runs when the template is created. This means, by the time onCreated is called, the view model will not have properties automatically added from the markup. I don't expect this to affect many people, if at all. You should be able to upgrade without a problem. Check where you use onCreated just to make sure.
+* The order of load priority is now: context props, direct props, from load, mixin, share, signal. This will only affect you if you use the same property name multiple times in the same view model. For example if you have a mixin with a property `name` and a view model that uses that mixin and also has `name` defined for itself. In those cases check that you're getting the expected result.
 
 ## 2.9.3
 
