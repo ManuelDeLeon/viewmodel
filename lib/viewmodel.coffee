@@ -772,7 +772,8 @@ class ViewModel
           viewmodel[boundProp] = viewmodel[key].bind(viewmodel)
           func = (e) ->
             viewmodel[boundProp] transform(e)
-          value.target.addEventListener value.event, func
+          funcToUse = if value.throttle then _.throttle( func, value.throttle ) else func
+          value.target.addEventListener value.event, funcToUse
         single.onDestroyed = ->
           value.target.removeEventListener this[boundProp]
         all.push single

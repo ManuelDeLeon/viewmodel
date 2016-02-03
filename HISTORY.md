@@ -1,4 +1,8 @@
-﻿## 3.2.0
+﻿## 3.3.0
+
+* Add throttle to signals.
+
+## 3.2.0
 
 * Add a way to transform signals. See: https://viewmodel.meteor.com/docs/viewmodels#signal
 
