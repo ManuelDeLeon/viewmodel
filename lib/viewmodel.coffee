@@ -765,10 +765,14 @@ class ViewModel
       do (key, value) ->
         single = {}
         single[key] = {}
+        transform = value.transform or (e) -> e
         boundProp = "_#{key}_Bound"
         single.onCreated = ->
-          this[boundProp] = this[key].bind(this)
-          value.target.addEventListener value.event, this[boundProp]
+          viewmodel = this
+          viewmodel[boundProp] = viewmodel[key].bind(viewmodel)
+          func = (e) ->
+            viewmodel[boundProp] transform(e)
+          value.target.addEventListener value.event, func
         single.onDestroyed = ->
           value.target.removeEventListener this[boundProp]
         all.push single

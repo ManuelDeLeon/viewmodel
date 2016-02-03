@@ -1,4 +1,8 @@
-﻿## 3.1.2
+﻿## 3.2.0
+
+* Add a way to transform signals. See: https://viewmodel.meteor.com/docs/viewmodels#signal
+
+## 3.1.2
 
 * Fix onCreated/onRendered/onDestroyed/autorun when using an array of functions
 
