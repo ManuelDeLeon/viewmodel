@@ -33,6 +33,7 @@ class ViewModel
     templateInstance: 1
     parent: 1
     children: 1
+    child: 1
     reset: 1
     data: 1
 
@@ -673,11 +674,12 @@ class ViewModel
 
     return
 
-
-  ############
-  # Not Tested
-
-
+  child: (args...) ->
+    children = this.children(args...)
+    if children?.length
+      return children[0]
+    else
+      return undefined
 
   @onDestroyed = (initial) ->
     return ->

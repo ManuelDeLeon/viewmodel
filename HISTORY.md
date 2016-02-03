@@ -1,4 +1,8 @@
-﻿## 3.0.0
+﻿## 3.1.0
+
+* Add viewmodel.child method which returns the first child it finds with the given criteria. See the docs.
+
+## 3.0.0
 
 * Add signals to capture stream of events that happen outside the view models.
 * Fix options binding on Firefox
