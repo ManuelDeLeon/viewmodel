@@ -1,4 +1,8 @@
-﻿## 3.1.1
+﻿## 3.1.2
+
+* Fix onCreated/onRendered/onDestroyed/autorun when using an array of functions
+
+## 3.1.1
 
 * Fix onRendered so it happens after bindings are in place.
 

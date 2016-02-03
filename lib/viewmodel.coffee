@@ -586,8 +586,11 @@ class ViewModel
       onDestroyed: 'vmOnDestroyed'
       autorun: 'vmAutorun'
     for hook, vmProp of hooks when toLoad[hook]
-      viewmodel[vmProp].push toLoad[hook]
-    #Load onCreated/onRendered/onDestroyed/autorun
+      if toLoad[hook] instanceof Array
+        for item in toLoad[hook]
+          viewmodel[vmProp].push item
+      else
+        viewmodel[vmProp].push toLoad[hook]
 
   parent: (args...) ->
     ViewModel.check "#parent", args...
@@ -735,7 +738,7 @@ class ViewModel
     for key, value of obj
       ViewModel.shared[key] = {}
       for prop, content of value
-        if _.isFunction(content)
+        if _.isFunction(content) or ViewModel.properties[prop]
           ViewModel.shared[key][prop] = content
         else
           ViewModel.shared[key][prop] = ViewModel.makeReactiveProperty(content)
