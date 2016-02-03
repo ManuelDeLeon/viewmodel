@@ -1,4 +1,8 @@
-﻿## 3.1.0
+﻿## 3.1.1
+
+* Fix onRendered so it happens after bindings are in place.
+
+## 3.1.0
 
 * Add viewmodel.child method which returns the first child it finds with the given criteria. See the docs.
 

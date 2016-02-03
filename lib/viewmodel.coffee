@@ -94,8 +94,7 @@ class ViewModel
       viewmodel.templateInstance = templateInstance
       ViewModel.add viewmodel
 
-      for fun in viewmodel.vmOnCreated
-        fun.call viewmodel, templateInstance
+
 
       if templateInstance.data?.ref
         parentTemplate = ViewModel.parentTemplate(templateInstance)
@@ -121,6 +120,9 @@ class ViewModel
         ViewModel.delay 0, autoLoadData
       else
         autoLoadData()
+
+      for fun in viewmodel.vmOnCreated
+        fun.call viewmodel, templateInstance
 
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
@@ -491,15 +493,18 @@ class ViewModel
 
       ViewModel.check "@onRendered", initial.autorun, templateInstance
 
-      for fun in viewmodel.vmOnRendered
-        fun.call viewmodel, templateInstance
-
+      # onRendered happens before onViewReady
+      # We want bindings to be in place before we run
+      # the onRendered functions and autoruns
       Tracker.afterFlush ->
+        for fun in viewmodel.vmOnRendered
+          fun.call viewmodel, templateInstance
+
         for autorun in viewmodel.vmAutorun
           do (autorun) ->
             fun = (c) -> autorun.call(viewmodel, c)
             templateInstance.autorun fun
-
+        return
       return
 
   @loadProperties = (toLoad, container) ->
