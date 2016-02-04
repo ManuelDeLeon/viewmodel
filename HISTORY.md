@@ -1,4 +1,8 @@
-﻿## 3.3.0
+﻿## 3.3.1
+
+* Allow .load to load an array of objects with hooks (like onRendered)
+
+## 3.3.0
 
 * Add throttle to signals.
 

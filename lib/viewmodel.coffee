@@ -561,6 +561,9 @@ class ViewModel
     return if not toLoad
     viewmodel = this
 
+    if toLoad instanceof Array
+      viewmodel.load item for item in toLoad
+
     # Signals are loaded 1st
     signals = ViewModel.signalToLoad(toLoad.signal)
     for signal in signals

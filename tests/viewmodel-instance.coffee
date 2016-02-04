@@ -242,6 +242,11 @@ describe "ViewModel instance", ->
       @viewmodel.load({ name: 'Alan' })
       assert.equal 'Alan', @viewmodel.name()
 
+    it "adds onRendered from an array", ->
+      f = ->
+      @viewmodel.load([ onRendered: f ])
+      assert.equal f, @viewmodel.vmOnRendered[0]
+
     it "adds a properties from an array", ->
       @viewmodel.load([{ name: 'Alan' },{ two: 'Brito' }])
       assert.equal 'Alan', @viewmodel.name()
