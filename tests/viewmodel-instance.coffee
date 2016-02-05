@@ -264,6 +264,15 @@ describe "ViewModel instance", ->
       assert.equal 'Brito', @viewmodel.name()
       assert.equal old, @viewmodel.name
 
+    it "creates a new property when using replace = true", ->
+      @viewmodel.load({ name: 'Alan' })
+      old = @viewmodel.name
+      @viewmodel.load({ name: 'Brito' }, true)
+      theNew = @viewmodel.name
+      assert.equal 'Brito', @viewmodel.name()
+      assert.equal theNew, @viewmodel.name
+      assert.notEqual old, theNew
+
     it "doesn't do anything with null and undefined", ->
       @viewmodel.load(undefined )
       @viewmodel.load(null)

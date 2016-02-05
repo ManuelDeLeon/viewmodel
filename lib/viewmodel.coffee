@@ -428,7 +428,7 @@ class ViewModel
         if container instanceof ViewModel and not primitive and not container[name]
           container[name] = ViewModel.makeReactiveProperty(undefined)
 
-        if !primitive and not (container? and container[name]?)
+        if !primitive and not (container? and (container[name]? or _.isObject(container)))
           errorMsg = "Can't access '#{name}' of '#{container}'."
           if viewmodel
             templateName = ViewModel.templateName(viewmodel.templateInstance)
@@ -507,17 +507,17 @@ class ViewModel
         return
       return
 
-  @loadProperties = (toLoad, container) ->
+  @loadProperties = (toLoad, container, replace) ->
     loadObj = (obj) ->
       for key, value of obj when not (ViewModel.properties[key] or ViewModel.reserved[key])
         if _.isFunction(value)
-# we don't care, just take the new function
+          # we don't care, just take the new function
           container[key] = value
-        else if container[key]
-# keep the reference to the old property we already have
+        else if container[key] and not replace
+          # keep the reference to the old property we already have
           container[key] value
         else
-# Create a new property
+          # Create a new property
           container[key] = ViewModel.makeReactiveProperty(value);
       return
     if toLoad instanceof Array
@@ -535,16 +535,16 @@ class ViewModel
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
     return
 
-  loadMixinShare = (toLoad, collection, viewmodel) ->
+  loadMixinShare = (toLoad, collection, viewmodel, replace) ->
     if toLoad
       if toLoad instanceof Array
         for element in toLoad
           if _.isString element
-            viewmodel.load collection[element]
+            viewmodel.load collection[element], replace
           else
             loadMixinShare element, collection, viewmodel
       else if _.isString toLoad
-        viewmodel.load collection[toLoad]
+        viewmodel.load collection[toLoad], replace
       else
         for ref of toLoad
           container = {}
@@ -557,31 +557,31 @@ class ViewModel
           viewmodel[ref] = container
     return
 
-  load: (toLoad) ->
+  load: (toLoad, replace) ->
     return if not toLoad
     viewmodel = this
 
     if toLoad instanceof Array
-      viewmodel.load item for item in toLoad
+      viewmodel.load( item, replace ) for item in toLoad
 
     # Signals are loaded 1st
     signals = ViewModel.signalToLoad(toLoad.signal)
     for signal in signals
-      viewmodel.load signal
+      viewmodel.load signal, replace
       viewmodel.vmOnCreated.push signal.onCreated
       viewmodel.vmOnDestroyed.push signal.onDestroyed
 
     # Shared are loaded 2nd
-    loadMixinShare toLoad.share, ViewModel.shared, viewmodel
+    loadMixinShare toLoad.share, ViewModel.shared, viewmodel, replace
 
     # Mixins are loaded 3rd
-    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel
+    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel, replace
 
     # Whatever is in 'load' is loaded before direct properties
-    viewmodel.load toLoad.load
+    viewmodel.load toLoad.load, replace
 
     # Direct properties are loaded last.
-    ViewModel.loadProperties toLoad, viewmodel
+    ViewModel.loadProperties toLoad, viewmodel, replace
 
     hooks =
       onCreated: 'vmOnCreated'
@@ -668,7 +668,7 @@ class ViewModel
     @vmOnDestroyed = []
     @vmAutorun = []
 
-    viewmodel.load initial
+    viewmodel.load initial, true
 
     @children = childrenProperty()
 
@@ -772,10 +772,11 @@ class ViewModel
         boundProp = "_#{key}_Bound"
         single.onCreated = ->
           viewmodel = this
-          viewmodel[boundProp] = viewmodel[key].bind(viewmodel)
+          vmProp = viewmodel[key]
           func = (e) ->
-            viewmodel[boundProp] transform(e)
+            vmProp transform(e)
           funcToUse = if value.throttle then _.throttle( func, value.throttle ) else func
+          viewmodel[boundProp] = funcToUse
           value.target.addEventListener value.event, funcToUse
         single.onDestroyed = ->
           value.target.removeEventListener this[boundProp]

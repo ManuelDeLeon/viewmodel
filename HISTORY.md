@@ -1,4 +1,8 @@
-﻿## 3.3.2
+﻿## 3.3.3
+
+* Initial load order overrides even functions.
+
+## 3.3.2
 
 * Throw nice error when trying to access a non property in your bindings
 
