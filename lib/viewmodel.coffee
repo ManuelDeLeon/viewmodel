@@ -114,8 +114,8 @@ class ViewModel
           ViewModel.saveUrl viewmodel
 
       autoLoadData = ->
-        templateInstance.autorun (c) ->
-          viewmodel.load Template.currentData(), c.firstRun
+        templateInstance.autorun ->
+          viewmodel.load Template.currentData()
       if Tracker.currentComputation
         ViewModel.delay 0, autoLoadData
       else
@@ -507,13 +507,13 @@ class ViewModel
         return
       return
 
-  @loadProperties = (toLoad, container, replace) ->
+  @loadProperties = (toLoad, container) ->
     loadObj = (obj) ->
       for key, value of obj when not (ViewModel.properties[key] or ViewModel.reserved[key])
         if _.isFunction(value)
           # we don't care, just take the new function
           container[key] = value
-        else if container[key] and not replace
+        else if container[key] and container[key].id and _.isFunction(container[key])
           # keep the reference to the old property we already have
           container[key] value
         else
@@ -535,16 +535,16 @@ class ViewModel
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
     return
 
-  loadMixinShare = (toLoad, collection, viewmodel, replace) ->
+  loadMixinShare = (toLoad, collection, viewmodel) ->
     if toLoad
       if toLoad instanceof Array
         for element in toLoad
           if _.isString element
-            viewmodel.load collection[element], replace
+            viewmodel.load collection[element]
           else
             loadMixinShare element, collection, viewmodel
       else if _.isString toLoad
-        viewmodel.load collection[toLoad], replace
+        viewmodel.load collection[toLoad]
       else
         for ref of toLoad
           container = {}
@@ -557,31 +557,31 @@ class ViewModel
           viewmodel[ref] = container
     return
 
-  load: (toLoad, replace) ->
+  load: (toLoad) ->
     return if not toLoad
     viewmodel = this
 
     if toLoad instanceof Array
-      viewmodel.load( item, replace ) for item in toLoad
+      viewmodel.load( item ) for item in toLoad
 
     # Signals are loaded 1st
     signals = ViewModel.signalToLoad(toLoad.signal)
     for signal in signals
-      viewmodel.load signal, replace
+      viewmodel.load signal
       viewmodel.vmOnCreated.push signal.onCreated
       viewmodel.vmOnDestroyed.push signal.onDestroyed
 
     # Shared are loaded 2nd
-    loadMixinShare toLoad.share, ViewModel.shared, viewmodel, replace
+    loadMixinShare toLoad.share, ViewModel.shared, viewmodel
 
     # Mixins are loaded 3rd
-    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel, replace
+    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel
 
     # Whatever is in 'load' is loaded before direct properties
-    viewmodel.load toLoad.load, replace
+    viewmodel.load toLoad.load
 
     # Direct properties are loaded last.
-    ViewModel.loadProperties toLoad, viewmodel, replace
+    ViewModel.loadProperties toLoad, viewmodel
 
     hooks =
       onCreated: 'vmOnCreated'
@@ -668,7 +668,7 @@ class ViewModel
     @vmOnDestroyed = []
     @vmAutorun = []
 
-    viewmodel.load initial, true
+    viewmodel.load initial
 
     @children = childrenProperty()
 

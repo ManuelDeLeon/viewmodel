@@ -264,8 +264,8 @@ describe "ViewModel instance", ->
       assert.equal 'Brito', @viewmodel.name()
       assert.equal old, @viewmodel.name
 
-    it "creates a new property when using replace = true", ->
-      @viewmodel.load({ name: 'Alan' })
+    it "overwrite existing functions", ->
+      @viewmodel.load({ name: -> 'Alan' })
       old = @viewmodel.name
       @viewmodel.load({ name: 'Brito' }, true)
       theNew = @viewmodel.name

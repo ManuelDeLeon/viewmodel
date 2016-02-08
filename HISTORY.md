@@ -1,4 +1,8 @@
-﻿## 3.3.4
+﻿## 3.3.5
+
+* Simplify override priority. 
+
+## 3.3.4
 
 * Context properties override even functions.
 
