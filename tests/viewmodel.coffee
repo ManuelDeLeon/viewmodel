@@ -123,7 +123,7 @@ describe "ViewModel", ->
         @afterFlushStub = sinon.stub Tracker, 'afterFlush'
         @instance =
           data: "A"
-          autorun: (f) -> f()
+          autorun: (f) -> f( { firstRun: true })
           view:
             name: 'body'
 

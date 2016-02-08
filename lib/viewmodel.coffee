@@ -114,8 +114,8 @@ class ViewModel
           ViewModel.saveUrl viewmodel
 
       autoLoadData = ->
-        templateInstance.autorun ->
-          viewmodel.load Template.currentData()
+        templateInstance.autorun (c) ->
+          viewmodel.load Template.currentData(), c.firstRun
       if Tracker.currentComputation
         ViewModel.delay 0, autoLoadData
       else

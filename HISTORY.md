@@ -1,4 +1,8 @@
-﻿## 3.3.3
+﻿## 3.3.4
+
+* Context properties override even functions.
+
+## 3.3.3
 
 * Initial load order overrides even functions.
 
