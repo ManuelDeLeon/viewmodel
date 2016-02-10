@@ -94,8 +94,6 @@ class ViewModel
       viewmodel.templateInstance = templateInstance
       ViewModel.add viewmodel
 
-
-
       if templateInstance.data?.ref
         parentTemplate = ViewModel.parentTemplate(templateInstance)
         if parentTemplate
@@ -496,7 +494,7 @@ class ViewModel
       # onRendered happens before onViewReady
       # We want bindings to be in place before we run
       # the onRendered functions and autoruns
-      Tracker.afterFlush ->
+      ViewModel.delay 0, ->
         for fun in viewmodel.vmOnRendered
           fun.call viewmodel, templateInstance
 

@@ -1,4 +1,8 @@
-﻿## 3.4.0
+﻿## 3.4.1
+
+* Fix this.parent() from onRendered
+
+## 3.4.0
 
 * Add refGroup binding. see https://viewmodel.meteor.com/docs/bindings#refgroup
 
