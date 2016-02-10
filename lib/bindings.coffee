@@ -345,6 +345,15 @@ addBinding
     return
 
 addBinding
+  name: 'refGroup'
+  bind: (bindArg) ->
+    if not bindArg.viewmodel[bindArg.bindValue]
+      bindArg.viewmodel[bindArg.bindValue] = $()
+    group = bindArg.viewmodel[bindArg.bindValue]
+    group.push.apply group, bindArg.element
+    return
+
+addBinding
   name: 'value'
   selector: 'input[type=file]:not([multiple])'
   events:

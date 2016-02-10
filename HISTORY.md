@@ -1,4 +1,8 @@
-﻿## 3.3.5
+﻿## 3.4.0
+
+* Add refGroup binding. see https://viewmodel.meteor.com/docs/bindings#refgroup
+
+## 3.3.5
 
 * Simplify override priority. 
 
