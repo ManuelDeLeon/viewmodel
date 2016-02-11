@@ -1,4 +1,8 @@
-﻿## 3.4.1
+﻿## 3.4.2
+
+* Fix onCreated. Delay loading data when running in a simulation
+
+## 3.4.1
 
 * Fix this.parent() from onRendered
 

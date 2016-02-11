@@ -101,23 +101,32 @@ class ViewModel
             ViewModel.addEmptyViewModel(parentTemplate)
           viewmodel.parent()[templateInstance.data.ref] = viewmodel
 
-      ViewModel.delay 0, ->
-        ViewModel.assignChild(viewmodel)
-        vmHash = viewmodel.vmHash()
-        if migrationData = Migration.get(vmHash)
-          viewmodel.load(migrationData)
-          ViewModel.removeMigration viewmodel, vmHash
-        if viewmodel.onUrl
-          ViewModel.loadUrl viewmodel
-          ViewModel.saveUrl viewmodel
+      loadData = ->
+        ViewModel.delay 0, ->
+          ViewModel.assignChild(viewmodel)
+          vmHash = viewmodel.vmHash()
+          if migrationData = Migration.get(vmHash)
+            viewmodel.load(migrationData)
+            ViewModel.removeMigration viewmodel, vmHash
+          if viewmodel.onUrl
+            ViewModel.loadUrl viewmodel
+            ViewModel.saveUrl viewmodel
 
       autoLoadData = ->
         templateInstance.autorun ->
           viewmodel.load Template.currentData()
+
+      # Can't use delay in a simulation.
+      # By default onCreated runs in a computation
       if Tracker.currentComputation
+        loadData()
         ViewModel.delay 0, autoLoadData
       else
-        autoLoadData()
+        # Running in a simulation
+        # setup the load data after tracker is done with the current queue
+        Tracker.afterFlush ->
+          loadData()
+          autoLoadData()
 
       for fun in viewmodel.vmOnCreated
         fun.call viewmodel, templateInstance
