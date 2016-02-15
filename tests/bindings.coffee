@@ -401,6 +401,41 @@ describe "bindings", ->
         done()
       return
 
+    it "element has the style from string take 2", (done) ->
+      bindObject =
+        style: "styleLabel"
+      @viewmodel.load
+        styleLabel: "color: red"
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element.inlineStyle("color")
+        done()
+      return
+
+    it "element has the style with commas", (done) ->
+      bindObject =
+        style: "styleLabel"
+      @viewmodel.load
+        styleLabel: "color: red, border-color: blue"
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element.inlineStyle("color")
+        assert.equal "blue", @element.inlineStyle("border-color")
+        done()
+      return
+
+    it "element has the style with semi-colons", (done) ->
+      bindObject =
+        style: "styleLabel"
+      @viewmodel.load
+        styleLabel: "color: red; border-color: blue;"
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element.inlineStyle("color")
+        assert.equal "blue", @element.inlineStyle("border-color")
+        done()
+      return
+
     it "element has the style from array", (done) ->
       bindObject =
         style: "[styles.label, styles.button]"

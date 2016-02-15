@@ -1,4 +1,8 @@
-﻿## 3.4.2
+﻿## 3.4.3
+
+* Style strings now accept semi-colons. 
+
+## 3.4.2
 
 * Fix onCreated. Delay loading data when running in a simulation
 

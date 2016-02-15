@@ -216,6 +216,8 @@ addBinding
   autorun: (bindArg) ->
     newValue = bindArg.getVmValue()
     if _.isString(newValue)
+      if ~newValue.indexOf(";")
+        newValue = newValue.split(";").join(",")
       newValue = ViewModel.parseBind(newValue)
     bindArg.element.css newValue
 

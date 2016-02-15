@@ -26,5 +26,5 @@ Go to the [help section][10] if you have any questions, comments, feedback, or j
 [6]:https://viewmodel.meteor.com/docs/viewmodels#mixin
 [7]:https://viewmodel.meteor.com/docs/misc#inlinestyles
 [8]:https://viewmodel.meteor.com/docs/misc#bettererrors
-[9]:http://viewmodel.meteor.com/
-[10]:http://viewmodelboard.meteor.com/
+[9]:https://viewmodel.meteor.com/
+[10]:https://viewmodel.meteor.com/help
