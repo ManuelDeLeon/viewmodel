@@ -1,4 +1,8 @@
-﻿## 3.4.3
+﻿## 3.4.4
+
+* Load context onCreated so Blaze helpers can use inherited properties.
+
+## 3.4.3
 
 * Style strings now accept semi-colons. 
 

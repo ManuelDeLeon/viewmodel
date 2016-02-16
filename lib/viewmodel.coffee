@@ -120,13 +120,18 @@ class ViewModel
       # By default onCreated runs in a computation
       if Tracker.currentComputation
         loadData()
+        # Crap, I have no idea why I'm delaying the load
+        # data from the context. I think Template.currentData()
+        # blows up if it's called inside a computation ?_?
         ViewModel.delay 0, autoLoadData
       else
+        # Loading the context data needs to happen immediately
+        # so the Blaze helpers can work with inherited values
+        autoLoadData()
         # Running in a simulation
         # setup the load data after tracker is done with the current queue
         Tracker.afterFlush ->
           loadData()
-          autoLoadData()
 
       for fun in viewmodel.vmOnCreated
         fun.call viewmodel, templateInstance
