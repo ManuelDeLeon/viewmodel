@@ -1,4 +1,8 @@
-﻿## 3.4.4
+﻿## 3.4.5
+
+* Change doesn't trigger on first run.
+
+## 3.4.4
 
 * Load context onCreated so Blaze helpers can use inherited properties.
 

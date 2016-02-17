@@ -73,7 +73,7 @@ addBinding
   name: 'change'
   bind: (bindArg)->
     bindValue = changeBinding(bindArg.elementBind)
-    bindArg.autorun (c) ->
+    bindArg.autorun (bindArg, c) ->
       newValue = bindArg.getVmValue(bindValue)
       bindArg.setVmValue newValue if not c.firstRun
 
