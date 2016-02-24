@@ -1,4 +1,8 @@
-﻿## 3.4.5
+﻿## 3.4.6
+
+* Only run defining function once.
+
+## 3.4.5
 
 * Change doesn't trigger on first run.
 
