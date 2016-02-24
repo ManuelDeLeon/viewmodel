@@ -42,6 +42,7 @@ Blaze.Template.prototype.createViewModel = (context) ->
   template = this
   initial = ViewModel.getInitialObject template.viewmodelInitial, context
   viewmodel = new ViewModel(initial)
+  viewmodel.vmInitial = initial
   viewmodel
 
 htmls = { }

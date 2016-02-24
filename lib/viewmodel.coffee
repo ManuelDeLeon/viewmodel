@@ -30,6 +30,7 @@ class ViewModel
     vmOnRendered: 1
     vmOnDestroyed: 1
     vmAutorun: 1
+    vmInitial: 1
     templateInstance: 1
     parent: 1
     children: 1
@@ -85,10 +86,9 @@ class ViewModel
       Package['manuel:viewmodel-debug']?.VmCheck key, args...
     return
 
-  @onCreated = (template, initial) ->
+  @onCreated = (template) ->
     return ->
       templateInstance = this
-      initial = initial(templateInstance.data) if _.isFunction(initial)
       viewmodel = template.createViewModel(templateInstance.data)
       templateInstance.viewmodel = viewmodel
       viewmodel.templateInstance = templateInstance
@@ -193,9 +193,9 @@ class ViewModel
 
   @getInitialObject = (initial, context) ->
     if _.isFunction(initial)
-      return initial(context)
+      return initial(context) or {}
     else
-      return initial
+      return initial or {}
 
   delayed = { }
   @delay = (time, nameOrFunc, fn) ->
@@ -432,7 +432,7 @@ class ViewModel
                 if viewmodel and `arg in viewmodel`
                   newArg = getValue(viewmodel, arg, viewmodel)
                 else
-                  newArg = getPrimitive(arg)
+                  newArg = arg #getPrimitive(arg)
                 newArg = !newArg if neg
               args.push newArg
 
@@ -497,12 +497,11 @@ class ViewModel
     viewmodel.parent()?.children().push(viewmodel)
     return
 
-  @onRendered = (initial) ->
+  @onRendered =  ->
     return ->
       templateInstance = this
-      initial = initial(templateInstance.data) if _.isFunction(initial)
       viewmodel = templateInstance.viewmodel
-
+      initial = viewmodel.vmInitial
       ViewModel.check "@onRendered", initial.autorun, templateInstance
 
       # onRendered happens before onViewReady

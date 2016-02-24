@@ -71,6 +71,7 @@ describe "ViewModel", ->
       afterFlush = Tracker.afterFlush
       beforeEach ->
         @viewmodel = new ViewModel()
+        @viewmodel.vmInitial = {}
         @instance =
           autorun: (f) -> f()
           viewmodel: @viewmodel
@@ -81,19 +82,20 @@ describe "ViewModel", ->
         Tracker.afterFlush = afterFlush
 
       it "checks the arguments", ->
-        ViewModel.onRendered({ autorun: 'X' }).call @instance
+        @viewmodel.vmInitial.autorun = "X"
+        ViewModel.onRendered().call @instance
         assert.isTrue @checkStub.calledWithExactly('@onRendered', "X", @instance)
 
       it "sets autorun for single function", ->
         ran = false
         @viewmodel.vmAutorun.push -> ran = true
-        ViewModel.onRendered({}).call @instance
+        ViewModel.onRendered().call @instance
         assert.isTrue ran
 
       it "calls viewmodel.onRendered", ->
         ran = false
         @viewmodel.vmOnRendered.push -> ran = true
-        ViewModel.onRendered({}).call @instance
+        ViewModel.onRendered().call @instance
         assert.isTrue ran
 
 
@@ -1291,8 +1293,10 @@ describe "ViewModel", ->
         context = this
       onCreatedStub = sinon.stub ViewModel, 'onCreated'
       onCreatedStub.returns f
+      vm = new ViewModel()
+      vm.vmInitial = {}
       templateInstance =
-        viewmodel: new ViewModel()
+        viewmodel: vm
         view:
           onViewDestroyed: -> onViewDestroyedCalled = true
           template: {}
