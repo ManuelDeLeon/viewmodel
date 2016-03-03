@@ -31,6 +31,7 @@ class ViewModel
     vmOnDestroyed: 1
     vmAutorun: 1
     vmInitial: 1
+    vmProp: 1
     templateInstance: 1
     parent: 1
     children: 1
@@ -222,7 +223,7 @@ class ViewModel
               _value = value
             dependency.changed()
           if funProp.delay > 0
-            ViewModel.delay funProp.delay, funProp.id, changeValue
+            ViewModel.delay funProp.delay, funProp.vmProp, changeValue
           else
             changeValue()
 
@@ -239,7 +240,7 @@ class ViewModel
     funProp.depend = -> dependency.depend()
     funProp.changed = -> dependency.changed()
     funProp.delay = 0
-    funProp.id = ViewModel.nextId()
+    funProp.vmProp = ViewModel.nextId()
 
     # to give the feel of non reactivity
     Object.defineProperty funProp, 'value', { get: -> _value}
@@ -524,7 +525,7 @@ class ViewModel
         if _.isFunction(value)
           # we don't care, just take the new function
           container[key] = value
-        else if container[key] and container[key].id and _.isFunction(container[key])
+        else if container[key] and container[key].vmProp and _.isFunction(container[key])
           # keep the reference to the old property we already have
           container[key] value
         else
@@ -625,7 +626,7 @@ class ViewModel
   data: (fields = []) ->
     viewmodel = this
     js = {}
-    for prop of viewmodel when viewmodel[prop]?.id and (fields.length is 0 or prop in fields)
+    for prop of viewmodel when viewmodel[prop]?.vmProp and (fields.length is 0 or prop in fields)
       value = viewmodel[prop]()
       if value instanceof ReactiveArray
         js[prop] = value.array()

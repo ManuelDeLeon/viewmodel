@@ -1,4 +1,8 @@
-﻿## 3.4.6
+﻿## 3.4.7
+
+* Fix hot code push with view models with an id property. 
+
+## 3.4.6
 
 * Only run defining function once.
 
