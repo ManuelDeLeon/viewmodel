@@ -654,7 +654,7 @@ class ViewModel
 
   @getPathTo = (element) ->
     # use ~ and #
-    if !element or element.tagName == 'HTML' or element == document.body
+    if !element or !element.parentNode or element.tagName is 'HTML' or element is document.body
       return '/'
 
     ix = 0
@@ -662,9 +662,9 @@ class ViewModel
     i = 0
     while i < siblings.length
       sibling = siblings[i]
-      if sibling == element
+      if sibling is element
         return ViewModel.getPathTo(element.parentNode) + '/' + element.tagName + '[' + (ix + 1) + ']'
-      if sibling.nodeType == 1 and sibling.tagName == element.tagName
+      if sibling.nodeType is 1 and sibling.tagName is element.tagName
         ix++
       i++
     return

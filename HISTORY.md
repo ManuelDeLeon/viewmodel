@@ -1,4 +1,8 @@
-﻿## 3.4.7
+﻿## 3.4.8
+
+* Check for parent node missing when calculating template's path.
+
+## 3.4.7
 
 * Fix hot code push with view models with an id property. 
 
