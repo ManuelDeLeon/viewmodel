@@ -1,4 +1,8 @@
-﻿## 3.4.8
+﻿## 3.4.9
+
+* Events are now loaded from mixin/share/load too
+
+## 3.4.8
 
 * Check for parent node missing when calculating template's path.
 

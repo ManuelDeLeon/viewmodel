@@ -9,8 +9,11 @@ Blaze.Template.prototype.viewmodel = (initial) ->
   template.onCreated ViewModel.onCreated(template, initial)
   template.onRendered ViewModel.onRendered(initial)
   template.onDestroyed ViewModel.onDestroyed(initial)
-  if initial.events
-    for event, eventFunction of initial.events
+  initialObject = ViewModel.getInitialObject initial
+  viewmodel = new ViewModel()
+  viewmodel.load initialObject, true
+  for eventGroup in viewmodel.vmEvents
+    for event, eventFunction of eventGroup
       do (event, eventFunction) ->
         eventObj = {}
         eventObj[event] = (e, t) ->
@@ -18,7 +21,6 @@ Blaze.Template.prototype.viewmodel = (initial) ->
           viewmodel = templateInstance.viewmodel
           eventFunction.call viewmodel, e, t
         template.events eventObj
-
   return
 
 Blaze.Template.prototype.createViewModel = (context) ->

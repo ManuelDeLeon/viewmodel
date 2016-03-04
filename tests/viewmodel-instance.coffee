@@ -267,11 +267,19 @@ describe "ViewModel instance", ->
     it "overwrite existing functions", ->
       @viewmodel.load({ name: -> 'Alan' })
       old = @viewmodel.name
-      @viewmodel.load({ name: 'Brito' }, true)
+      @viewmodel.load({ name: 'Brito' })
       theNew = @viewmodel.name
       assert.equal 'Brito', @viewmodel.name()
       assert.equal theNew, @viewmodel.name
       assert.notEqual old, theNew
+
+    it "doesn't add events", ->
+      @viewmodel.load({ events: { 'click one' : -> } })
+      assert.equal 0, @viewmodel.vmEvents.length
+
+    it "adds events", ->
+      @viewmodel.load({ events: { 'click one' : -> } }, true)
+      assert.equal 1, @viewmodel.vmEvents.length
 
     it "doesn't do anything with null and undefined", ->
       @viewmodel.load(undefined )

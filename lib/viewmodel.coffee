@@ -30,6 +30,7 @@ class ViewModel
     vmOnRendered: 1
     vmOnDestroyed: 1
     vmAutorun: 1
+    vmEvents: 1
     vmInitial: 1
     vmProp: 1
     templateInstance: 1
@@ -547,16 +548,16 @@ class ViewModel
       ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
     return
 
-  loadMixinShare = (toLoad, collection, viewmodel) ->
+  loadMixinShare = (toLoad, collection, viewmodel, onlyEvents) ->
     if toLoad
       if toLoad instanceof Array
         for element in toLoad
           if _.isString element
-            viewmodel.load collection[element]
+            viewmodel.load collection[element], onlyEvents
           else
-            loadMixinShare element, collection, viewmodel
+            loadMixinShare element, collection, viewmodel, onlyEvents
       else if _.isString toLoad
-        viewmodel.load collection[toLoad]
+        viewmodel.load collection[toLoad], onlyEvents
       else
         for ref of toLoad
           container = {}
@@ -569,37 +570,45 @@ class ViewModel
           viewmodel[ref] = container
     return
 
-  load: (toLoad) ->
+  load: (toLoad, onlyEvents) ->
     return if not toLoad
     viewmodel = this
 
     if toLoad instanceof Array
-      viewmodel.load( item ) for item in toLoad
+      viewmodel.load( item, onlyEvents ) for item in toLoad
 
-    # Signals are loaded 1st
-    signals = ViewModel.signalToLoad(toLoad.signal)
-    for signal in signals
-      viewmodel.load signal
-      viewmodel.vmOnCreated.push signal.onCreated
-      viewmodel.vmOnDestroyed.push signal.onDestroyed
+    if not onlyEvents
+      # Signals are loaded 1st
+      signals = ViewModel.signalToLoad(toLoad.signal)
+      for signal in signals
+        viewmodel.load signal
+        viewmodel.vmOnCreated.push signal.onCreated
+        viewmodel.vmOnDestroyed.push signal.onDestroyed
 
     # Shared are loaded 2nd
-    loadMixinShare toLoad.share, ViewModel.shared, viewmodel
+    loadMixinShare toLoad.share, ViewModel.shared, viewmodel, onlyEvents
 
     # Mixins are loaded 3rd
-    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel
+    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel, onlyEvents
 
     # Whatever is in 'load' is loaded before direct properties
-    viewmodel.load toLoad.load
+    viewmodel.load toLoad.load, onlyEvents
 
-    # Direct properties are loaded last.
-    ViewModel.loadProperties toLoad, viewmodel
+    if not onlyEvents
+      # Direct properties are loaded last.
+      ViewModel.loadProperties toLoad, viewmodel
 
-    hooks =
-      onCreated: 'vmOnCreated'
-      onRendered: 'vmOnRendered'
-      onDestroyed: 'vmOnDestroyed'
-      autorun: 'vmAutorun'
+    if onlyEvents
+      hooks =
+        events: 'vmEvents'
+    else
+      hooks =
+        onCreated: 'vmOnCreated'
+        onRendered: 'vmOnRendered'
+        onDestroyed: 'vmOnDestroyed'
+        autorun: 'vmAutorun'
+
+
     for hook, vmProp of hooks when toLoad[hook]
       if toLoad[hook] instanceof Array
         for item in toLoad[hook]
@@ -679,6 +688,7 @@ class ViewModel
     @vmOnRendered = []
     @vmOnDestroyed = []
     @vmAutorun = []
+    @vmEvents = []
 
     viewmodel.load initial
 
