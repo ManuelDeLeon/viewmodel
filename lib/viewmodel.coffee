@@ -801,7 +801,7 @@ class ViewModel
           viewmodel[boundProp] = funcToUse
           value.target.addEventListener value.event, funcToUse
         single.onDestroyed = ->
-          value.target.removeEventListener this[boundProp]
+          value.target.removeEventListener value.event, this[boundProp]
         all.push single
     return all
 

@@ -1,4 +1,8 @@
-﻿## 3.4.9
+﻿## 3.4.10
+
+* Fix signals with Firefox
+
+## 3.4.9
 
 * Events are now loaded from mixin/share/load too
 
