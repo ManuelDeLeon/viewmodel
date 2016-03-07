@@ -259,41 +259,29 @@ describe "bindings", ->
         assert.equal 'Y', @element.attr('href')
         done()
 
-  describe "href", ->
-    beforeEach ->
+
+
+  describe "addAttributeBinding", ->
+    it "sets from array", (done) ->
+      ViewModel.addAttributeBinding( ['href'] )
       bindObject =
         href: 'on'
       @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
-
-    it "sets from vm", (done) ->
       @viewmodel.on 'Y'
       delay =>
         assert.equal 'Y', @element.attr('href')
         done()
 
-  describe "src", ->
-    beforeEach ->
+    it "sets from string", (done) ->
+      ViewModel.addAttributeBinding( 'src' )
       bindObject =
         src: 'on'
       @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
-
-    it "sets from vm", (done) ->
       @viewmodel.on 'Y'
       delay =>
         assert.equal 'Y', @element.attr('src')
         done()
 
-  describe "readonly", ->
-    beforeEach ->
-      bindObject =
-        readonly: 'on'
-      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
-
-    it "sets from vm", (done) ->
-      @viewmodel.on true
-      delay =>
-        assert.equal 'readonly', @element.attr('readonly')
-        done()
 
   describe "check", ->
     beforeEach ->

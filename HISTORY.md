@@ -1,4 +1,12 @@
-﻿## 3.4.10
+﻿## 4.0.0
+
+* New ViewModel.addAttributeBinding to add attribute as bindings. See https://viewmodel.meteor.com/docs/bindings#attr
+
+### BREAKING CHANGES
+
+* src, readonly, and href used to be default bindings which mapped to their corresponding attributes. Now they're not. If you use these bindings you now have to add them with ViewModel.addAttributeBinding( ['src','href','readonly'] )
+
+## 3.4.10
 
 * Fix signals with Firefox
 

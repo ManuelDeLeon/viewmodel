@@ -95,16 +95,6 @@ addBinding
           bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])
     return
 
-attrPremade = ['src','href','readonly']
-for attr in attrPremade
-  do (attr) ->
-    addBinding
-      name: attr
-      bind: (bindArg) ->
-        bindArg.autorun ->
-          bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])
-        return
-
 addBinding
   name: 'check'
   events:
