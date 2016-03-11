@@ -349,38 +349,50 @@ class ViewModel
       else (if $.isNumeric(val) then parseFloat(val) else val)
 
   tokens =
-    '+': (a, b) -> a + b
-    '-': (a, b) -> a - b
+    '**': (a, b) -> a ** b
     '*': (a, b) -> a * b
     '/': (a, b) -> a / b
-    '&&': (a, b) -> a && b
-    '||': (a, b) -> a || b
-    '===': (a, b) -> a is b
-    '==': (a, b) -> `a == b`
-    '!===': (a, b) -> a isnt b
-    '!==': (a, b) -> `a !== b`
-    '>': (a, b) -> a > b
-    '>=': (a, b) -> a >= b
+    '%': (a, b) -> a % b
+    '+': (a, b) -> a + b
+    '-': (a, b) -> a - b
     '<': (a, b) -> a < b
     '<=': (a, b) -> a <= b
+    '>': (a, b) -> a > b
+    '>=': (a, b) -> a >= b
+    '==': (a, b) -> `a == b`
+    '!==': (a, b) -> `a !== b`
+    '===': (a, b) -> a is b
+    '!===': (a, b) -> a isnt b
+    '&&': (a, b) -> a && b
+    '||': (a, b) -> a || b
 
-  tokenRegex = /[\+\-\*\/&\|=><]/
+  tokenGroup = {}
+  for _t of tokens
+    tokenGroup[_t.length] = {} if not tokenGroup[_t.length]
+    tokenGroup[_t.length][_t] = 1
+
   dotRegex = /(\D\.)|(\.\D)/
-  spaceRegex = (token) ->
-    t = token.split('').join('\\')
-    new RegExp("(\\s\\#{t}\\s)")
-#    new RegExp("(\\S\\#{t}\\s)|(\\s\\#{t}\\S)")
 
-  spaceRegexMem = _.memoize spaceRegex
-
-  getToken = (str) ->
-    for token of tokens
-      regex = spaceRegexMem(token)
-      index = str.search(regex)
-#      index += 1 if ~index and str.charAt(index) isnt ' '
-      if ~index
-        return str.substr(index, token.length + 2)
-    return null
+  firstToken = (str) ->
+    tokenIndex = -1
+    token = null
+    inQuote = null
+    for c, i in str
+      break if token
+      if c is '"' or c is "'"
+        if inQuote is c
+          inQuote = null
+        else if not inQuote
+          inQuote = c
+      else if not inQuote and ~"+-*/%&|><=".indexOf(c)
+        tokenIndex = i
+        for length in [4..1]
+          if str.length > tokenIndex + length
+            candidateToken = str.substr(tokenIndex, length)
+            if tokenGroup[length] and tokenGroup[length][candidateToken]
+              token = candidateToken
+              break
+    return [token, tokenIndex]
 
   getMatchingParenIndex = (bindValue, parenIndexStart) ->
     return -1 if !~parenIndexStart
@@ -406,19 +418,20 @@ class ViewModel
       Template.instance()?.data
 
   getValue = (container, bindValue, viewmodel) ->
-    negate = bindValue.charAt(0) is '!'
-    bindValue = bindValue.substring 1 if negate
-
-    if bindValue is "this"
+    bindValue = bindValue.trim()
+    [token, tokenIndex] = firstToken(bindValue)
+    if ~tokenIndex
+      left = getValue(container, bindValue.substring(0, tokenIndex), viewmodel)
+      right = getValue(container, bindValue.substring(tokenIndex + token.length), viewmodel)
+      value = tokens[token.trim()]( left, right )
+    else if bindValue is "this"
       value = currentContext()
     else if quoted(bindValue)
       value = removeQuotes(bindValue)
-    else if (token = tokenRegex.test(bindValue) and getToken(bindValue))
-      i = bindValue.indexOf(token)
-      left = getValue(container, bindValue.substring(0, i), viewmodel)
-      right = getValue(container, bindValue.substring(i + token.length), viewmodel)
-      value = tokens[token.trim()]( left, right )
     else
+      negate = bindValue.charAt(0) is '!'
+      bindValue = bindValue.substring 1 if negate
+
       dotIndex = bindValue.search(dotRegex)
       dotIndex += 1 if ~dotIndex and bindValue.charAt(dotIndex) isnt '.'
       parenIndexStart = bindValue.indexOf('(')
@@ -474,9 +487,9 @@ class ViewModel
             value = container[name].apply(container, args)
           else
             value = container[name]
+      value = !value if negate
 
-
-    return if negate then !value else value
+    return value
 
   @getVmValueGetter = (viewmodel, bindValue, view) ->
     return  (optBindValue = bindValue) ->

@@ -1,4 +1,8 @@
-﻿## 4.0.0
+﻿## 4.0.1
+
+* Fix binding conditionals when it starts with a negative
+
+## 4.0.0
 
 * New ViewModel.addAttributeBinding to add attribute as bindings. See https://viewmodel.meteor.com/docs/bindings#attr
 

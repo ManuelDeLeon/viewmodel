@@ -1201,6 +1201,74 @@ describe "ViewModel", ->
       assert.equal 'AB', getVmValue()
       return
 
+    it "returns value from !first && second", ->
+      viewmodel =
+        first: true
+        second: true
+      bindValue = ViewModel.parseBind("x: !first && second").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
+
+    it "returns value from !first && second _2", ->
+      viewmodel =
+        first: false
+        second: true
+      bindValue = ViewModel.parseBind("x: !first && second").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
+    it "returns value from !first && second _3", ->
+      viewmodel =
+        first: false
+        second: false
+      bindValue = ViewModel.parseBind("x: !first && second").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
+
+    it "returns value from !first || second", ->
+      viewmodel =
+        first: false
+        second: true
+      bindValue = ViewModel.parseBind("x: !first || second").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
+    it "returns value from !first || second _2", ->
+      viewmodel =
+        first: true
+        second: false
+      bindValue = ViewModel.parseBind("x: !first || second").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isFalse getVmValue()
+      return
+
+    it "returns value from !first || second _3", ->
+      viewmodel =
+        first: true
+        second: true
+      bindValue = ViewModel.parseBind("x: !first || second").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.isTrue getVmValue()
+      return
+
+    it "returns value from 2**3", ->
+      viewmodel = {}
+      bindValue = ViewModel.parseBind("x: 2**3").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal getVmValue(), 8
+      return
+
+    it "returns value from 9%4", ->
+      viewmodel = {}
+      bindValue = ViewModel.parseBind("x: 9%4").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal getVmValue(), 1
+      return
+
   describe "@getVmValueSetter", ->
 
     it "sets first func", ->
