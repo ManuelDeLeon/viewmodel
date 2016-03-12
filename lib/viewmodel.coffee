@@ -270,14 +270,14 @@ class ViewModel
             name: attr
             bind: (bindArg) ->
               bindArg.autorun ->
-                bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])
+                bindArg.element[0].setAttribute attr, bindArg.getVmValue(bindArg.bindValue[attr])
               return
     else if _.isString(attrs)
       ViewModel.addBinding
         name: attrs
         bind: (bindArg) ->
           bindArg.autorun ->
-            bindArg.element.attr attrs, bindArg.getVmValue(bindArg.bindValue[attrs])
+            bindArg.element[0].setAttribute attrs, bindArg.getVmValue(bindArg.bindValue[attrs])
           return
     return
 

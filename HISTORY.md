@@ -1,4 +1,8 @@
-﻿## 4.0.2
+﻿## 4.0.3
+
+* AddAttributeBinding is now case sensitive
+
+## 4.0.2
 
 * Make attributes case sensitive
 
