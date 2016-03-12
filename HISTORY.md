@@ -1,4 +1,8 @@
-﻿## 4.0.1
+﻿## 4.0.2
+
+* Make attributes case sensitive
+
+## 4.0.1
 
 * Fix binding conditionals when it starts with a negative
 

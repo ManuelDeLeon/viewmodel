@@ -92,7 +92,7 @@ addBinding
     for attr of bindArg.bindValue
       do (attr) ->
         bindArg.autorun ->
-          bindArg.element.attr attr, bindArg.getVmValue(bindArg.bindValue[attr])
+          bindArg.element[0].setAttribute attr, bindArg.getVmValue(bindArg.bindValue[attr])
     return
 
 addBinding

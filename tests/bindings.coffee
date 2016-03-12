@@ -248,15 +248,16 @@ describe "bindings", ->
       bindObject =
         attr:
           title: 'name'
-          href: 'on'
+          viewBox: 'on'
       @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
 
     it "sets from vm", (done) ->
       @viewmodel.name 'X'
       @viewmodel.on 'Y'
+      @viewmodel.viewBox
       delay =>
         assert.equal 'X', @element.attr('title')
-        assert.equal 'Y', @element.attr('href')
+        assert.equal 'Y', @element[0].getAttribute('viewBox')
         done()
 
 
