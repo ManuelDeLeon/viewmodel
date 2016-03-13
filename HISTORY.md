@@ -12,7 +12,7 @@
 
 ## 4.0.0
 
-* New ViewModel.addAttributeBinding to add attribute as bindings. See https://viewmodel.meteor.com/docs/bindings#attr
+* New ViewModel.addAttributeBinding to add attribute as bindings. See https://viewmodel.org/docs/bindings#attr
 
 ### BREAKING CHANGES
 
@@ -60,7 +60,7 @@
 
 ## 3.4.0
 
-* Add refGroup binding. see https://viewmodel.meteor.com/docs/bindings#refgroup
+* Add refGroup binding. see https://viewmodel.org/docs/bindings#refgroup
 
 ## 3.3.5
 
@@ -88,7 +88,7 @@
 
 ## 3.2.0
 
-* Add a way to transform signals. See: https://viewmodel.meteor.com/docs/viewmodels#signal
+* Add a way to transform signals. See: https://viewmodel.org/docs/viewmodels#signal
 
 ## 3.1.2
 
@@ -174,7 +174,7 @@
 
 ## 2.7.0
 
-* mixins and shares can be scoped to a view model property. So instead of adding all share/mixin properties to the view model, you can specify under which property they should fall. See: https://viewmodel.meteor.com/docs/viewmodels#sharemixinscope
+* mixins and shares can be scoped to a view model property. So instead of adding all share/mixin properties to the view model, you can specify under which property they should fall. See: https://viewmodel.org/docs/viewmodels#sharemixinscope
 
 ## 2.6.0
 
