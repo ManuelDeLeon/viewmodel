@@ -1,4 +1,8 @@
-﻿## 4.0.3
+﻿## 4.0.4
+
+* Update docs url (now that *.meteor.com is going down)
+
+## 4.0.3
 
 * AddAttributeBinding is now case sensitive
 
