@@ -1,4 +1,8 @@
-﻿## 4.0.4
+﻿## 4.0.5
+
+* Don't check if an event is supported (the code was buggy)
+
+## 4.0.4
 
 * Update docs url (now that *.meteor.com is going down)
 

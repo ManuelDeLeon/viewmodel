@@ -6,7 +6,6 @@ addBinding = ViewModel.addBinding
 addBinding
   name: 'default'
   bind: (bindArg, event) ->
-    ViewModel.check '$default', bindArg
     bindArg.element.on bindArg.bindName, (event) ->
       bindArg.setVmValue(event)
       return

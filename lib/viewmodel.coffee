@@ -577,7 +577,11 @@ class ViewModel
   bind: (bindObject, templateInstance, element, bindings, bindId, view) ->
     viewmodel = this
     for bindName, bindValue of bindObject when not ViewModel.nonBindings[bindName]
-      ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
+      if ~bindName.indexOf(' ')
+        for bindNameSingle in bindName.split(' ')
+          ViewModel.bindSingle templateInstance, element, bindNameSingle, bindValue, bindObject, viewmodel, bindings, bindId, view
+      else
+        ViewModel.bindSingle templateInstance, element, bindName, bindValue, bindObject, viewmodel, bindings, bindId, view
     return
 
   loadMixinShare = (toLoad, collection, viewmodel, onlyEvents) ->
