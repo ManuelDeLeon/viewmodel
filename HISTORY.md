@@ -1,4 +1,8 @@
-﻿## 4.0.5
+﻿## 4.0.6
+
+* Fix automatic state save across hot code push when using appcache package.
+
+## 4.0.5
 
 * Don't check if an event is supported (the code was buggy)
 
