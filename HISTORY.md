@@ -1,4 +1,8 @@
-﻿## 4.0.6
+﻿## 4.0.7
+
+* Use afterFlush instead of onViewReady (so it can work better with packages like jagi:astronomy and tap:i18n)
+
+## 4.0.6
 
 * Fix automatic state save across hot code push when using appcache package.
 

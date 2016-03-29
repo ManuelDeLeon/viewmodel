@@ -181,10 +181,13 @@ class ViewModel
       # Iron Router's contentFor blocks.
       # See https://github.com/ManuelDeLeon/viewmodel/issues/142
       currentViewInstance = Blaze.currentView._templateInstance or templateInstance
-      Blaze.currentView.onViewReady ->
+
+      currentView = Blaze.currentView
+      
+      # Blaze.currentView.onViewReady fails for some packages like jagi:astronomy and tap:i18n
+      Tracker.afterFlush ->
         element = currentViewInstance.$("[#{bindIdAttribute}='#{bindId}']")
-        templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, this
-        return
+        templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, currentView
 
       bindIdObj = {}
       bindIdObj[bindIdAttribute] = bindId
