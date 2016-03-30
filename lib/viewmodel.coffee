@@ -186,6 +186,8 @@ class ViewModel
       
       # Blaze.currentView.onViewReady fails for some packages like jagi:astronomy and tap:i18n
       Tracker.afterFlush ->
+        # The element may be removed before it can even be bound/used
+        return if currentView.isDestroyed
         element = currentViewInstance.$("[#{bindIdAttribute}='#{bindId}']")
         templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, currentView
 

@@ -1,4 +1,8 @@
-﻿## 4.0.7
+﻿## 4.0.8
+
+* Don't try to bind to an element if its view is destroyed 
+
+## 4.0.7
 
 * Use afterFlush instead of onViewReady (so it can work better with packages like jagi:astronomy and tap:i18n)
 
