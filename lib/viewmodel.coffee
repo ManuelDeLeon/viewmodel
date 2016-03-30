@@ -105,6 +105,10 @@ class ViewModel
 
       loadData = ->
         ViewModel.delay 0, ->
+          # Don't bother if the template
+          # gets destroyed by the time it gets here (the next js cycle)
+          return if templateInstance.isDestroyed
+
           ViewModel.assignChild(viewmodel)
           vmHash = viewmodel.vmHash()
           if migrationData = Migration.get(vmHash)
@@ -547,6 +551,9 @@ class ViewModel
       # We want bindings to be in place before we run
       # the onRendered functions and autoruns
       ViewModel.delay 0, ->
+        # Don't bother running onRendered or autoruns if the template
+        # gets destroyed by the time it gets here (the next js cycle)
+        return if templateInstance.isDestroyed
         for fun in viewmodel.vmOnRendered
           fun.call viewmodel, templateInstance
 

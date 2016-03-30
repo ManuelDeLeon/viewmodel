@@ -1,4 +1,8 @@
-﻿## 4.0.8
+﻿## 4.0.9
+
+* Don't execute onCreated/onRendered/autoruns if the template instance is destroyed
+
+## 4.0.8
 
 * Don't try to bind to an element if its view is destroyed 
 
