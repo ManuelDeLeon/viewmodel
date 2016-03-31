@@ -1,4 +1,8 @@
-﻿## 4.0.9
+﻿## 4.0.10
+
+* Only process bindings once
+
+## 4.0.9
 
 * Don't execute onCreated/onRendered/autoruns if the template instance is destroyed
 

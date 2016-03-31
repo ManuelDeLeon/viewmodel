@@ -169,6 +169,11 @@ class ViewModel
     bindIdAttribute = ViewModel.bindIdAttribute
     bindIdAttribute += "-e" if not useBindings
     return (bindString) ->
+      currentView = Blaze.currentView
+      
+      # Don't do anything if the element has been rendered already
+      return if currentView.isRendered
+
       bindId = ViewModel.nextId()
       bindObject = ViewModel.parseBind bindString
       ViewModel.bindObjects[bindId] = bindObject
@@ -186,8 +191,6 @@ class ViewModel
       # See https://github.com/ManuelDeLeon/viewmodel/issues/142
       currentViewInstance = Blaze.currentView._templateInstance or templateInstance
 
-      currentView = Blaze.currentView
-      
       # Blaze.currentView.onViewReady fails for some packages like jagi:astronomy and tap:i18n
       Tracker.afterFlush ->
         # The element may be removed before it can even be bound/used
