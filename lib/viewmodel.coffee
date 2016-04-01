@@ -169,11 +169,6 @@ class ViewModel
     bindIdAttribute = ViewModel.bindIdAttribute
     bindIdAttribute += "-e" if not useBindings
     return (bindString) ->
-      currentView = Blaze.currentView
-      
-      # Don't do anything if the element has been rendered already
-      return if currentView.isRendered
-
       bindId = ViewModel.nextId()
       bindObject = ViewModel.parseBind bindString
       ViewModel.bindObjects[bindId] = bindObject
@@ -184,19 +179,24 @@ class ViewModel
 
       bindings = if useBindings then ViewModel.bindings else _.pick(ViewModel.bindings, 'default')
 
+      currentView = Blaze.currentView
+
       # The template on which the element is rendered might not be
       # the one where the user puts it on the html. If it sounds confusing
       # it's because it IS confusing. The only case I know of is with
       # Iron Router's contentFor blocks.
       # See https://github.com/ManuelDeLeon/viewmodel/issues/142
-      currentViewInstance = Blaze.currentView._templateInstance or templateInstance
+      currentViewInstance = currentView._templateInstance or templateInstance
 
       # Blaze.currentView.onViewReady fails for some packages like jagi:astronomy and tap:i18n
       Tracker.afterFlush ->
-        # The element may be removed before it can even be bound/used
-        return if currentView.isDestroyed
+        return if currentView.isDestroyed # The element may be removed before it can even be bound/used
         element = currentViewInstance.$("[#{bindIdAttribute}='#{bindId}']")
-        templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, currentView
+        # Don't bind the element because of a context change
+        if element.length and not element[0].vmBound
+          element[0].vmBound = true
+          element.removeAttr bindIdAttribute
+          templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, currentView
 
       bindIdObj = {}
       bindIdObj[bindIdAttribute] = bindId

@@ -1,4 +1,8 @@
-﻿## 4.0.10
+﻿## 4.0.11
+
+* I don't even know what to say...
+
+## 4.0.10
 
 * Only process bindings once
 
