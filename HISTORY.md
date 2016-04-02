@@ -1,4 +1,8 @@
-﻿## 4.0.11
+﻿## 4.0.12
+
+* Check that a view model property exists before using it as a template helper.
+
+## 4.0.11
 
 * I don't even know what to say...
 

@@ -145,7 +145,12 @@ class ViewModel
       helpers = {}
       for prop of viewmodel when not ViewModel.reserved[prop]
         do (prop) ->
-          helpers[prop] = (args...) -> Template.instance().viewmodel[prop](args...)
+          helpers[prop] = (args...) ->
+            instanceVm = Template.instance().viewmodel
+            # We have to check that the view model has the property
+            # as they may not be present if they're inherited properties
+            # See: https://github.com/ManuelDeLeon/viewmodel/issues/223
+            return instanceVm[prop](args...) if instanceVm[prop]
 
       template.helpers helpers
 
