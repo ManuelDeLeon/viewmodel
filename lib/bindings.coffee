@@ -332,6 +332,7 @@ addBinding
 addBinding
   name: 'ref'
   bind: (bindArg) ->
+    ViewModel.check "refBinding", bindArg
     bindArg.viewmodel[bindArg.bindValue] = bindArg.element
     return
 

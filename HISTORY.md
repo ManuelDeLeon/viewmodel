@@ -1,4 +1,8 @@
-﻿## 4.0.12
+﻿## 4.0.13
+
+* Allow .children to use a template name plus a function
+
+## 4.0.12
 
 * Check that a view model property exists before using it as a template helper.
 

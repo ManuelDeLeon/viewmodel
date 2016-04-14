@@ -706,12 +706,20 @@ class ViewModel
 
   childrenProperty = ->
     array = new ReactiveArray()
-    funProp = (search) ->
+    funProp = (search, predicate) ->
       array.depend()
       if arguments.length
         ViewModel.check "#children", search
-        predicate = if _.isString(search) then ((vm) -> ViewModel.templateName(vm.templateInstance) is search) else search
-        return _.filter array, predicate
+        newPredicate = undefined ;
+        if _.isString(search)
+          first = (vm) -> ViewModel.templateName(vm.templateInstance) is search
+          if predicate
+            newPredicate = (vm) -> first(vm) and predicate(vm)
+          else
+            newPredicate = first
+        else
+          newPredicate = search
+        return _.filter array, newPredicate
       else
         return array
 
