@@ -1,4 +1,8 @@
-﻿## 4.0.13
+﻿## 4.0.14
+
+* Throw an error if a bind can't be parsed.
+
+## 4.0.13
 
 * Allow .children to use a template name plus a function
 

@@ -32,7 +32,7 @@ ViewModel.parseBind = (objectLiteralString) ->
         if depth <= 0
           if key
             unless values
-              result['unknown'] = key
+              throw new Error("Error parsing: " + objectLiteralString)
             else
               v = values.join ''
               v = @parseBind(v) if v.indexOf('{') is 0
@@ -68,4 +68,7 @@ ViewModel.parseBind = (objectLiteralString) ->
         values.push tok
       else
         values = [tok]
-  return result
+  if objectLiteralString and !Object.getOwnPropertyNames(result).length
+    throw new Error("Error parsing: " + objectLiteralString)
+  else
+    return result
