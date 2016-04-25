@@ -287,14 +287,14 @@ class ViewModel
       validDependency = new Tracker.Dependency()
       validatingItems = new ReactiveArray()
 
-    validationAsync = undefined
+    validationAsync = {}
 
     getDone = if hasAsync
       (initialValue) ->
         validatingItems.push(1)
         return (result) ->
           validatingItems.pop()
-          if _value is initialValue and not (validationAsync or result)
+          if _value is initialValue and not ((validationAsync.value is _value) or result)
             validationAsync = { value: _value }
             validDependency.changed()
 
@@ -303,7 +303,6 @@ class ViewModel
       if hasAsync
         validDependency.depend()
       if validationAsync and validationAsync.value is _value
-        #validationAsync = undefined
         return false
       else
         if hasAsync and !noAsync
