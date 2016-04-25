@@ -10,6 +10,7 @@ var CLIENT = 'client';
 Package.onUse(function(api) {
   api.use([
     'coffeescript@1.0.6',
+    'ecmascript@0.4.2',
     'blaze@2.1.2',
     'templating@1.1.1',
     'jquery@1.11.3_2',
@@ -30,6 +31,7 @@ Package.onUse(function(api) {
     'lib/template.coffee',
     'lib/migration.coffee',
     'lib/viewmodel-onUrl.coffee',
+    'lib/viewmodel-property.js',
     'lib/lzstring.js'
   ], CLIENT);
 
@@ -42,6 +44,7 @@ Package.onTest(function(api) {
 
   api.use([
     'coffeescript',
+    'ecmascript',
     'blaze',
     'templating',
     'jquery',
@@ -71,6 +74,7 @@ Package.onTest(function(api) {
     'tests/viewmodel-instance.coffee',
     'tests/viewmodel-check.coffee',
     'tests/viewmodel-parseBind.coffee',
+    'lib/viewmodel-property.js',
     'tests/template.coffee'
   ], CLIENT);
 

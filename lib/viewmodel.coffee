@@ -50,6 +50,16 @@ class ViewModel
     defaultText: 1
     defaultValue: 1
 
+  # Properties which the user needs to be more explicit in what they want
+  # e.g. in a bind "if: prop.valid" the assumption is that the user wants to invoke
+  # "prop.valid", not "prop().valid". If 'valid' is part of the object contained in
+  # the property then the user must use the parenthesis: "if: prop().valid"
+  @funPropReserved =
+    valid: 1
+    'valid()': 1
+    validating: 1
+    'validating()': 1
+
   @bindObjects = {}
 
   @byId = {}
@@ -228,7 +238,12 @@ class ViewModel
   @makeReactiveProperty = (initial) ->
     dependency = new Tracker.Dependency()
     isArray = _.isArray(initial)
-    initialValue = if isArray then new ReactiveArray(initial, dependency) else initial
+    initialValue = if isArray
+      new ReactiveArray(initial, dependency)
+    else if initial instanceof ViewModel.Property
+      initial.defaultValue
+    else
+      initial
     _value = initialValue
 
     funProp = (value) ->
@@ -259,6 +274,46 @@ class ViewModel
     funProp.changed = -> dependency.changed()
     funProp.delay = 0
     funProp.vmProp = ViewModel.nextId()
+
+    validator = if initial instanceof ViewModel.Property
+      initial
+    else 
+      ViewModel.Property.validator(initial)
+
+    hasAsync = validator.hasAsync()
+    validDependency = undefined
+    validatingItems = undefined
+    if hasAsync
+      validDependency = new Tracker.Dependency()
+      validatingItems = new ReactiveArray()
+
+    validationAsync = undefined
+
+    getDone = if hasAsync
+      (initialValue) ->
+        validatingItems.push(1)
+        return (result) ->
+          validatingItems.pop()
+          if _value is initialValue and not (validationAsync or result)
+            validationAsync = { value: _value }
+            validDependency.changed()
+
+    funProp.valid = (noAsync) ->
+      dependency.depend()
+      if hasAsync
+        validDependency.depend()
+      if validationAsync and validationAsync.value is _value
+        #validationAsync = undefined
+        return false
+      else
+        if hasAsync and !noAsync
+          validator.validateAsync(_value, getDone(_value))
+        return validator.validate(_value)
+
+    funProp.validating = ->
+      return false if not hasAsync
+      validatingItems.depend()
+      return !!validatingItems.length
 
     # to give the feel of non reactivity
     Object.defineProperty funProp, 'value', { get: -> _value}
@@ -434,7 +489,7 @@ class ViewModel
     else
       Template.instance()?.data
 
-  getValue = (container, bindValue, viewmodel) ->
+  getValue = (container, bindValue, viewmodel, funPropReserved) ->
     bindValue = bindValue.trim()
     [token, tokenIndex] = firstToken(bindValue)
     if ~tokenIndex
@@ -457,8 +512,8 @@ class ViewModel
       breakOnFirstDot = ~dotIndex and (!~parenIndexStart or dotIndex < parenIndexStart or dotIndex is (parenIndexEnd + 1))
 
       if breakOnFirstDot
-        newContainer = getValue container, bindValue.substring(0, dotIndex), viewmodel
         newBindValue = bindValue.substring(dotIndex + 1)
+        newContainer = getValue container, bindValue.substring(0, dotIndex), viewmodel, ViewModel.funPropReserved[newBindValue]
         value = getValue newContainer, newBindValue, viewmodel
       else
         name = bindValue
@@ -500,7 +555,7 @@ class ViewModel
         else if primitive or not (`name in container`)
           value = getPrimitive(name)
         else
-          if _.isFunction(container[name])
+          if !funPropReserved and _.isFunction(container[name])
             value = container[name].apply(container, args)
           else
             value = container[name]
@@ -699,6 +754,12 @@ class ViewModel
         js[prop] = value
     return js
 
+  valid: (fields = []) ->
+    viewmodel = this
+    js = {}
+    for prop of viewmodel when viewmodel[prop]?.vmProp and (fields.length is 0 or prop in fields)
+      return false if not viewmodel[prop].valid(true)
+    return true
 
 
 #############
