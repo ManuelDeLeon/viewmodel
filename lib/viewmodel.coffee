@@ -56,9 +56,11 @@ class ViewModel
   # the property then the user must use the parenthesis: "if: prop().valid"
   @funPropReserved =
     valid: 1
-    'valid()': 1
+    validMessage: 1
+    invalid: 1
+    invalidMessage: 1
     validating: 1
-    'validating()': 1
+    message: 1
 
   @bindObjects = {}
 
@@ -309,10 +311,21 @@ class ViewModel
           validator.validateAsync(_value, getDone(_value))
         return validator.validate(_value)
 
+    funProp.validMessage = -> validator.validMessageValue
+
+    funProp.invalid = (noAsync) -> not this.valid(noAsync)
+    funProp.invalidMessage = -> validator.invalidMessageValue
+
     funProp.validating = ->
       return false if not hasAsync
       validatingItems.depend()
       return !!validatingItems.length
+
+    funProp.message = ->
+      if this.valid(true)
+        return validator.validMessageValue
+      else
+        return validator.invalidMessageValue
 
     # to give the feel of non reactivity
     Object.defineProperty funProp, 'value', { get: -> _value}
@@ -512,7 +525,8 @@ class ViewModel
 
       if breakOnFirstDot
         newBindValue = bindValue.substring(dotIndex + 1)
-        newContainer = getValue container, bindValue.substring(0, dotIndex), viewmodel, ViewModel.funPropReserved[newBindValue]
+        newBindValueCheck = if newBindValue.endsWith('()') then newBindValue.substr(0, newBindValue.length - 2) else newBindValue
+        newContainer = getValue container, bindValue.substring(0, dotIndex), viewmodel, ViewModel.funPropReserved[newBindValueCheck]
         value = getValue newContainer, newBindValue, viewmodel
       else
         name = bindValue
@@ -755,11 +769,30 @@ class ViewModel
 
   valid: (fields = []) ->
     viewmodel = this
-    js = {}
     for prop of viewmodel when viewmodel[prop]?.vmProp and (fields.length is 0 or prop in fields)
       return false if not viewmodel[prop].valid(true)
     return true
 
+  validMessages: (fields = []) ->
+    viewmodel = this
+    messages = []
+    for prop of viewmodel when viewmodel[prop]?.vmProp and (fields.length is 0 or prop in fields)
+      if viewmodel[prop].valid(true)
+        message = viewmodel[prop].message()
+        if message
+          messages.push(message)
+    return messages
+
+  invalid: (fields = []) -> not this.valid(fields)
+  invalidMessages: (fields = []) ->
+    viewmodel = this
+    messages = []
+    for prop of viewmodel when viewmodel[prop]?.vmProp and (fields.length is 0 or prop in fields)
+      if not viewmodel[prop].valid(true)
+        message = viewmodel[prop].message()
+        if message
+          messages.push(message)
+    return messages
 
 #############
   # Constructor

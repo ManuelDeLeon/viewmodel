@@ -64,6 +64,7 @@ Package.onTest(function(api) {
   api.addFiles([
     'lib/viewmodel.coffee',
     'lib/viewmodel-parseBind.coffee',
+    'lib/viewmodel-property.js',
     'lib/bindings.coffee',
     'lib/template.coffee',
     'lib/migration.coffee',
@@ -74,7 +75,8 @@ Package.onTest(function(api) {
     'tests/viewmodel-instance.coffee',
     'tests/viewmodel-check.coffee',
     'tests/viewmodel-parseBind.coffee',
-    'lib/viewmodel-property.js',
+    'tests/viewmodel-property.coffee',
+
     'tests/template.coffee'
   ], CLIENT);
 
