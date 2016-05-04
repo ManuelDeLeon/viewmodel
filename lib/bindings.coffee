@@ -48,11 +48,13 @@ addBinding
   events:
     'change input propertychange': (bindArg) ->
       newVal = bindArg.element.val()
-      bindArg.setVmValue(newVal) if newVal isnt bindArg.getVmValue()
+      bindArg.setVmValue(newVal) if newVal isnt bindArg.getVmValue().toString()
+      return
 
   autorun: (bindArg) ->
-    newVal = bindArg.getVmValue()
+    newVal = bindArg.getVmValue().toString()
     bindArg.element.val(newVal) if newVal isnt bindArg.element.val()
+    return
 
 addBinding
   name: 'text'

@@ -34,6 +34,7 @@ class ViewModel
     vmInitial: 1
     vmProp: 1
     templateInstance: 1
+    templateName: 1
     parent: 1
     children: 1
     child: 1
@@ -211,6 +212,7 @@ class ViewModel
         element = currentViewInstance.$("[#{bindIdAttribute}='#{bindId}']")
         # Don't bind the element because of a context change
         if element.length and not element[0].vmBound
+          return if not element.removeAttr
           element[0].vmBound = true
           element.removeAttr bindIdAttribute
           templateInstance.viewmodel.bind bindObject, templateInstance, element, bindings, bindId, currentView
@@ -237,7 +239,7 @@ class ViewModel
     id = Meteor.setTimeout func, time
     delayed[name] = id if name
 
-  @makeReactiveProperty = (initial) ->
+  @makeReactiveProperty = (initial, viewmodel) ->
     dependency = new Tracker.Dependency()
     isArray = _.isArray(initial)
     initialValue = if isArray
@@ -248,23 +250,42 @@ class ViewModel
       initial
     _value = initialValue
 
+    validator = if initial instanceof ViewModel.Property
+      initial
+    else
+      ViewModel.Property.validator(initial)
+
     funProp = (value) ->
       if arguments.length
         if _value isnt value
           changeValue = ->
+
+            if validator.beforeUpdates.length
+              validator.beforeValueUpdate(_value, viewmodel);
+
             if value instanceof Array
               _value = new ReactiveArray(value, dependency)
             else
               _value = value
+
+            if validator.convertIns.length
+              _value = validator.convertValueIn(_value, viewmodel);
+
+            if validator.afterUpdates.length
+              validator.afterValueUpdate(_value, viewmodel);
+
             dependency.changed()
           if funProp.delay > 0
             ViewModel.delay funProp.delay, funProp.vmProp, changeValue
           else
             changeValue()
-
       else
         dependency.depend()
-      return _value;
+
+      if validator.convertOuts.length
+        return validator.convertValueOut(_value, viewmodel);
+      else
+        return _value;
     funProp.reset = ->
       if _value instanceof ReactiveArray
         _value = new ReactiveArray(initial, dependency)
@@ -277,10 +298,7 @@ class ViewModel
     funProp.delay = 0
     funProp.vmProp = ViewModel.nextId()
 
-    validator = if initial instanceof ViewModel.Property
-      initial
-    else 
-      ViewModel.Property.validator(initial)
+
 
     hasAsync = validator.hasAsync()
     validDependency = undefined
@@ -308,8 +326,8 @@ class ViewModel
         return false
       else
         if hasAsync and !noAsync
-          validator.validateAsync(_value, getDone(_value))
-        return validator.validate(_value)
+          validator.verifyAsync(_value, getDone(_value), viewmodel)
+        return validator.verify(_value, viewmodel)
 
     funProp.validMessage = -> validator.validMessageValue
 
@@ -557,7 +575,7 @@ class ViewModel
 
         primitive = isPrimitive(name)
         if container instanceof ViewModel and not primitive and not container[name]
-          container[name] = ViewModel.makeReactiveProperty(undefined)
+          container[name] = ViewModel.makeReactiveProperty(undefined, viewmodel)
 
         if !primitive and not (container? and (container[name]? or _.isObject(container)))
           errorMsg = "Can't access '#{name}' of '#{container}'."
@@ -651,7 +669,7 @@ class ViewModel
           container[key] value
         else
           # Create a new property
-          container[key] = ViewModel.makeReactiveProperty(value);
+          container[key] = ViewModel.makeReactiveProperty(value, container);
       return
     if toLoad instanceof Array
       loadObj obj for obj in toLoad
@@ -760,7 +778,8 @@ class ViewModel
     viewmodel = this
     js = {}
     for prop of viewmodel when viewmodel[prop]?.vmProp and (fields.length is 0 or prop in fields)
-      value = viewmodel[prop]()
+      viewmodel[prop].depend()
+      value = viewmodel[prop].value
       if value instanceof ReactiveArray
         js[prop] = value.array()
       else
@@ -793,6 +812,8 @@ class ViewModel
         if message
           messages.push(message)
     return messages
+
+  templateName: -> ViewModel.templateName(@templateInstance)
 
 #############
   # Constructor

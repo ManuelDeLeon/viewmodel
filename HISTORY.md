@@ -1,4 +1,8 @@
-﻿## 4.0.14
+﻿## 4.1.0
+
+* Added .templateName() to view models.
+
+## 4.0.14
 
 * Throw an error if a bind can't be parsed.
 
