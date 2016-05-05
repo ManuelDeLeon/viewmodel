@@ -1,5 +1,6 @@
 ﻿## 4.1.0
 
+* Added validations. See https://viewmodel.org/docs/viewmodels#validation
 * Added .templateName() to view models.
 
 ## 4.0.14
