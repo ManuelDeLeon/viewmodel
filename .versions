@@ -27,11 +27,11 @@ htmljs@1.0.9
 http@1.1.5
 id-map@1.0.7
 jquery@1.11.8
-local-test:manuel:viewmodel@4.1.0
+local-test:manuel:viewmodel@4.1.1
 logging@1.0.12
 manuel:isdev@1.0.0
 manuel:reactivearray@1.0.5
-manuel:viewmodel@4.1.0
+manuel:viewmodel@4.1.1
 manuel:viewmodel-debug@2.7.0
 meteor@1.1.14
 minifier-js@1.1.11

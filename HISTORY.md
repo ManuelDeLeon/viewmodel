@@ -1,4 +1,8 @@
-﻿## 4.1.0
+﻿## 4.1.1
+
+* Fixed issue with onUrl
+
+## 4.1.0
 
 * Added validations. See https://viewmodel.org/docs/viewmodels#validation
 * Added .templateName() to view models.
