@@ -1,4 +1,8 @@
-﻿## 4.1.1
+﻿## 4.1.2
+
+* Add automatic array validator
+
+## 4.1.1
 
 * Fixed issue with onUrl
 
