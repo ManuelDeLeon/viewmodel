@@ -1,4 +1,9 @@
-﻿## 4.1.2
+﻿## 4.1.3
+
+* Fix array validator
+* Lower ecmascript version
+
+## 4.1.2
 
 * Add automatic array validator
 

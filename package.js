@@ -1,7 +1,7 @@
 Package.describe({
   name: 'manuel:viewmodel',
   summary: "MVVM, two-way data binding, and components for Meteor. Similar to Angular and Knockout.",
-  version: "4.1.2",
+  version: "4.1.3",
   git: "https://github.com/ManuelDeLeon/viewmodel"
 });
 
@@ -10,7 +10,7 @@ var CLIENT = 'client';
 Package.onUse(function(api) {
   api.use([
     'coffeescript@1.0.6',
-    'ecmascript@0.4.2',
+    'ecmascript@0.1.6',
     'blaze@2.1.2',
     'templating@1.1.1',
     'jquery@1.11.3_2',
