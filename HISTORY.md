@@ -1,4 +1,8 @@
-﻿## 4.1.3
+﻿## 4.1.4
+
+* ViewModel.property.array is now reactive
+
+## 4.1.3
 
 * Fix array validator
 * Lower ecmascript version

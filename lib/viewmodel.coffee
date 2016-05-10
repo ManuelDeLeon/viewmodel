@@ -241,14 +241,19 @@ class ViewModel
 
   @makeReactiveProperty = (initial, viewmodel) ->
     dependency = new Tracker.Dependency()
-    isArray = _.isArray(initial)
-    initialValue = if isArray
-      new ReactiveArray(initial, dependency)
-    else if initial instanceof ViewModel.Property
+    initialValue = if initial instanceof ViewModel.Property
       initial.defaultValue
     else
       initial
-    _value = initialValue
+
+    _value = undefined
+    reset = ->
+      if initialValue instanceof Array
+        _value = new ReactiveArray(initialValue, dependency)
+      else
+        _value = initialValue
+
+    reset()
 
     validator = if initial instanceof ViewModel.Property
       initial
@@ -286,11 +291,9 @@ class ViewModel
         return validator.convertValueOut(_value, viewmodel);
       else
         return _value;
+
     funProp.reset = ->
-      if _value instanceof ReactiveArray
-        _value = new ReactiveArray(initial, dependency)
-      else
-        _value = initialValue
+      reset()
       dependency.changed()
 
     funProp.depend = -> dependency.depend()

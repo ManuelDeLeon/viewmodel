@@ -299,6 +299,34 @@ describe "ViewModel", ->
         assert.equal "Y", actual()
         return
 
+    describe "validations", ->
+      it "returns a function", ->
+        assert.isFunction ViewModel.makeReactiveProperty(ViewModel.property.string)
+      it "sets default value", ->
+        actual = ViewModel.makeReactiveProperty(ViewModel.property.string.default("X"))
+        assert.equal "X", actual()
+      it "sets and gets values", ->
+        actual = ViewModel.makeReactiveProperty(ViewModel.property.string.default("X"))
+        actual("Y")
+        assert.equal "Y", actual()
+      it "resets the value", ->
+        actual = ViewModel.makeReactiveProperty(ViewModel.property.string.default("X"))
+        actual("Y")
+        actual.reset()
+        assert.equal "X", actual()
+
+      it "reactifies arrays", ->
+        actual = ViewModel.makeReactiveProperty(ViewModel.property.array)
+        assert.isTrue actual() instanceof ReactiveArray
+
+      it "resets arrays", ->
+        actual = ViewModel.makeReactiveProperty(ViewModel.property.array.default([1]))
+        actual().push(2)
+        assert.equal 2, actual().length
+        actual.reset()
+        assert.equal 1, actual().length
+        assert.equal 1, actual()[0]
+
   describe "@addBinding", ->
 
     last = 1
