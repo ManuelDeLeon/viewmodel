@@ -34,6 +34,20 @@ describe "bindings", ->
         assert.equal "X", @viewmodel.name()
         done()
 
+    it "can handle undefined", (done) ->
+      @element.val 'X'
+      @viewmodel.name undefined
+      delay =>
+        assert.equal "", @element.val()
+        done()
+
+    it "can handle null", (done) ->
+      @element.val 'X'
+      @viewmodel.name null
+      delay =>
+        assert.equal "", @element.val()
+        done()
+
     it "sets value from element (propertychange)", (done) ->
       @element.val 'X'
       @element.trigger 'propertychange'

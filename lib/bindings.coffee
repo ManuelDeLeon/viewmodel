@@ -52,7 +52,8 @@ addBinding
       return
 
   autorun: (bindArg) ->
-    newVal = bindArg.getVmValue().toString()
+    newVal = bindArg.getVmValue()
+    newVal = if `newVal == null` then "" else newVal.toString()
     bindArg.element.val(newVal) if newVal isnt bindArg.element.val()
     return
 

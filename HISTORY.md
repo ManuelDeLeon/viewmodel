@@ -1,4 +1,8 @@
-﻿## 4.1.4
+﻿## 4.1.5
+
+* Check for null/undefined in value binding
+
+## 4.1.4
 
 * ViewModel.property.array is now reactive
 
