@@ -1,4 +1,8 @@
-﻿## 4.1.5
+﻿## 4.1.6
+
+* Check for null/undefined in value binding when the property starts with a null/undefined
+
+## 4.1.5
 
 * Check for null/undefined in value binding
 

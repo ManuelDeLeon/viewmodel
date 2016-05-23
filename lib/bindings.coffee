@@ -48,7 +48,9 @@ addBinding
   events:
     'change input propertychange': (bindArg) ->
       newVal = bindArg.element.val()
-      bindArg.setVmValue(newVal) if newVal isnt bindArg.getVmValue().toString()
+      vmVal = bindArg.getVmValue()
+      vmVal = if `vmVal == null` then "" else vmVal.toString()
+      bindArg.setVmValue(newVal) if newVal isnt vmVal
       return
 
   autorun: (bindArg) ->
