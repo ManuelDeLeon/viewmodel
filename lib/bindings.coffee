@@ -5,7 +5,7 @@ addBinding = ViewModel.addBinding
 
 addBinding
   name: 'default'
-  bind: (bindArg, event) ->
+  bind: (bindArg) ->
     bindArg.element.on bindArg.bindName, (event) ->
       bindArg.setVmValue(event)
       return
