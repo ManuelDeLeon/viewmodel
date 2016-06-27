@@ -5,7 +5,7 @@ addBinding = ViewModel.addBinding
 
 addBinding
   name: 'default'
-  bind: (bindArg, event) ->
+  bind: (bindArg) ->
     bindArg.element.on bindArg.bindName, (event) ->
       bindArg.setVmValue(event)
       return
@@ -50,13 +50,13 @@ addBinding
       newVal = bindArg.element.val()
       vmVal = bindArg.getVmValue()
       vmVal = if `vmVal == null` then "" else vmVal.toString()
-      bindArg.setVmValue(newVal) if newVal isnt vmVal
+      bindArg.setVmValue(newVal) if newVal isnt vmVal or bindArg.elementBind.throttle
       return
 
   autorun: (bindArg) ->
     newVal = bindArg.getVmValue()
     newVal = if `newVal == null` then "" else newVal.toString()
-    bindArg.element.val(newVal) if newVal isnt bindArg.element.val()
+    bindArg.element.val(newVal) if newVal isnt bindArg.element.val() or bindArg.elementBind.throttle
     return
 
 addBinding

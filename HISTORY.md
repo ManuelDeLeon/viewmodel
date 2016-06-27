@@ -1,4 +1,8 @@
-﻿## 4.1.6
+﻿## 4.1.7
+
+* Fix throttle with input value starting blank then deleting the text before the time is up.
+
+## 4.1.6
 
 * Check for null/undefined in value binding when the property starts with a null/undefined
 
