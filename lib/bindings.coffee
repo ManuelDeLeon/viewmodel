@@ -253,13 +253,13 @@ addBinding
     return
 
 enable = (elem) ->
-  if elem.is('button') or elem.is('input') or elem.is('textarea')
+  if elem.is('button') or elem.is('input') or elem.is('textarea') or elem.is('select')
     elem.removeAttr('disabled')
   else
     elem.removeClass('disabled')
 
 disable = (elem) ->
-  if elem.is('button') or elem.is('input') or elem.is('textarea')
+  if elem.is('button') or elem.is('input') or elem.is('textarea') or elem.is('select')
     elem.attr('disabled', 'disabled')
   else
     elem.addClass('disabled')
