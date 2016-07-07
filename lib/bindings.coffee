@@ -252,14 +252,16 @@ addBinding
         bindArg.element.blur()
     return
 
+canDisable = (elem) -> elem.is('button') or elem.is('input') or elem.is('textarea') or elem.is('select')
+    
 enable = (elem) ->
-  if elem.is('button') or elem.is('input') or elem.is('textarea')
+  if canDisable(elem)
     elem.removeAttr('disabled')
   else
     elem.removeClass('disabled')
 
 disable = (elem) ->
-  if elem.is('button') or elem.is('input') or elem.is('textarea')
+  if canDisable(elem)
     elem.attr('disabled', 'disabled')
   else
     elem.addClass('disabled')

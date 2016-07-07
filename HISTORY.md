@@ -1,4 +1,8 @@
-﻿## 4.1.7
+﻿## 4.1.8
+
+* enable/disable bindings add disabled attribute to select elements
+
+## 4.1.7
 
 * Fix throttle with input value starting blank then deleting the text before the time is up.
 
