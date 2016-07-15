@@ -1,4 +1,8 @@
-﻿## 4.1.8
+﻿## 4.1.9
+
+* Don't save on url in older browsers
+
+## 4.1.8
 
 * enable/disable bindings add disabled attribute to select elements
 

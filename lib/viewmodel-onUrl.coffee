@@ -2,14 +2,18 @@
   pushState = history.pushState
   replaceState = history.replaceState
 
-  history.pushState = (state, title, url) ->
-    if typeof history.onstatechange is 'function'
-      history.onstatechange state, title, url
-    pushState.apply history, arguments
-  history.replaceState = (state, title, url) ->
-    if typeof history.onstatechange is 'function'
-      history.onstatechange state, title, url
-    replaceState.apply history, arguments
+  if (pushState)
+    history.pushState = (state, title, url) ->
+      if typeof history.onstatechange is 'function'
+        history.onstatechange state, title, url
+      pushState.apply history, arguments
+    history.replaceState = (state, title, url) ->
+      if typeof history.onstatechange is 'function'
+        history.onstatechange state, title, url
+      replaceState.apply history, arguments
+  else
+    history.pushState = ->
+    history.replaceState = ->
   return
 ) window.history
 
