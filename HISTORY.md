@@ -1,4 +1,9 @@
-﻿## 4.1.9
+﻿## 5.0.0
+
+* Before: If a mixin A used another mixin B and you scope A to a property, mixin B would attach to the root of view model.
+* Now: mixin B gets attached to the same property as A
+
+## 4.1.9
 
 * Don't save on url in older browsers
 

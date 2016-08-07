@@ -434,6 +434,42 @@ describe "ViewModel instance", ->
           address: 'A'
         person:
           name: 'X'
+        glob:
+          mixin: 'person'
+        prom:
+          mixin:
+            scoped: 'glob'
+        bland:
+          mixin: [ { subGlob: 'glob'}, 'house']
+
+    it "sub-mixin adds property to vm", ->
+      vm = new ViewModel
+        mixin: 'glob'
+      assert.equal 'X', vm.name()
+
+    it "sub-mixin adds sub-property to vm", ->
+      vm = new ViewModel
+        mixin:
+          scoped: 'glob'
+      assert.equal 'X', vm.scoped.name()
+
+    it "sub-mixin adds sub-property to vm prom", ->
+      vm = new ViewModel
+        mixin: 'prom'
+      assert.equal 'X', vm.scoped.name()
+
+    it "sub-mixin adds sub-property to vm bland", ->
+      vm = new ViewModel
+        mixin: 'bland'
+      assert.equal 'A', vm.address()
+      assert.equal 'X', vm.subGlob.name()
+
+    it "sub-mixin adds sub-property to vm bland scoped", ->
+      vm = new ViewModel
+        mixin:
+          scoped: 'bland'
+      assert.equal 'A', vm.scoped.address()
+      assert.equal 'X', vm.scoped.subGlob.name()
 
     it "adds property to vm", ->
       vm = new ViewModel

@@ -698,50 +698,62 @@ class ViewModel
       if toLoad instanceof Array
         for element in toLoad
           if _.isString element
-            viewmodel.load collection[element], onlyEvents
+            #viewmodel.load collection[element], onlyEvents
+            loadToContainer viewmodel, viewmodel, collection[element], onlyEvents
+#            if viewmodel instanceof ViewModel
+#              viewmodel.load collection[element], onlyEvents
+#            else
+#              ViewModel.loadProperties collection[element], viewmodel
           else
             loadMixinShare element, collection, viewmodel, onlyEvents
       else if _.isString toLoad
-        viewmodel.load collection[toLoad], onlyEvents
+        loadToContainer viewmodel, viewmodel, collection[toLoad], onlyEvents
+#        if viewmodel instanceof ViewModel
+#        viewmodel.load collection[toLoad], onlyEvents
+#        else
+#          ViewModel.loadProperties collection[toLoad], viewmodel
       else
         for ref of toLoad
           container = {}
           mixshare = toLoad[ref]
           if mixshare instanceof Array
             for item in mixshare
-              ViewModel.loadProperties collection[item], container
+#              loadMixinShare collection[item], container, onlyEvents
+              loadToContainer container, viewmodel, collection[item], onlyEvents
+#              ViewModel.loadProperties collection[item], container
           else
-            ViewModel.loadProperties collection[mixshare], container
+#            loadMixinShare collection[mixshare], container, onlyEvents
+            loadToContainer container, viewmodel, collection[mixshare], onlyEvents
+#            ViewModel.loadProperties collection[mixshare], container
           viewmodel[ref] = container
     return
 
-  load: (toLoad, onlyEvents) ->
+  loadToContainer = (container, viewmodel, toLoad, onlyEvents) ->
     return if not toLoad
-    viewmodel = this
 
     if toLoad instanceof Array
-      viewmodel.load( item, onlyEvents ) for item in toLoad
+      loadToContainer( container, viewmodel, item, onlyEvents ) for item in toLoad
 
     if not onlyEvents
       # Signals are loaded 1st
-      signals = ViewModel.signalToLoad(toLoad.signal)
+      signals = ViewModel.signalToLoad(toLoad.signal, container)
       for signal in signals
-        viewmodel.load signal
+        loadToContainer container, viewmodel, signal, onlyEvents
         viewmodel.vmOnCreated.push signal.onCreated
         viewmodel.vmOnDestroyed.push signal.onDestroyed
 
     # Shared are loaded 2nd
-    loadMixinShare toLoad.share, ViewModel.shared, viewmodel, onlyEvents
+    loadMixinShare toLoad.share, ViewModel.shared, container, onlyEvents
 
     # Mixins are loaded 3rd
-    loadMixinShare toLoad.mixin, ViewModel.mixins, viewmodel, onlyEvents
+    loadMixinShare toLoad.mixin, ViewModel.mixins, container, onlyEvents
 
     # Whatever is in 'load' is loaded before direct properties
-    viewmodel.load toLoad.load, onlyEvents
+    loadToContainer container, viewmodel, toLoad.load, onlyEvents
 
     if not onlyEvents
       # Direct properties are loaded last.
-      ViewModel.loadProperties toLoad, viewmodel
+      ViewModel.loadProperties toLoad, container
 
     if onlyEvents
       hooks =
@@ -760,6 +772,8 @@ class ViewModel
           viewmodel[vmProp].push item
       else
         viewmodel[vmProp].push toLoad[hook]
+
+  load: (toLoad, onlyEvents) -> loadToContainer(this, this, toLoad, onlyEvents)
 
   parent: (args...) ->
     ViewModel.check "#parent", args...
@@ -963,7 +977,7 @@ class ViewModel
       ViewModel.signals[key] = value
     return
 
-  signalContainer = (containerName) ->
+  signalContainer = (containerName, container) ->
     all = []
     return all if not containerName
     signalObject = ViewModel.signals[containerName]
@@ -974,20 +988,19 @@ class ViewModel
         transform = value.transform or (e) -> e
         boundProp = "_#{key}_Bound"
         single.onCreated = ->
-          viewmodel = this
-          vmProp = viewmodel[key]
+          vmProp = container[key]
           func = (e) ->
             vmProp transform(e)
           funcToUse = if value.throttle then _.throttle( func, value.throttle ) else func
-          viewmodel[boundProp] = funcToUse
+          container[boundProp] = funcToUse
           value.target.addEventListener value.event, funcToUse
         single.onDestroyed = ->
           value.target.removeEventListener value.event, this[boundProp]
         all.push single
     return all
 
-  @signalToLoad = (container) ->
-    if container instanceof Array
-      _.flatten( (signalContainer(name) for name in container), true )
+  @signalToLoad = (containerName, container) ->
+    if containerName instanceof Array
+      _.flatten( (signalContainer(name, container) for name in containerName), true )
     else
-      signalContainer container
+      signalContainer containerName, container
