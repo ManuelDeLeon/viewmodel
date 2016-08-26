@@ -482,6 +482,7 @@ class ViewModel
     tokenIndex = -1
     token = null
     inQuote = null
+    parensCount = 0
     for c, i in str
       break if token
       if c is '"' or c is "'"
@@ -489,7 +490,12 @@ class ViewModel
           inQuote = null
         else if not inQuote
           inQuote = c
-      else if not inQuote and ~"+-*/%&|><=".indexOf(c)
+      else if not inQuote and (c is '(' or c is ')')
+        if c is '('
+          parensCount++
+        if c is ')'
+          parensCount--
+      else if not inQuote and parensCount is 0 and ~"+-*/%&|><=".indexOf(c)
         tokenIndex = i
         for length in [4..1]
           if str.length > tokenIndex + length
@@ -524,6 +530,7 @@ class ViewModel
 
   getValue = (container, bindValue, viewmodel, funPropReserved) ->
     bindValue = bindValue.trim()
+    return getPrimitive(bindValue) if isPrimitive(bindValue)
     [token, tokenIndex] = firstToken(bindValue)
     if ~tokenIndex
       left = getValue(container, bindValue.substring(0, tokenIndex), viewmodel)

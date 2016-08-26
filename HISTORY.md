@@ -1,4 +1,8 @@
-﻿## 5.0.0
+﻿## 5.0.1
+
+* Bindings parser can now handle negative numbers inside parenthesis operations
+
+## 5.0.0
 
 * Before: If a mixin A used another mixin B and you scope A to a property, mixin B would attach to the root of view model.
 * Now: mixin B gets attached to the same property as A

@@ -616,10 +616,10 @@ describe "ViewModel", ->
   describe "@getVmValueGetter", ->
 
     it "returns value from 1 + 'A'", ->
-    viewmodel = {}
-    bindValue = ViewModel.parseBind("x: 1 + 'A'").x
-    getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
-    assert.equal "1A", getVmValue()
+      viewmodel = {}
+      bindValue = ViewModel.parseBind("x: 1 + 'A'").x
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal "1A", getVmValue()
 
     it "returns value from name", ->
       viewmodel =
@@ -627,6 +627,27 @@ describe "ViewModel", ->
       bindValue = 'name'
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "A", getVmValue()
+
+    it "returns value from call(1, -2)", ->
+      viewmodel =
+        call: (a, b) -> b
+      bindValue = "call(1, -2)"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal -2, getVmValue()
+
+    it "returns value from call(1 - 2)", ->
+      viewmodel =
+        call: (a) -> a
+      bindValue = "call(1 - 2)"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal -1, getVmValue()
+
+    it "returns value from call(1, 1 - 2)", ->
+      viewmodel =
+        call: (a, b) -> b
+      bindValue = "call(1, 1 - 2)"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal -1, getVmValue()
 
     it "returns value from name(address.zip)", ->
       viewmodel =
