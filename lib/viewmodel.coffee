@@ -40,6 +40,7 @@ class ViewModel
     child: 1
     reset: 1
     data: 1
+    b: 1
 
 
   # These are objects used as bindings but do not have
@@ -534,8 +535,11 @@ class ViewModel
     [token, tokenIndex] = firstToken(bindValue)
     if ~tokenIndex
       left = getValue(container, bindValue.substring(0, tokenIndex), viewmodel)
-      right = getValue(container, bindValue.substring(tokenIndex + token.length), viewmodel)
-      value = tokens[token.trim()]( left, right )
+      if (token is '&&' and not left) || (token is '||' and left)
+        value = left
+      else
+        right = getValue(container, bindValue.substring(tokenIndex + token.length), viewmodel)
+        value = tokens[token.trim()]( left, right )
     else if bindValue is "this"
       value = currentContext()
     else if quoted(bindValue)
@@ -610,26 +614,37 @@ class ViewModel
       getValue(viewmodel, optBindValue.toString(), viewmodel)
 
   setValue = (value, container, bindValue, viewmodel) ->
-    if dotRegex.test(bindValue)
+    bindValue = bindValue.trim()
+    return getPrimitive(bindValue) if isPrimitive(bindValue)
+    [token, tokenIndex] = firstToken(bindValue)
+    retValue = undefined
+    if ~tokenIndex
+      left = setValue(value, container, bindValue.substring(0, tokenIndex), viewmodel)
+      return left if token is '&&' and not left
+      return left if token is '||' and left
+      right = setValue(value, container, bindValue.substring(tokenIndex + token.length), viewmodel)
+      retValue = tokens[token.trim()]( left, right )
+    else if ~bindValue.indexOf(')', bindValue.length - 1)
+      retValue = getValue(viewmodel, bindValue, viewmodel)
+    else if dotRegex.test(bindValue)
       i = bindValue.search(dotRegex)
       i += 1 if bindValue.charAt(i) isnt '.'
       newContainer = getValue container, bindValue.substring(0, i), viewmodel
       newBindValue = bindValue.substring(i + 1)
-      setValue value, newContainer, newBindValue, viewmodel
+      retValue = setValue value, newContainer, newBindValue, viewmodel
     else
-      if _.isFunction(container[bindValue]) then container[bindValue](value) else container[bindValue] = value
-    return
+      if _.isFunction(container[bindValue]) 
+        retValue = container[bindValue](value) 
+      else 
+        container[bindValue] = value
+        retValue = value
+    return retValue
 
   @getVmValueSetter = (viewmodel, bindValue, view) ->
     return (->) if not _.isString(bindValue)
-    if ~bindValue.indexOf(')', bindValue.length - 1)
-      return ->
-        currentView = view
-        getValue(viewmodel, bindValue, viewmodel)
-    else
-      return (value) ->
-        currentView = view
-        setValue(value, viewmodel, bindValue, viewmodel)
+    return (value) ->
+      currentView = view
+      setValue(value, viewmodel, bindValue, viewmodel)
 
 
   @parentTemplate = (templateInstance) ->
@@ -670,16 +685,19 @@ class ViewModel
 
   @loadProperties = (toLoad, container) ->
     loadObj = (obj) ->
-      for key, value of obj when not (ViewModel.properties[key] or ViewModel.reserved[key])
-        if _.isFunction(value)
-          # we don't care, just take the new function
-          container[key] = value
-        else if container[key] and container[key].vmProp and _.isFunction(container[key])
-          # keep the reference to the old property we already have
-          container[key] value
+      for key, value of obj when not ViewModel.properties[key]
+        if ViewModel.reserved[key]
+          throw new Error "Can't use reserved word '" + key + "' as a view model property."
         else
-          # Create a new property
-          container[key] = ViewModel.makeReactiveProperty(value, container);
+          if _.isFunction(value)
+            # we don't care, just take the new function
+            container[key] = value
+          else if container[key] and container[key].vmProp and _.isFunction(container[key])
+            # keep the reference to the old property we already have
+            container[key] value
+          else
+            # Create a new property
+            container[key] = ViewModel.makeReactiveProperty(value, container);
       return
     if toLoad instanceof Array
       loadObj obj for obj in toLoad

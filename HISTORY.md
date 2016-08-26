@@ -1,4 +1,28 @@
-﻿## 5.0.1
+﻿## 6.0.0
+
+* Short circuit && || operators in bindings.
+* Prevent using "b" as a view model property. It conflicts with Blaze.
+* Throw error if you try to use a reserved property.
+
+    vmId
+    vmPathToParent
+    vmOnCreated
+    vmOnRendered
+    vmOnDestroyed
+    vmAutorun
+    vmEvents
+    vmInitial
+    vmProp
+    templateInstance
+    templateName
+    parent
+    children
+    child
+    reset
+    data
+    b
+
+## 5.0.1
 
 * Bindings parser can now handle negative numbers inside parenthesis operations
 

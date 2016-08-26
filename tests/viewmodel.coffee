@@ -628,6 +628,30 @@ describe "ViewModel", ->
       getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
       assert.equal "A", getVmValue()
 
+    it "returns short circuits false && true", ->
+      called = false
+      viewmodel =
+        a: -> false
+        b: ->
+          called = true
+          true
+      bindValue = "a && b"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal false, getVmValue()
+      assert.equal false, called
+
+    it "returns short circuits true || false", ->
+      called = false
+      viewmodel =
+        a: -> true
+        b: ->
+          called = true
+          true
+      bindValue = "a || b"
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal true, getVmValue()
+      assert.equal false, called
+
     it "returns value from call(1, -2)", ->
       viewmodel =
         call: (a, b) -> b
@@ -1283,6 +1307,19 @@ describe "ViewModel", ->
 
   describe "@getVmValueSetter", ->
 
+    it "sets first && second", ->
+      firstVal = null
+      secondVal = null
+      viewmodel =
+        first: (v) -> firstVal = v
+        second: (v) -> secondVal = v
+      bindValue = 'first && second'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(2)
+      assert.equal 2, firstVal
+      assert.equal 2, secondVal
+      return
+
     it "sets first func", ->
       val = null
       viewmodel =
@@ -1452,7 +1489,6 @@ describe "ViewModel", ->
       ViewModel.byId = {}
       ViewModel.byTemplate = {}
       @vm1 = new ViewModel
-        vmId: 1
         name: 'A'
         age: 2
       @vm1.templateInstance =
@@ -1460,7 +1496,6 @@ describe "ViewModel", ->
           name: 'Template.X'
       ViewModel.add @vm1
       @vm2 = new ViewModel
-        vmId: 2
         name: 'B'
         age: 1
       @vm2.templateInstance =
@@ -1468,7 +1503,6 @@ describe "ViewModel", ->
           name: 'Template.X'
       ViewModel.add @vm2
       @vm3 = new ViewModel
-        vmId: 3
         name: 'C'
         age: 1
       @vm3.templateInstance =
