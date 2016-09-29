@@ -561,49 +561,54 @@ class ViewModel
         newContainer = getValue container, bindValue.substring(0, dotIndex), viewmodel, ViewModel.funPropReserved[newBindValueCheck]
         value = getValue newContainer, newBindValue, viewmodel
       else
-        name = bindValue
-        args = []
-        if ~parenIndexStart
-          parsed = ViewModel.parseBind(bindValue)
-          name = Object.keys(parsed)[0]
-          second = parsed[name]
-          if second.length > 2
-            for arg in second.substr(1, second.length - 2).split(',') #remove parenthesis
-              arg = $.trim(arg)
-              newArg = undefined
-              if arg is "this"
-                newArg = currentContext()
-              else if quoted(arg)
-                newArg = removeQuotes(arg)
-              else
-                neg = arg.charAt(0) is '!'
-                arg = arg.substring 1 if neg
-
-                arg = getValue(viewmodel, arg, viewmodel)
-                if viewmodel and `arg in viewmodel`
-                  newArg = getValue(viewmodel, arg, viewmodel)
-                else
-                  newArg = arg #getPrimitive(arg)
-                newArg = !newArg if neg
-              args.push newArg
-
-        primitive = isPrimitive(name)
-        if container instanceof ViewModel and not primitive and not container[name]
-          container[name] = ViewModel.makeReactiveProperty(undefined, viewmodel)
-
-        if !primitive and not (container? and (container[name]? or _.isObject(container)))
-          errorMsg = "Can't access '#{name}' of '#{container}'."
-          if viewmodel
-            templateName = ViewModel.templateName(viewmodel.templateInstance)
-            errorMsg += " This is for template '#{templateName}'."
-          console.error errorMsg
-        else if primitive or not (`name in container`)
-          value = getPrimitive(name)
+        if `container == null`
+          value = undefined
         else
-          if !funPropReserved and _.isFunction(container[name])
-            value = container[name].apply(container, args)
+          name = bindValue
+          args = []
+          if ~parenIndexStart
+            parsed = ViewModel.parseBind(bindValue)
+            name = Object.keys(parsed)[0]
+            second = parsed[name]
+            if second.length > 2
+              for arg in second.substr(1, second.length - 2).split(',') #remove parenthesis
+                arg = $.trim(arg)
+                newArg = undefined
+                if arg is "this"
+                  newArg = currentContext()
+                else if quoted(arg)
+                  newArg = removeQuotes(arg)
+                else
+                  neg = arg.charAt(0) is '!'
+                  arg = arg.substring 1 if neg
+
+                  arg = getValue(viewmodel, arg, viewmodel)
+                  if viewmodel and `arg in viewmodel`
+                    newArg = getValue(viewmodel, arg, viewmodel)
+                  else
+                    newArg = arg #getPrimitive(arg)
+                  newArg = !newArg if neg
+                args.push newArg
+
+          primitive = isPrimitive(name)
+          if container instanceof ViewModel and not primitive and not container[name]
+            container[name] = ViewModel.makeReactiveProperty(undefined, viewmodel)
+
+          if !primitive and not (container? and (container[name]? or _.isObject(container)))
+            errorMsg = "Can't access '#{name}' of '#{container}'."
+            if viewmodel
+              templateName = ViewModel.templateName(viewmodel.templateInstance)
+              errorMsg += " This is for template '#{templateName}'."
+            console.error errorMsg
+          else if primitive
+            value = getPrimitive(name)
+          else if not (`name in container`)
+            return undefined
           else
-            value = container[name]
+            if !funPropReserved and _.isFunction(container[name])
+              value = container[name].apply(container, args)
+            else
+              value = container[name]
       value = !value if negate
 
     return value

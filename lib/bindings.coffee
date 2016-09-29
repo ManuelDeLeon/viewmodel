@@ -300,7 +300,16 @@ addBinding
     source = bindArg.getVmValue()
     collection = if source instanceof Mongo.Cursor then source.fetch() else source
     for item in collection
-      itemText = _.escape(if optionsText then item[optionsText] else item)
+      itemTextRaw = if optionsText
+        if item.hasOwnProperty(optionsText)
+          item[optionsText]
+        else if _.isFunction(bindArg.viewmodel[optionsText])
+          bindArg.viewmodel[optionsText](item)
+        else
+          undefined
+      else
+        item
+      itemText = _.escape(itemTextRaw)
       itemValue = _.escape(if optionsValue then item[optionsValue] else item)
       selected = if selection is itemValue then "selected='selected'" else ""
       bindArg.element.append("<option #{selected} value=\"#{itemValue}\">#{itemText}</option>")
@@ -317,7 +326,16 @@ addBinding
     source = bindArg.getVmValue()
     collection = if source instanceof Mongo.Cursor then source.fetch() else source
     for item in collection
-      itemText = _.escape(if optionsText then item[optionsText] else item)
+      itemTextRaw = if optionsText
+        if item.hasOwnProperty(optionsText)
+          item[optionsText]
+        else if _.isFunction(bindArg.viewmodel[optionsText])
+          bindArg.viewmodel[optionsText](item)
+        else
+          undefined
+      else
+        item
+      itemText = _.escape(itemTextRaw)
       itemValue = _.escape(if optionsValue then item[optionsValue] else item)
       selected = if itemValue in selection then "selected='selected'" else ""
       bindArg.element.append("<option #{selected} value=\"#{itemValue}\">#{itemText}</option>")

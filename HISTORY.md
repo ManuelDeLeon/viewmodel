@@ -1,4 +1,8 @@
-﻿## 6.0.0
+﻿## 6.1.0
+
+* optionsText can now point to a vm function
+
+## 6.0.0
 
 * Short circuit && || operators in bindings.
 * Prevent using "b" as a view model property. It conflicts with Blaze.
