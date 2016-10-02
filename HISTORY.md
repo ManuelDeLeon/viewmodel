@@ -1,4 +1,8 @@
-﻿## 6.1.0
+﻿## 6.1.1
+
+* value binding now only uses 'input' event
+
+## 6.1.0
 
 * optionsText can now point to a vm function
 
