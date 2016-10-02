@@ -1,4 +1,8 @@
-﻿## 6.1.1
+﻿## 6.1.2
+
+* Use change event for select elements
+
+## 6.1.1
 
 * value binding now only uses 'input' event
 

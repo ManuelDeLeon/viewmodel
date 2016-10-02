@@ -45,6 +45,23 @@ addBinding
 
 addBinding
   name: 'value'
+  selector: 'select'
+  events:
+    'change': (bindArg) ->
+      newVal = bindArg.element.val()
+      vmVal = bindArg.getVmValue()
+      vmVal = if `vmVal == null` then "" else vmVal.toString()
+      bindArg.setVmValue(newVal) if newVal isnt vmVal or bindArg.elementBind.throttle
+      return
+
+  autorun: (bindArg) ->
+    newVal = bindArg.getVmValue()
+    newVal = if `newVal == null` then "" else newVal.toString()
+    bindArg.element.val(newVal) if newVal isnt bindArg.element.val() or bindArg.elementBind.throttle
+    return
+
+addBinding
+  name: 'value'
   events:
     'input': (bindArg) ->
       newVal = bindArg.element.val()
