@@ -43,38 +43,38 @@ addBinding
   name: 'hide'
   autorun: showHide(true)
 
+valueEvent = (bindArg) ->
+  newVal = bindArg.element.val()
+  vmVal = bindArg.getVmValue()
+  vmVal = if `vmVal == null` then "" else vmVal.toString()
+  bindArg.setVmValue(newVal) if newVal isnt vmVal or bindArg.elementBind.throttle
+  return
+
+valueAutorun = (bindArg) ->
+  newVal = bindArg.getVmValue()
+  newVal = if `newVal == null` then "" else newVal.toString()
+  bindArg.element.val(newVal) if newVal isnt bindArg.element.val() or bindArg.elementBind.throttle
+  return
+
 addBinding
   name: 'value'
   selector: 'select'
   events:
-    'change': (bindArg) ->
-      newVal = bindArg.element.val()
-      vmVal = bindArg.getVmValue()
-      vmVal = if `vmVal == null` then "" else vmVal.toString()
-      bindArg.setVmValue(newVal) if newVal isnt vmVal or bindArg.elementBind.throttle
-      return
-
-  autorun: (bindArg) ->
-    newVal = bindArg.getVmValue()
-    newVal = if `newVal == null` then "" else newVal.toString()
-    bindArg.element.val(newVal) if newVal isnt bindArg.element.val() or bindArg.elementBind.throttle
-    return
+    'change': valueEvent
+  autorun: valueAutorun
 
 addBinding
   name: 'value'
   events:
-    'input': (bindArg) ->
-      newVal = bindArg.element.val()
-      vmVal = bindArg.getVmValue()
-      vmVal = if `vmVal == null` then "" else vmVal.toString()
-      bindArg.setVmValue(newVal) if newVal isnt vmVal or bindArg.elementBind.throttle
-      return
+    'input': valueEvent
+  autorun: valueAutorun
 
-  autorun: (bindArg) ->
-    newVal = bindArg.getVmValue()
-    newVal = if `newVal == null` then "" else newVal.toString()
-    bindArg.element.val(newVal) if newVal isnt bindArg.element.val() or bindArg.elementBind.throttle
-    return
+addBinding
+  name: 'value'
+  selector: '[type=hidden]'
+  events:
+    'input change': valueEvent
+  autorun: valueAutorun
 
 addBinding
   name: 'text'
@@ -270,7 +270,7 @@ addBinding
     return
 
 canDisable = (elem) -> elem.is('button') or elem.is('input') or elem.is('textarea') or elem.is('select')
-    
+
 enable = (elem) ->
   if canDisable(elem)
     elem.removeAttr('disabled')

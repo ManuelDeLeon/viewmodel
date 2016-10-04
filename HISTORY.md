@@ -1,4 +1,8 @@
-﻿## 6.1.2
+﻿## 6.1.3
+
+* Hidden elements now respond to both input and change events
+
+## 6.1.2
 
 * Use change event for select elements
 
