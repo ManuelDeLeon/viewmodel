@@ -47,31 +47,22 @@ valueEvent = (bindArg) ->
   newVal = bindArg.element.val()
   vmVal = bindArg.getVmValue()
   vmVal = if `vmVal == null` then "" else vmVal.toString()
-  bindArg.setVmValue(newVal) if newVal isnt vmVal or bindArg.elementBind.throttle
+  if newVal isnt vmVal or (bindArg.elementBind.throttle and (!bindArg.viewmodel[bindArg.bindValue].hasOwnProperty('nextVal') or newVal isnt bindArg.viewmodel[bindArg.bindValue].nextVal ))
+    if bindArg.elementBind.throttle
+      bindArg.viewmodel[bindArg.bindValue].nextVal = newVal
+      bindArg.setVmValue(newVal) 
+    else
+      bindArg.setVmValue(newVal) 
   return
 
 valueAutorun = (bindArg) ->
   newVal = bindArg.getVmValue()
   newVal = if `newVal == null` then "" else newVal.toString()
-  bindArg.element.val(newVal) if newVal isnt bindArg.element.val() or bindArg.elementBind.throttle
+  bindArg.element.val(newVal) if newVal isnt bindArg.element.val()
   return
 
 addBinding
   name: 'value'
-  selector: 'select'
-  events:
-    'change': valueEvent
-  autorun: valueAutorun
-
-addBinding
-  name: 'value'
-  events:
-    'input': valueEvent
-  autorun: valueAutorun
-
-addBinding
-  name: 'value'
-  selector: '[type=hidden]'
   events:
     'input change': valueEvent
   autorun: valueAutorun

@@ -66,9 +66,9 @@ describe "bindings", ->
         assert.equal "", @element.val()
         done()
 
-    it "sets value from element (propertychange)", (done) ->
+    it "sets value from element (change event)", (done) ->
       @element.val 'X'
-      @element.trigger 'propertychange'
+      @element.trigger 'change'
       delay =>
         assert.equal "X", @viewmodel.name()
         done()

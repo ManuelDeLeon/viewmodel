@@ -1,4 +1,8 @@
-﻿## 6.1.3
+﻿## 6.1.4
+
+* Fix the value/throttle issues by saving the next value when throttled
+
+## 6.1.3
 
 * Hidden elements now respond to both input and change events
 
