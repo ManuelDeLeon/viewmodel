@@ -47,6 +47,8 @@ valueEvent = (bindArg) ->
   newVal = bindArg.element.val()
   vmVal = bindArg.getVmValue()
   vmVal = if `vmVal == null` then "" else vmVal.toString()
+  if bindArg.elementBind.throttle and !bindArg.viewmodel.hasOwnProperty(bindArg.bindValue)
+    bindArg.viewmodel[bindArg.bindValue] = {}
   if newVal isnt vmVal or (bindArg.elementBind.throttle and (!bindArg.viewmodel[bindArg.bindValue].hasOwnProperty('nextVal') or newVal isnt bindArg.viewmodel[bindArg.bindValue].nextVal ))
     if bindArg.elementBind.throttle
       bindArg.viewmodel[bindArg.bindValue].nextVal = newVal

@@ -1,4 +1,8 @@
-﻿## 6.1.4
+﻿## 6.1.5
+
+* Fix value/throttle with complex binds
+
+## 6.1.4
 
 * Fix the value/throttle issues by saving the next value when throttled
 
