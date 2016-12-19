@@ -124,6 +124,10 @@ class ViewModel
           return if templateInstance.isDestroyed
 
           ViewModel.assignChild(viewmodel)
+
+          for obj in ViewModel.globals
+            viewmodel.load(obj);
+
           vmHash = viewmodel.vmHash()
           if migrationData = Migration.get(vmHash)
             viewmodel.load(migrationData)
@@ -994,6 +998,10 @@ class ViewModel
           ViewModel.shared[key][prop] = ViewModel.makeReactiveProperty(content)
 
     return
+
+  @globals = []
+  @global = (obj) ->
+    ViewModel.globals.push(obj)
 
   @mixins = {}
   @mixin = (obj) ->

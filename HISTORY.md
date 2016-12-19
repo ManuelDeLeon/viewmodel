@@ -1,4 +1,8 @@
-﻿## 6.1.5
+﻿## 6.2.0
+
+* Add global properties
+
+## 6.1.5
 
 * Fix value/throttle with complex binds
 
