@@ -236,6 +236,12 @@ describe "ViewModel instance", ->
       ret = @viewmodel.bind bindObject, 'templateInstance', 'element', 'bindings'
       assert.isUndefined ret
 
+  describe "validation", ->
+    it "vm is valid with an undefined", ->
+      @viewmodel.load({ name: undefined })
+      assert.equal true, @viewmodel.valid()
+      return
+
   describe "#load", ->
 
     it "adds a property to the view model", ->

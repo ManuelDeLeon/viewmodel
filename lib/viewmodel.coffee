@@ -330,7 +330,7 @@ class ViewModel
       dependency.depend()
       if hasAsync
         validDependency.depend()
-      if validationAsync and validationAsync.value is _value
+      if validationAsync and validationAsync.hasOwnProperty('value') and validationAsync.value is _value
         return false
       else
         if hasAsync and !noAsync
