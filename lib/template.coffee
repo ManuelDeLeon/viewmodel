@@ -45,3 +45,8 @@ Blaze.Template.prototype.elementBind = (selector, data) ->
   bindId = html.find(selector).attr("b-id")
   bindOject = ViewModel.bindObjects[bindId]
   return bindOject
+
+Template.registerHelper 'vmRef', (prop) ->
+  instance = Template.instance()
+  return () ->
+    return instance.viewmodel[prop]

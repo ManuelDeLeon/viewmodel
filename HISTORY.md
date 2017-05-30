@@ -1,4 +1,8 @@
-﻿## 6.2.1
+﻿## 6.3.0
+
+* Add vmRef global helper. See: https://viewmodel.org/docs/misc#usingcontrols
+
+## 6.2.1
 
 * fix validation for undefined values
 
