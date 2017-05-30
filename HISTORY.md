@@ -1,4 +1,8 @@
-﻿## 6.2.0
+﻿## 6.2.1
+
+* fix validation for undefined values
+
+## 6.2.0
 
 * Add global properties
 
