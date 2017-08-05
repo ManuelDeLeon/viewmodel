@@ -399,6 +399,36 @@ describe "bindings", ->
         done()
 
   describe "style", ->
+    it "removes the style from string", (done) ->
+      bindObject =
+        style: "styleLabel"
+      @viewmodel.load
+        styleLabel: 
+          color: "red"
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element[0].style.color
+        @viewmodel.styleLabel({ color: null })
+        delay =>
+          assert.equal "", @element[0].style.color
+          done()
+      return
+
+    it "removes the style from object", (done) ->
+      bindObject =
+        style:
+          color: "color"
+      @viewmodel.load
+        color: "red"
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element[0].style.color
+        @viewmodel.color(null)
+        delay =>
+          assert.equal "", @element[0].style.color
+          done()
+      return
+
     it "element has the style from object", (done) ->
       bindObject =
         style:
@@ -471,4 +501,20 @@ describe "bindings", ->
         assert.equal "red", @element.inlineStyle("color")
         assert.equal "10px", @element.inlineStyle("height")
         done()
+      return
+
+    it "removes the style from array", (done) ->
+      bindObject =
+        style: "[styles.label]"
+      @viewmodel.load
+        styles:
+          label:
+            color: 'red'
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+      delay =>
+        assert.equal "red", @element.inlineStyle("color")
+        @viewmodel.styles({ label: { color: null } })
+        delay =>
+          assert.equal "", @element[0].style.color
+          done()
       return

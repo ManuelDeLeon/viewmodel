@@ -1,4 +1,8 @@
-﻿## 6.3.0
+﻿## 6.3.2
+
+* style binding now removes styles when set to null
+
+## 6.3.0
 
 * Add vmRef global helper. See: https://viewmodel.org/docs/misc#usingcontrols
 

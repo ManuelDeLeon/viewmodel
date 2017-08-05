@@ -211,7 +211,8 @@ addBinding
     items = itemString.split(',')
     for item in items
       value = bindArg.getVmValue($.trim(item))
-      bindArg.element.css value
+      for style of value
+        bindArg.element[0].style[style] = value[style]
     return
 
 addBinding
@@ -223,7 +224,8 @@ addBinding
       if ~newValue.indexOf(";")
         newValue = newValue.split(";").join(",")
       newValue = ViewModel.parseBind(newValue)
-    bindArg.element.css newValue
+    for style of newValue
+      bindArg.element[0].style[style] = newValue[style]
 
 addBinding
   name: 'style'
@@ -232,7 +234,7 @@ addBinding
     for style of bindArg.bindValue
       do (style) ->
         bindArg.autorun ->
-          bindArg.element.css style, bindArg.getVmValue(bindArg.bindValue[style])
+          bindArg.element[0].style[style] = bindArg.getVmValue(bindArg.bindValue[style])
           return
     return
 
