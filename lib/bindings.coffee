@@ -1,4 +1,4 @@
-isArray = (obj) -> obj instanceof Array
+isArray = (obj) -> obj instanceof Array or Array.isArray(obj)
 
 addBinding = ViewModel.addBinding
 

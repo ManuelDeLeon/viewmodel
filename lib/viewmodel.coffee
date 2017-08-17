@@ -1,3 +1,5 @@
+isArray = (obj) -> obj instanceof Array or Array.isArray(obj)
+
 class ViewModel
 
   #@@@@@@@@@@@@@@
@@ -253,7 +255,7 @@ class ViewModel
 
     _value = undefined
     reset = ->
-      if initialValue instanceof Array
+      if isArray(initialValue)
         _value = new ReactiveArray(initialValue, dependency)
       else
         _value = initialValue
@@ -273,7 +275,7 @@ class ViewModel
             if validator.beforeUpdates.length
               validator.beforeValueUpdate(_value, viewmodel);
 
-            if value instanceof Array
+            if isArray(value)
               _value = new ReactiveArray(value, dependency)
             else
               _value = value
@@ -373,7 +375,7 @@ class ViewModel
     return
 
   @addAttributeBinding = (attrs) ->
-    if attrs instanceof Array
+    if isArray(attrs)
       for attr in attrs
         do (attr) ->
           ViewModel.addBinding
@@ -708,7 +710,7 @@ class ViewModel
             # Create a new property
             container[key] = ViewModel.makeReactiveProperty(value, container);
       return
-    if toLoad instanceof Array
+    if isArray(toLoad)
       loadObj obj for obj in toLoad
     else
       loadObj toLoad
@@ -729,7 +731,7 @@ class ViewModel
 
   loadMixinShare = (toLoad, collection, viewmodel, onlyEvents) ->
     if toLoad
-      if toLoad instanceof Array
+      if isArray(toLoad)
         for element in toLoad
           if _.isString element
             #viewmodel.load collection[element], onlyEvents
@@ -750,7 +752,7 @@ class ViewModel
         for ref of toLoad
           container = {}
           mixshare = toLoad[ref]
-          if mixshare instanceof Array
+          if isArray(mixshare)
             for item in mixshare
 #              loadMixinShare collection[item], container, onlyEvents
               loadToContainer container, viewmodel, collection[item], onlyEvents
@@ -765,7 +767,7 @@ class ViewModel
   loadToContainer = (container, viewmodel, toLoad, onlyEvents) ->
     return if not toLoad
 
-    if toLoad instanceof Array
+    if isArray(toLoad)
       loadToContainer( container, viewmodel, item, onlyEvents ) for item in toLoad
 
     if not onlyEvents
@@ -801,7 +803,7 @@ class ViewModel
 
 
     for hook, vmProp of hooks when toLoad[hook]
-      if toLoad[hook] instanceof Array
+      if isArray(toLoad[hook])
         for item in toLoad[hook]
           viewmodel[vmProp].push item
       else
@@ -1038,7 +1040,7 @@ class ViewModel
     return all
 
   @signalToLoad = (containerName, container) ->
-    if containerName instanceof Array
+    if isArray(containerName)
       _.flatten( (signalContainer(name, container) for name in containerName), true )
     else
       signalContainer containerName, container

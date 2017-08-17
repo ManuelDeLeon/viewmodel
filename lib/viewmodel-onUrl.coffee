@@ -1,3 +1,5 @@
+isArray = (obj) -> obj instanceof Array or Array.isArray(obj)
+
 ((history) ->
   pushState = history.pushState
   replaceState = history.replaceState
@@ -99,7 +101,7 @@ ViewModel.saveUrl = (viewmodel) ->
     vmHash = viewmodel.vmHash()
     url = window.location.href
     savedData = getSavedData() or {}
-    fields = if viewmodel.onUrl() instanceof Array then viewmodel.onUrl() else [viewmodel.onUrl()]
+    fields = if isArray(viewmodel.onUrl()) then viewmodel.onUrl() else [viewmodel.onUrl()]
     data = viewmodel.data(fields)
     savedData[vmHash] = data
     dataString = JSON.stringify savedData
