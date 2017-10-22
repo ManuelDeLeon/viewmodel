@@ -1351,6 +1351,21 @@ describe "ViewModel", ->
       assert.equal val , 2
       return
 
+    it "sets first(second) with event", ->
+      val = null
+      evt = null
+      viewmodel =
+        first: (v, e) -> 
+          val = v
+          evt = e
+        second: 2
+      bindValue = 'first(second)'
+      setVmValue = ViewModel.getVmValueSetter(viewmodel, bindValue)
+      setVmValue(3)
+      assert.equal val , 2
+      assert.equal evt , 3
+      return
+
     it "doesn't do anything if bindValue isn't a string", ->
       val = null
       viewmodel =

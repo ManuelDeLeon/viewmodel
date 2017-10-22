@@ -255,7 +255,7 @@ class ViewModel
 
     _value = undefined
     reset = ->
-      if isArray(initialValue)
+      if !(initialValue instanceof ReactiveArray) && isArray(initialValue)
         _value = new ReactiveArray(initialValue, dependency)
       else
         _value = initialValue
@@ -275,7 +275,7 @@ class ViewModel
             if validator.beforeUpdates.length
               validator.beforeValueUpdate(_value, viewmodel);
 
-            if isArray(value)
+            if !(value instanceof ReactiveArray) && isArray(value)
               _value = new ReactiveArray(value, dependency)
             else
               _value = value
@@ -535,7 +535,7 @@ class ViewModel
     else
       Template.instance()?.data
 
-  getValue = (container, bindValue, viewmodel, funPropReserved) ->
+  getValue = (container, bindValue, viewmodel, funPropReserved, event) ->
     bindValue = bindValue.trim()
     return getPrimitive(bindValue) if isPrimitive(bindValue)
     [token, tokenIndex] = firstToken(bindValue)
@@ -612,6 +612,7 @@ class ViewModel
             return undefined
           else
             if !funPropReserved and _.isFunction(container[name])
+              args.push(event) if event
               value = container[name].apply(container, args)
             else
               value = container[name]
@@ -624,7 +625,7 @@ class ViewModel
       currentView = view
       getValue(viewmodel, optBindValue.toString(), viewmodel)
 
-  setValue = (value, container, bindValue, viewmodel) ->
+  setValue = (value, container, bindValue, viewmodel, event) ->
     bindValue = bindValue.trim()
     return getPrimitive(bindValue) if isPrimitive(bindValue)
     [token, tokenIndex] = firstToken(bindValue)
@@ -636,11 +637,11 @@ class ViewModel
       right = setValue(value, container, bindValue.substring(tokenIndex + token.length), viewmodel)
       retValue = tokens[token.trim()]( left, right )
     else if ~bindValue.indexOf(')', bindValue.length - 1)
-      retValue = getValue(viewmodel, bindValue, viewmodel)
+      retValue = getValue(viewmodel, bindValue, viewmodel, undefined, event)
     else if dotRegex.test(bindValue)
       i = bindValue.search(dotRegex)
       i += 1 if bindValue.charAt(i) isnt '.'
-      newContainer = getValue container, bindValue.substring(0, i), viewmodel
+      newContainer = getValue container, bindValue.substring(0, i), viewmodel, undefined, event
       newBindValue = bindValue.substring(i + 1)
       retValue = setValue value, newContainer, newBindValue, viewmodel
     else
@@ -655,7 +656,7 @@ class ViewModel
     return (->) if not _.isString(bindValue)
     return (value) ->
       currentView = view
-      setValue(value, viewmodel, bindValue, viewmodel)
+      setValue(value, viewmodel, bindValue, viewmodel, value)
 
 
   @parentTemplate = (templateInstance) ->
