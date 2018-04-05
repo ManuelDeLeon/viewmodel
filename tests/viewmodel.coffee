@@ -1366,6 +1366,15 @@ describe "ViewModel", ->
       assert.equal evt , 3
       return
 
+    it "works with sub properties", ->
+      viewmodel =
+        formData: 
+          position: ""
+      bindValue = 'formData.position'
+      getVmValue = ViewModel.getVmValueGetter(viewmodel, bindValue)
+      assert.equal getVmValue() , ""
+      return
+
     it "doesn't do anything if bindValue isn't a string", ->
       val = null
       viewmodel =

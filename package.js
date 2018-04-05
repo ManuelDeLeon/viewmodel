@@ -11,7 +11,7 @@ var CLIENT = "client";
 Package.onUse(function(api) {
   api.use(
     [
-      "coffeescript@1.0.6",
+      "coffeescript@2.0.3_1",
       "ecmascript@0.1.6",
       "blaze@2.1.2",
       "templating@1.1.1",
