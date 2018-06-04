@@ -1,4 +1,8 @@
-﻿## 6.3.2
+﻿## 6.3.3
+
+* Fix arrays returning more than their items.
+
+## 6.3.2
 
 * style binding now removes styles when set to null
 
@@ -44,23 +48,23 @@
 * Prevent using "b" as a view model property. It conflicts with Blaze.
 * Throw error if you try to use a reserved property.
 
-    vmId
-    vmPathToParent
-    vmOnCreated
-    vmOnRendered
-    vmOnDestroyed
-    vmAutorun
-    vmEvents
-    vmInitial
-    vmProp
-    templateInstance
-    templateName
-    parent
-    children
-    child
-    reset
-    data
-    b
+  vmId
+  vmPathToParent
+  vmOnCreated
+  vmOnRendered
+  vmOnDestroyed
+  vmAutorun
+  vmEvents
+  vmInitial
+  vmProp
+  templateInstance
+  templateName
+  parent
+  children
+  child
+  reset
+  data
+  b
 
 ## 5.0.1
 
@@ -139,7 +143,7 @@
 
 ## 4.0.8
 
-* Don't try to bind to an element if its view is destroyed 
+* Don't try to bind to an element if its view is destroyed
 
 ## 4.0.7
 
@@ -155,7 +159,7 @@
 
 ## 4.0.4
 
-* Update docs url (now that *.meteor.com is going down)
+* Update docs url (now that \*.meteor.com is going down)
 
 ## 4.0.3
 
@@ -191,7 +195,7 @@
 
 ## 3.4.7
 
-* Fix hot code push with view models with an id property. 
+* Fix hot code push with view models with an id property.
 
 ## 3.4.6
 
@@ -207,7 +211,7 @@
 
 ## 3.4.3
 
-* Style strings now accept semi-colons. 
+* Style strings now accept semi-colons.
 
 ## 3.4.2
 
@@ -223,7 +227,7 @@
 
 ## 3.3.5
 
-* Simplify override priority. 
+* Simplify override priority.
 
 ## 3.3.4
 
@@ -281,7 +285,7 @@
 
 ## 2.9.2
 
-* Warn if you try to put _id on the url without specifying a vmTag property.
+* Warn if you try to put \_id on the url without specifying a vmTag property.
 
 ## 2.9.1
 
@@ -297,7 +301,7 @@
 
 ## 2.8.0
 
-* You can now add an array of strings and objects to mixin and share properties. 
+* You can now add an array of strings and objects to mixin and share properties.
 
 ## 2.7.8
 
@@ -313,15 +317,15 @@
 
 ## 2.7.5
 
-* Missed underscore 1.0.3 
+* Missed underscore 1.0.3
 
 ## 2.7.4
 
-* Reduce version requirements so it works with Meteor 1.1 
+* Reduce version requirements so it works with Meteor 1.1
 
 ## 2.7.3
 
-* options binding now works with mongo collections 
+* options binding now works with mongo collections
 
 ## 2.7.2
 

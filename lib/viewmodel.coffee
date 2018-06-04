@@ -255,7 +255,7 @@ class ViewModel
 
     _value = undefined
     reset = ->
-      if !(initialValue instanceof ReactiveArray) && isArray(initialValue)
+      if isArray(initialValue)
         _value = new ReactiveArray(initialValue, dependency)
       else
         _value = initialValue
@@ -275,7 +275,7 @@ class ViewModel
             if validator.beforeUpdates.length
               validator.beforeValueUpdate(_value, viewmodel);
 
-            if !(value instanceof ReactiveArray) && isArray(value)
+            if isArray(value)
               _value = new ReactiveArray(value, dependency)
             else
               _value = value
@@ -834,7 +834,7 @@ class ViewModel
     for prop of viewmodel when viewmodel[prop]?.vmProp and (fields.length is 0 or prop in fields)
       viewmodel[prop].depend()
       value = viewmodel[prop].value
-      if value instanceof ReactiveArray
+      if value instanceof Array
         js[prop] = value.array()
       else
         js[prop] = value
