@@ -2,7 +2,7 @@ Package.describe({
   name: "manuel:viewmodel",
   summary:
     "MVVM, two-way data binding, and components for Meteor. Similar to Angular and Knockout.",
-  version: "6.3.7",
+  version: "6.3.8",
   git: "https://github.com/ManuelDeLeon/viewmodel"
 });
 
@@ -59,6 +59,9 @@ Package.onTest(function(api) {
       "sha",
       "reactive-dict",
       "manuel:reactivearray",
+      "cultofcoders:mocha",
+      "practicalmeteor:sinon",
+      "practicalmeteor:chai",
       "manuel:isdev"
     ],
     CLIENT

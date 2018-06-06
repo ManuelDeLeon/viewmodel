@@ -1,6 +1,31 @@
 delay = (f) ->
   setTimeout(f, 0)
 
+describe "bindings - input value nested", ->
+
+  beforeEach ->
+    @viewmodel = new ViewModel
+      formData:
+        position: "X"
+    @element = $("<input></input>")
+    @templateInstance =
+      autorun: Tracker.autorun
+
+  describe "input value nested", ->
+    beforeEach ->
+      bindObject =
+        value: "formData.position"
+      @viewmodel.bind bindObject, @templateInstance, @element, ViewModel.bindings
+
+  it "gets value", ->
+    assert.equal "X", @viewmodel.formData().position
+
+  it "sets value from vm", (done) ->
+    @viewmodel.formData({ position: "Y" })
+    delay =>
+      assert.equal "Y", @viewmodel.formData().position
+      done()
+
 describe "bindings", ->
 
   beforeEach ->

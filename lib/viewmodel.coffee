@@ -605,7 +605,7 @@ class ViewModel
             if viewmodel
               templateName = ViewModel.templateName(viewmodel.templateInstance)
               errorMsg += " This is for template '#{templateName}'."
-            console.error errorMsg
+            throw new Error errorMsg
           else if primitive
             value = getPrimitive(name)
           else if not (`name in container`)
@@ -625,7 +625,7 @@ class ViewModel
       currentView = view
       getValue(viewmodel, optBindValue.toString(), viewmodel)
 
-  setValue = (value, container, bindValue, viewmodel, event) ->
+  setValue = (value, container, bindValue, viewmodel, event, initialProp) ->
     bindValue = bindValue.trim()
     return getPrimitive(bindValue) if isPrimitive(bindValue)
     [token, tokenIndex] = firstToken(bindValue)
@@ -641,14 +641,17 @@ class ViewModel
     else if dotRegex.test(bindValue)
       i = bindValue.search(dotRegex)
       i += 1 if bindValue.charAt(i) isnt '.'
-      newContainer = getValue container, bindValue.substring(0, i), viewmodel, undefined, event
+      newContainer = getValue container, bindValue.substring(0, i), viewmodel, undefined
       newBindValue = bindValue.substring(i + 1)
-      retValue = setValue value, newContainer, newBindValue, viewmodel
+      initProp = initialProp || container[bindValue.substring(0, i)]
+      retValue = setValue value, newContainer, newBindValue, viewmodel, undefined, initProp
     else
       if _.isFunction(container[bindValue]) 
         retValue = container[bindValue](value) 
       else 
         container[bindValue] = value
+        if initialProp && initialProp.changed
+          initialProp.changed();
         retValue = value
     return retValue
 

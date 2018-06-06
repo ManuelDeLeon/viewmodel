@@ -271,7 +271,8 @@ describe "ViewModel", ->
       assert.isFunction actual.changed
     it "reactifies arrays", ->
       actual = ViewModel.makeReactiveProperty([])
-      assert.isTrue actual() instanceof ReactiveArray
+      assert.ok actual().depend
+      assert.isTrue actual() instanceof Array
 
     it "resets arrays", ->
       actual = ViewModel.makeReactiveProperty([1])
@@ -317,7 +318,8 @@ describe "ViewModel", ->
 
       it "reactifies arrays", ->
         actual = ViewModel.makeReactiveProperty(ViewModel.property.array)
-        assert.isTrue actual() instanceof ReactiveArray
+        assert.ok actual().depend
+        assert.isTrue actual() instanceof Array
 
       it "resets arrays", ->
         actual = ViewModel.makeReactiveProperty(ViewModel.property.array.default([1]))
